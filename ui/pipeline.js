@@ -169,6 +169,9 @@ export async function runAnalysis() {
     const url    = `${BACKEND_URL}/api/analyze?sector=${encodeURIComponent(sector)}`;
     const source = new EventSource(url);
 
+    /** True once `pipeline_done` or JSON `error` is handled — avoids treating normal SSE close as failure. */
+    let streamSettled = false;
+
     function finish() {
       source.close();
       clearInterval(metaInterval);
@@ -217,6 +220,7 @@ export async function runAnalysis() {
         }
 
         case 'pipeline_done': {
+          streamSettled = true;
           clearSmoothProgress();
           clearIdleTick();
           panel.setProgress(100, 'Pipeline complete. Generating report…');
@@ -229,6 +233,7 @@ export async function runAnalysis() {
         }
 
         case 'error': {
+          streamSettled = true;
           clearSmoothProgress();
           clearInitProgress();
           clearInitStatusTimer();
@@ -241,6 +246,9 @@ export async function runAnalysis() {
     };
 
     source.onerror = () => {
+      // End of stream after success still closes the connection and fires `error` in many browsers.
+      if (streamSettled) return;
+      streamSettled = true;
       clearSmoothProgress();
       clearInitProgress();
       clearInitStatusTimer();
