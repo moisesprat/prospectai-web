@@ -685,6 +685,52 @@ h1 em {
   color: #BA6830;
 }
 
+/* Stock recommendation cards (live report renderer) */
+.stock-card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+.stock-card-header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.stock-ticker {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--amber);
+}
+
+.stock-rec {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+
+.stock-score {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-left: auto;
+}
+
+.subsection-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin: 16px 0 6px;
+}
+
 /* ============================================================
    FOOTER
    ============================================================ */

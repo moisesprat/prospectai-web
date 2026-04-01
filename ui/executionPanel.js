@@ -136,6 +136,14 @@ export function completeAgent(i) {
   cardEls[i].className = 'agent-card done';
 }
 
+/**
+ * Updates the active agent's output with live step text (no typing animation).
+ * Called repeatedly as agent_step SSE events arrive.
+ */
+export function setAgentStep(i, text) {
+  outputEls[i].innerHTML = text + '<span class="typing-cursor"></span>';
+}
+
 /** Animates the final output text for agent i. */
 export async function typeAgentOutput(i, text) {
   await typeOutput(outputEls[i], text);

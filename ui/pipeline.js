@@ -1,30 +1,50 @@
 /* ============================================================
    PIPELINE ORCHESTRATOR
-   Controls the full analysis run — currently simulated locally.
+   Connects to the prospectai-backend Modal endpoint via SSE
+   and drives the execution panel + report from live events.
 
-   TO CONNECT BACKEND:
-   Replace the simulation block (marked below) with a fetch()
-   call to the Modal endpoint. Stream agent outputs via SSE or
-   poll the response object for per-agent updates.
+   SSE event types consumed:
+     agent_start   — {agent_index, agent_name}
+     agent_step    — {agent_index, step_type, thought, tool?, tool_input?}
+     agent_done    — {agent_index, summary}
+     pipeline_done — {report}
+     error         — {message}
    ============================================================ */
 
-import { delay } from './utils.js';
 import { getSelectedSector, getIsRunning, setIsRunning } from './state.js';
-import { AGENT_SCRIPTS, DEFAULT_SCRIPT } from './data.js';
 import * as panel from './executionPanel.js';
 import * as report from './report.js';
 import { disableControls, enableControls } from './sectorSelector.js';
+import { renderReport } from './reportRenderer.js';
 
-const TOTAL_DURATION   = 55_000; // ms — used for progress bar pacing
-const AGENT_TIMINGS    = [800, 13_000, 13_000, 13_000]; // stagger between agents
-const AGENT_ACTIVE_MS  = 10_000; // how long each agent "thinks" before typing output
+// ── Backend URL ─────────────────────────────────────────────
+// In local dev (npm run dev) Vite proxies /api → Modal, so BACKEND_URL is ''.
+// In production (static files, no Vite), import.meta.env is undefined and the
+// fallback full URL is used directly.
+const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL
+  ?? 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
+
+// Progress % milestones keyed by agent index
+const PROGRESS_ON_START = [2,  27, 52, 77];
+const PROGRESS_ON_DONE  = [25, 50, 75, 99];
+
+/**
+ * Formats a step event payload into a single display string.
+ * AgentAction (step_type="action"): show thought + tool name.
+ * AgentFinish (step_type="finish"): show thought only.
+ */
+function formatStep(event) {
+  const parts = [];
+  if (event.thought)    parts.push(event.thought);
+  if (event.tool)       parts.push(`→ ${event.tool}`);
+  return parts.join('\n') || '…';
+}
 
 export async function runAnalysis() {
   const sector = getSelectedSector();
   if (!sector || getIsRunning()) return;
   setIsRunning(true);
 
-  // Reset + show execution UI
   panel.reset();
   panel.show(sector);
   report.hide();
@@ -35,35 +55,69 @@ export async function runAnalysis() {
   panel.updateMeta(startTime);
   const metaInterval = setInterval(() => panel.updateMeta(startTime), 1_000);
 
-  // ── SIMULATION BLOCK ────────────────────────────────────────
-  // Replace everything between these comments with real API calls.
-  // The panel.* and report.* methods below are the stable interface
-  // your backend integration should drive.
+  await new Promise((resolve) => {
+    const url    = `${BACKEND_URL}/api/analyze?sector=${encodeURIComponent(sector)}`;
+    const source = new EventSource(url);
 
-  const scripts = AGENT_SCRIPTS[sector] ?? DEFAULT_SCRIPT;
+    function finish() {
+      source.close();
+      clearInterval(metaInterval);
+      setIsRunning(false);
+      enableControls('Run Again');
+      resolve();
+    }
 
-  const progressStart = Date.now();
-  const progressInterval = setInterval(() => {
-    const pct = Math.min(95, ((Date.now() - progressStart) / TOTAL_DURATION) * 100);
-    panel.setProgress(pct, panel.getStatusMessage(pct));
-  }, 500);
+    source.onmessage = (e) => {
+      let event;
+      try { event = JSON.parse(e.data); } catch { return; }
 
-  for (let i = 0; i < 4; i++) {
-    await delay(AGENT_TIMINGS[i]);
-    panel.activateAgent(i, scripts[i].active);
-    await delay(AGENT_ACTIVE_MS);
-    await panel.typeAgentOutput(i, scripts[i].done);
-    panel.completeAgent(i);
-  }
+      switch (event.type) {
 
-  clearInterval(progressInterval);
-  panel.setProgress(100, 'Pipeline complete. Generating report...');
-  await delay(1_200);
+        case 'agent_start': {
+          const idx = event.agent_index;
+          const pct = PROGRESS_ON_START[idx] ?? 0;
+          panel.activateAgent(idx, 'Initializing…');
+          panel.setProgress(pct, panel.getStatusMessage(pct));
+          break;
+        }
 
-  report.show(sector, startTime);
-  // ── END SIMULATION BLOCK ────────────────────────────────────
+        case 'agent_step': {
+          panel.setAgentStep(event.agent_index, formatStep(event));
+          break;
+        }
 
-  clearInterval(metaInterval);
-  setIsRunning(false);
-  enableControls('Run Again');
+        case 'agent_done': {
+          const idx = event.agent_index;
+          const pct = PROGRESS_ON_DONE[idx] ?? 99;
+          panel.setProgress(pct, panel.getStatusMessage(pct));
+          // Type the summary, then mark card green — fire-and-forget so the
+          // next agent_start event can activate the next card in parallel.
+          panel.typeAgentOutput(idx, event.summary || 'Analysis complete.')
+               .then(() => panel.completeAgent(idx));
+          break;
+        }
+
+        case 'pipeline_done': {
+          panel.setProgress(100, 'Pipeline complete. Generating report…');
+          const html = renderReport(event.report);
+          setTimeout(() => {
+            report.show(sector, startTime, html);
+            finish();
+          }, 800);
+          break;
+        }
+
+        case 'error': {
+          panel.setProgress(0, `Error: ${event.message}`);
+          finish();
+          break;
+        }
+      }
+    };
+
+    source.onerror = () => {
+      panel.setProgress(0, 'Connection failed. Check backend and try again.');
+      finish();
+    };
+  });
 }
