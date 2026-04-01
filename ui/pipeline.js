@@ -28,6 +28,107 @@ const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL
 const PROGRESS_ON_START = [2,  27, 52, 77];
 const PROGRESS_ON_DONE  = [25, 50, 75, 99];
 
+/** Status line: "Initializing…" only for this long, then "Processing…". */
+const INIT_STATUS_MS = 5_500;
+/** Rough duration per agent segment so the bar keeps moving (~2 min). */
+const SEGMENT_DURATION_MS = 120_000;
+/** After the linear segment, creep slowly toward the done milestone until `agent_done`. */
+const OVERTIME_MS_PER_PCT = 25_000;
+
+const STATUS_PROCESSING = 'Processing…';
+const STATUS_INIT = 'Initializing agents…';
+
+let smoothRaf = null;
+let initRaf = null;
+let initStatusTimer = null;
+/** Slow creep while waiting for the first SSE event after init. */
+let idleTick = null;
+
+const IDLE_CREEP_MAX = 7.5;
+const IDLE_CREEP_STEP = 0.14;
+const IDLE_CREEP_MS = 1_600;
+
+function clearSmoothProgress() {
+  if (smoothRaf !== null) {
+    cancelAnimationFrame(smoothRaf);
+    smoothRaf = null;
+  }
+}
+
+function clearInitProgress() {
+  if (initRaf !== null) {
+    cancelAnimationFrame(initRaf);
+    initRaf = null;
+  }
+}
+
+function clearInitStatusTimer() {
+  if (initStatusTimer !== null) {
+    clearTimeout(initStatusTimer);
+    initStatusTimer = null;
+  }
+}
+
+function clearIdleTick() {
+  if (idleTick !== null) {
+    clearInterval(idleTick);
+    idleTick = null;
+  }
+}
+
+function startIdleCreep() {
+  clearIdleTick();
+  idleTick = setInterval(() => {
+    const p = panel.getProgressFill();
+    if (p >= IDLE_CREEP_MAX) return;
+    panel.setProgressFill(Math.min(IDLE_CREEP_MAX, p + IDLE_CREEP_STEP));
+  }, IDLE_CREEP_MS);
+}
+
+/** Smooth bar from PROGRESS_ON_START[idx] toward (almost) PROGRESS_ON_DONE[idx]. */
+function startAgentSegmentProgress(agentIndex) {
+  clearSmoothProgress();
+  const from = PROGRESS_ON_START[agentIndex] ?? 0;
+  const done = PROGRESS_ON_DONE[agentIndex] ?? 99;
+  const softEnd = Math.max(from, done - 0.55);
+  const creepCap = done - 0.1;
+  const start = performance.now();
+
+  function frame(now) {
+    const elapsed = now - start;
+    const span = softEnd - from;
+    let pct;
+    if (elapsed < SEGMENT_DURATION_MS) {
+      pct = from + (elapsed / SEGMENT_DURATION_MS) * span;
+    } else {
+      const over = elapsed - SEGMENT_DURATION_MS;
+      pct = Math.min(creepCap, softEnd + over / OVERTIME_MS_PER_PCT);
+    }
+    panel.setProgressFill(pct);
+    smoothRaf = requestAnimationFrame(frame);
+  }
+  smoothRaf = requestAnimationFrame(frame);
+}
+
+/** Gentle movement on the bar during the initial status window (0 → ~2%). */
+function startBootProgress() {
+  clearInitProgress();
+  const start = performance.now();
+  const endPct = 2;
+
+  function frame(now) {
+    const elapsed = now - start;
+    if (elapsed >= INIT_STATUS_MS) {
+      panel.setProgressFill(endPct);
+      initRaf = null;
+      return;
+    }
+    panel.setProgressFill((elapsed / INIT_STATUS_MS) * endPct);
+    initRaf = requestAnimationFrame(frame);
+  }
+  initRaf = requestAnimationFrame(frame);
+}
+
 /**
  * Formats a step event payload into a single display string.
  * AgentAction (step_type="action"): show thought + tool name.
@@ -55,6 +156,15 @@ export async function runAnalysis() {
   panel.updateMeta(startTime);
   const metaInterval = setInterval(() => panel.updateMeta(startTime), 1_000);
 
+  let pastInitStatus = false;
+  panel.setProgress(0, STATUS_INIT);
+  startBootProgress();
+  initStatusTimer = setTimeout(() => {
+    pastInitStatus = true;
+    panel.setStatusLine(STATUS_PROCESSING);
+    startIdleCreep();
+  }, INIT_STATUS_MS);
+
   await new Promise((resolve) => {
     const url    = `${BACKEND_URL}/api/analyze?sector=${encodeURIComponent(sector)}`;
     const source = new EventSource(url);
@@ -62,6 +172,10 @@ export async function runAnalysis() {
     function finish() {
       source.close();
       clearInterval(metaInterval);
+      clearSmoothProgress();
+      clearInitProgress();
+      clearInitStatusTimer();
+      clearIdleTick();
       setIsRunning(false);
       enableControls('Run Again');
       resolve();
@@ -75,9 +189,13 @@ export async function runAnalysis() {
 
         case 'agent_start': {
           const idx = event.agent_index;
-          const pct = PROGRESS_ON_START[idx] ?? 0;
-          panel.activateAgent(idx, 'Initializing…');
-          panel.setProgress(pct, panel.getStatusMessage(pct));
+          clearInitProgress();
+          clearIdleTick();
+          panel.activateAgent(idx, STATUS_PROCESSING);
+          startAgentSegmentProgress(idx);
+          if (!pastInitStatus) {
+            panel.setStatusLine(STATUS_INIT);
+          }
           break;
         }
 
@@ -89,7 +207,8 @@ export async function runAnalysis() {
         case 'agent_done': {
           const idx = event.agent_index;
           const pct = PROGRESS_ON_DONE[idx] ?? 99;
-          panel.setProgress(pct, panel.getStatusMessage(pct));
+          clearSmoothProgress();
+          panel.setProgress(pct, pastInitStatus ? STATUS_PROCESSING : STATUS_INIT);
           // Type the summary, then mark card green — fire-and-forget so the
           // next agent_start event can activate the next card in parallel.
           panel.typeAgentOutput(idx, event.summary || 'Analysis complete.')
@@ -98,6 +217,8 @@ export async function runAnalysis() {
         }
 
         case 'pipeline_done': {
+          clearSmoothProgress();
+          clearIdleTick();
           panel.setProgress(100, 'Pipeline complete. Generating report…');
           const html = renderReport(event.report);
           setTimeout(() => {
@@ -108,6 +229,10 @@ export async function runAnalysis() {
         }
 
         case 'error': {
+          clearSmoothProgress();
+          clearInitProgress();
+          clearInitStatusTimer();
+          clearIdleTick();
           panel.setProgress(0, `Error: ${event.message}`);
           finish();
           break;
@@ -116,6 +241,10 @@ export async function runAnalysis() {
     };
 
     source.onerror = () => {
+      clearSmoothProgress();
+      clearInitProgress();
+      clearInitStatusTimer();
+      clearIdleTick();
       panel.setProgress(0, 'Connection failed. Check backend and try again.');
       finish();
     };

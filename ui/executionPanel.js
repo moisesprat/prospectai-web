@@ -104,9 +104,24 @@ export function reset() {
 }
 
 export function setProgress(pct, status) {
+  setProgressFill(pct);
+  if (status) statusLineEl.textContent = status;
+}
+
+/** Updates only the bar and % label (status line unchanged). Used for smooth in-flight progress. */
+export function setProgressFill(pct) {
   progressFillEl.style.width = pct + '%';
   progressPctEl.textContent  = Math.round(pct) + '%';
-  if (status) statusLineEl.textContent = status;
+}
+
+export function getProgressFill() {
+  const t = progressPctEl.textContent.replace('%', '').trim();
+  const n = parseFloat(t);
+  return Number.isFinite(n) ? n : 0;
+}
+
+export function setStatusLine(text) {
+  statusLineEl.textContent = text;
 }
 
 export function getStatusMessage(pct) {
