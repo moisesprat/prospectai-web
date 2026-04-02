@@ -16,6 +16,7 @@ import * as panel from './executionPanel.js';
 import * as report from './report.js';
 import { disableControls, enableControls } from './sectorSelector.js';
 import { renderReport } from './reportRenderer.js';
+import { refresh as refreshAnalytics } from './analytics.js';
 
 // ── Backend URL ─────────────────────────────────────────────
 // In local dev (npm run dev) Vite proxies /api → Modal, so BACKEND_URL is ''.
@@ -38,11 +39,58 @@ const OVERTIME_MS_PER_PCT = 25_000;
 const STATUS_PROCESSING = 'Processing…';
 const STATUS_INIT = 'Initializing agents…';
 
+/** Cycling status messages shown while an agent is running between step callbacks. */
+const AGENT_IDLE_MESSAGES = [
+  // 0 — Market Analyst
+  (sector) => [
+    `Scanning Reddit posts for ${sector} sector activity…`,
+    `Crawling r/investing, r/stocks, r/wallstreetbets for mentions…`,
+    `Falling back to SerperDev web search for additional signals…`,
+    `Scoring sentiment polarity for each ticker found…`,
+    `Counting mention frequency per stock…`,
+    `Ranking candidates by mention count and sentiment score…`,
+    `Identifying top 5 ${sector} stocks by community signals…`,
+  ],
+  // 1 — Technical Analyst
+  (sector) => [
+    `Fetching OHLCV price history for ${sector} candidates via yfinance…`,
+    `Computing RSI — measuring overbought / oversold conditions…`,
+    `Computing MACD — detecting momentum crossovers…`,
+    `Calculating Bollinger Bands — measuring volatility envelopes…`,
+    `Computing ATR — assessing average true range…`,
+    `Running 13+ indicators across all candidate tickers…`,
+    `Scoring momentum and trend strength per stock…`,
+  ],
+  // 2 — Fundamental Analyst
+  (sector) => [
+    `Pulling income statements and balance sheets via yfinance…`,
+    `Analysing P/E, P/B, and EV/EBITDA valuation multiples…`,
+    `Reviewing quarterly revenue growth rates…`,
+    `Evaluating net profit margins and operating leverage…`,
+    `Assessing debt-to-equity and interest coverage ratios…`,
+    `Computing free cash flow yield for each ${sector} stock…`,
+    `Scoring fundamental quality and competitive positioning…`,
+  ],
+  // 3 — Investor Strategist
+  (sector) => [
+    `Synthesizing sentiment signals from Market Analyst…`,
+    `Integrating momentum scores from Technical Analyst…`,
+    `Weighting fundamental quality from Fundamental Analyst…`,
+    `Computing composite scores (30% sentiment · 40% momentum · 30% fundamentals)…`,
+    `Determining portfolio allocation percentages…`,
+    `Formulating entry zones and stop-loss levels…`,
+    `Generating final ${sector} investment recommendations…`,
+  ],
+];
+
 let smoothRaf = null;
 let initRaf = null;
 let initStatusTimer = null;
 /** Slow creep while waiting for the first SSE event after init. */
 let idleTick = null;
+/** Cycling contextual messages while an agent is running between step callbacks. */
+let idleMessageTimer = null;
+let idleMessageIdx = 0;
 
 const IDLE_CREEP_MAX = 7.5;
 const IDLE_CREEP_STEP = 0.14;
@@ -74,6 +122,56 @@ function clearIdleTick() {
     clearInterval(idleTick);
     idleTick = null;
   }
+}
+
+function clearIdleMessages() {
+  if (idleMessageTimer !== null) {
+    clearTimeout(idleMessageTimer);
+    idleMessageTimer = null;
+  }
+}
+
+/**
+ * Starts cycling per-agent contextual messages into the card output area.
+ * Messages rotate every 3.5 s until clearIdleMessages() is called.
+ */
+function startIdleMessages(agentIndex) {
+  clearIdleMessages();
+  const sector = getSelectedSector() || 'selected';
+  const msgs = AGENT_IDLE_MESSAGES[agentIndex]?.(sector) ?? [];
+  if (!msgs.length) return;
+  idleMessageIdx = 0;
+
+  function showNext() {
+    panel.setAgentStep(agentIndex, msgs[idleMessageIdx]);
+    idleMessageIdx = (idleMessageIdx + 1) % msgs.length;
+    idleMessageTimer = setTimeout(showNext, 3_500);
+  }
+  showNext();
+}
+
+/**
+ * Reveals a long text in progressively larger chunks so it doesn't appear
+ * all at once. Each chunk appends ~180 chars, pausing 700 ms between chunks.
+ * Calls onDone when the full text is showing.
+ */
+function showTextInParts(agentIndex, text, onDone) {
+  const CHUNK = 180;
+  const clean = text.replace(/```[a-z]*/gi, '').trim();
+  let shown = 0;
+
+  function next() {
+    shown = Math.min(shown + CHUNK, clean.length);
+    const partial = clean.slice(0, shown);
+    const more    = shown < clean.length;
+    panel.setAgentStep(agentIndex, `Finalizing output…\n${partial}${more ? '…' : ''}`);
+    if (more) {
+      idleMessageTimer = setTimeout(next, 700);
+    } else {
+      onDone?.();
+    }
+  }
+  next();
 }
 
 function startIdleCreep() {
@@ -130,15 +228,13 @@ function startBootProgress() {
 }
 
 /**
- * Formats a step event payload into a single display string.
- * AgentAction (step_type="action"): show thought + tool name.
- * AgentFinish (step_type="finish"): show thought only.
+ * Formats an AgentAction step into a display string (tool calls only).
+ * Finish and unknown steps are handled inline in the event handler.
  */
-function formatStep(event) {
-  const parts = [];
-  if (event.thought)    parts.push(event.thought);
-  if (event.tool)       parts.push(`→ ${event.tool}`);
-  return parts.join('\n') || '…';
+function formatActionStep(event) {
+  const tool    = event.tool    ? `Calling tool: ${event.tool}` : '';
+  const thought = event.thought || '';
+  return [thought, tool].filter(Boolean).join('\n') || 'Running…';
 }
 
 export async function runAnalysis() {
@@ -179,6 +275,7 @@ export async function runAnalysis() {
       clearInitProgress();
       clearInitStatusTimer();
       clearIdleTick();
+      clearIdleMessages();
       setIsRunning(false);
       enableControls('Run Again');
       resolve();
@@ -196,6 +293,7 @@ export async function runAnalysis() {
           clearIdleTick();
           panel.activateAgent(idx, STATUS_PROCESSING);
           startAgentSegmentProgress(idx);
+          startIdleMessages(idx);
           if (!pastInitStatus) {
             panel.setStatusLine(STATUS_INIT);
           }
@@ -203,18 +301,44 @@ export async function runAnalysis() {
         }
 
         case 'agent_step': {
-          panel.setAgentStep(event.agent_index, formatStep(event));
+          const idx = event.agent_index;
+          if (event.step_type === 'action') {
+            // Tool call — show it, pause idle cycle briefly then resume
+            clearIdleMessages();
+            panel.setAgentStep(idx, formatActionStep(event));
+            idleMessageTimer = setTimeout(() => startIdleMessages(idx), 4_000);
+          } else if (event.step_type === 'finish') {
+            // Agent wrapping up — stop idle cycle and stream the output in parts
+            clearIdleMessages();
+            if (event.preview) {
+              showTextInParts(idx, event.preview, null);
+            } else {
+              panel.setAgentStep(idx, event.thought || 'Finalizing output…');
+            }
+          } else {
+            // Unknown fallback — show raw briefly then resume idle
+            clearIdleMessages();
+            panel.setAgentStep(idx, event.raw ? event.raw.slice(0, 200) : '…');
+            idleMessageTimer = setTimeout(() => startIdleMessages(idx), 4_000);
+          }
           break;
         }
 
         case 'agent_done': {
           const idx = event.agent_index;
           const pct = PROGRESS_ON_DONE[idx] ?? 99;
+          clearIdleMessages();
           clearSmoothProgress();
           panel.setProgress(pct, pastInitStatus ? STATUS_PROCESSING : STATUS_INIT);
-          // Type the summary, then mark card green — fire-and-forget so the
+          // Build display: handoff message + optional content preview
+          let display = event.summary || 'Analysis complete.';
+          if (event.preview) {
+            const peek = event.preview.replace(/```[a-z]*/gi, '').trim().slice(0, 300);
+            display += `\n\n${peek}${event.preview.length > 300 ? '…' : ''}`;
+          }
+          // Type the output, then mark card green — fire-and-forget so the
           // next agent_start event can activate the next card in parallel.
-          panel.typeAgentOutput(idx, event.summary || 'Analysis complete.')
+          panel.typeAgentOutput(idx, display)
                .then(() => panel.completeAgent(idx));
           break;
         }
@@ -224,6 +348,7 @@ export async function runAnalysis() {
           clearSmoothProgress();
           clearIdleTick();
           panel.setProgress(100, 'Pipeline complete. Generating report…');
+          refreshAnalytics();
           const html = renderReport(event.report);
           setTimeout(() => {
             report.show(sector, startTime, html);
@@ -253,6 +378,7 @@ export async function runAnalysis() {
       clearInitProgress();
       clearInitStatusTimer();
       clearIdleTick();
+      clearIdleMessages();
       panel.setProgress(0, 'Connection failed. Check backend and try again.');
       finish();
     };
