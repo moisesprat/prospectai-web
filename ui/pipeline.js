@@ -340,7 +340,7 @@ export async function runAnalysis() {
           // Type the output, then mark card green — fire-and-forget so the
           // next agent_start event can activate the next card in parallel.
           panel.typeAgentOutput(idx, display)
-               .then(() => panel.completeAgent(idx));
+               .then(() => panel.completeAgent(idx, event.tokens_est));
           break;
         }
 
