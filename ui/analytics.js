@@ -8,7 +8,7 @@
 const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL
   ?? 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
 
-let countEl, leadingEl, widgetEl;
+let countEl, leadingEl, versionEl, widgetEl;
 
 /** Renders the analytics widget into `container` and fetches initial data. */
 export function render(container) {
@@ -20,26 +20,35 @@ export function render(container) {
     <span class="analytics-label">analyses completed</span>
     <span class="analytics-sep" aria-hidden="true">·</span>
     <span class="analytics-leading">—</span>
+    <span class="analytics-sep" aria-hidden="true">·</span>
+    <span class="analytics-version">v—</span>
   `;
   countEl   = widgetEl.querySelector('.analytics-count');
   leadingEl = widgetEl.querySelector('.analytics-leading');
+  versionEl = widgetEl.querySelector('.analytics-version');
   container.appendChild(widgetEl);
   refresh();
 }
 
-/** Re-fetches analytics from the backend and updates the widget. */
+/** Re-fetches analytics and version from the backend and updates the widget. */
 export async function refresh() {
   try {
-    const res  = await fetch(`${BACKEND_URL}/api/analytics`);
-    if (!res.ok) return;
-    const data = await res.json();
+    const [analyticsRes, versionRes] = await Promise.all([
+      fetch(`${BACKEND_URL}/api/analytics`),
+      fetch(`${BACKEND_URL}/api/version`),
+    ]);
 
-    countEl.textContent = (data.total ?? 0).toLocaleString();
+    if (analyticsRes.ok) {
+      const data = await analyticsRes.json();
+      countEl.textContent = (data.total ?? 0).toLocaleString();
+      leadingEl.textContent = data.leading_sector
+        ? `${data.leading_sector} leads`
+        : 'No runs yet';
+    }
 
-    if (data.leading_sector) {
-      leadingEl.textContent = `${data.leading_sector} leads`;
-    } else {
-      leadingEl.textContent = 'No runs yet';
+    if (versionRes.ok) {
+      const data = await versionRes.json();
+      versionEl.textContent = data.version ? `v${data.version}` : 'v—';
     }
 
     // Brief highlight animation on update

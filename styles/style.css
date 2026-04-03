@@ -238,6 +238,11 @@ h1 em {
   color: var(--text);
 }
 
+.analytics-version {
+  color: var(--text-dim);
+  letter-spacing: .02em;
+}
+
 /* ============================================================
    SECTOR SELECTOR
    ============================================================ */
