@@ -18,6 +18,7 @@ let panel;
 let execSectorEl, execMetaEl, progressFillEl, progressPctEl, statusLineEl;
 const cardEls   = new Array(4);
 const outputEls = new Array(4);
+const modelEls  = new Array(4);
 
 /**
  * Renders the execution panel into `container`.
@@ -71,11 +72,13 @@ export function render(container) {
         <span class="agent-status-dot"></span>
       </div>
       <div class="agent-name">${name}</div>
+      <div class="agent-model-tag"></div>
       <div class="agent-role">${role}</div>
       <div class="agent-output">Waiting to execute...</div>`;
     grid.appendChild(card);
     cardEls[i]   = card;
     outputEls[i] = card.querySelector('.agent-output');
+    modelEls[i]  = card.querySelector('.agent-model-tag');
   });
 
   panel.append(header, progressWrap, sectionLabel, grid);
@@ -99,8 +102,13 @@ export function reset() {
   cardEls.forEach((card, i) => {
     card.className = 'agent-card pending';
     outputEls[i].innerHTML = 'Waiting to execute...';
+    modelEls[i].textContent = '';
   });
   setProgress(0, 'Initializing agents...');
+}
+
+export function setAgentModel(i, model) {
+  modelEls[i].textContent = model;
 }
 
 export function setProgress(pct, status) {

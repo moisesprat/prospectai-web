@@ -543,6 +543,19 @@ h1 em {
   color: var(--green);
 }
 
+.agent-model-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--amber-dim);
+  letter-spacing: .04em;
+  margin-bottom: 6px;
+  min-height: 13px;
+}
+
+.agent-card.done .agent-model-tag {
+  color: var(--green-dim);
+}
+
 .agent-role {
   font-family: var(--mono);
   font-size: 10px;
