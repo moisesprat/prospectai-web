@@ -4,14 +4,12 @@
    ============================================================ */
 
 function saEvent(name, metadata) {
-  if (typeof window === 'undefined') return;
-  // Both the queue stub and the real SA script are functions — wait for either.
-  if (typeof window.sa_event !== 'function') return;
+  if (typeof sa_event === 'undefined') return;
   try {
     if (metadata != null && typeof metadata === 'object' && Object.keys(metadata).length > 0) {
-      window.sa_event(name, metadata);
+      sa_event(name, metadata);
     } else {
-      window.sa_event(name);
+      sa_event(name);
     }
   } catch (e) {
     // Never let analytics errors surface to the user.
