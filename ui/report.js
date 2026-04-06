@@ -6,6 +6,7 @@
    ============================================================ */
 
 import { REPORT_TEMPLATES } from './data.js';
+import { trackExportPdf } from './saEvents.js';
 
 // DOM references — populated by render()
 let section, reportSectorEl, reportMetaEl, reportBodyEl, downloadBtn;
@@ -15,6 +16,7 @@ let section, reportSectorEl, reportMetaEl, reportBodyEl, downloadBtn;
  * Adds a body class so @media print CSS can hide everything else.
  */
 function triggerPDF() {
+  trackExportPdf();
   downloadBtn.disabled = true;
   downloadBtn.querySelector('.btn-label').textContent = 'Preparing…';
   downloadBtn.querySelector('.btn-icon').style.display = 'none';

@@ -4,7 +4,8 @@
    ============================================================ */
 
 import { SECTORS } from './data.js';
-import { getIsRunning, setSelectedSector } from './state.js';
+import { trackRunAnalysis, trackSectorSelect } from './saEvents.js';
+import { getIsRunning, getSelectedSector, setSelectedSector } from './state.js';
 
 let runBtn;
 let sectorBtns = [];
@@ -40,7 +41,10 @@ export function render(container, { onRun }) {
   runBtn.id = 'runBtn';
   runBtn.disabled = true;
   runBtn.innerHTML = '<span>Run Analysis</span><span>-&gt;</span>';
-  runBtn.addEventListener('click', onRun);
+  runBtn.addEventListener('click', () => {
+    trackRunAnalysis(getSelectedSector());
+    onRun();
+  });
 
   section.append(label, grid, runBtn);
   container.appendChild(section);
@@ -51,6 +55,7 @@ function _handleSelect(btn, section) {
   section.querySelectorAll('.sector-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   setSelectedSector(btn.dataset.sector);
+  trackSectorSelect(btn.dataset.sector);
   runBtn.disabled = false;
 }
 
