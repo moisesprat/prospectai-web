@@ -4,11 +4,17 @@
    ============================================================ */
 
 function saEvent(name, metadata) {
-  if (typeof window === 'undefined' || typeof window.sa_event !== 'function') return;
-  if (metadata != null && typeof metadata === 'object') {
-    window.sa_event(name, metadata);
-  } else {
-    window.sa_event(name);
+  if (typeof window === 'undefined') return;
+  // Both the queue stub and the real SA script are functions — wait for either.
+  if (typeof window.sa_event !== 'function') return;
+  try {
+    if (metadata != null && typeof metadata === 'object' && Object.keys(metadata).length > 0) {
+      window.sa_event(name, metadata);
+    } else {
+      window.sa_event(name);
+    }
+  } catch (e) {
+    // Never let analytics errors surface to the user.
   }
 }
 
@@ -81,9 +87,8 @@ function bindOutboundTrackedLink(anchor, eventName) {
     const fallback = window.setTimeout(finish, OUTBOUND_FALLBACK_MS);
 
     try {
-      // Second arg must be metadata (object); callback is the third arg — same as
-      // https://scripts.simpleanalyticscdn.com/inline-events.js (not sa_event(name, cb)).
-      window.sa_event(eventName, {}, () => {
+      // SA's latest.js supports sa_event(name, callback) — callback is the second arg.
+      window.sa_event(eventName, () => {
         window.clearTimeout(fallback);
         finish();
       });
