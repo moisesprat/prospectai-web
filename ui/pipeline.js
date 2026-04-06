@@ -12,6 +12,7 @@
    ============================================================ */
 
 import { getSelectedSector, getIsRunning, setIsRunning } from './state.js';
+import { trackAnalysisComplete, trackAnalysisError } from './saEvents.js';
 import * as panel from './executionPanel.js';
 import * as report from './report.js';
 import { disableControls, enableControls } from './sectorSelector.js';
@@ -349,6 +350,7 @@ export async function runAnalysis() {
           clearSmoothProgress();
           clearIdleTick();
           panel.setProgress(100, 'Pipeline complete. Generating report…');
+          trackAnalysisComplete(sector, (Date.now() - startTime) / 1000);
           refreshAnalytics();
           const html = renderReport(event.report);
           setTimeout(() => {
@@ -364,6 +366,7 @@ export async function runAnalysis() {
           clearInitProgress();
           clearInitStatusTimer();
           clearIdleTick();
+          trackAnalysisError(sector, event.message);
           panel.setProgress(0, `Error: ${event.message}`);
           finish();
           break;
@@ -380,6 +383,7 @@ export async function runAnalysis() {
       clearInitStatusTimer();
       clearIdleTick();
       clearIdleMessages();
+      trackAnalysisError(sector, 'connection_failed');
       panel.setProgress(0, 'Connection failed. Check backend and try again.');
       finish();
     };

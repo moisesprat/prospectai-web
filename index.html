@@ -51,9 +51,10 @@
     </div>
   </footer>
 
+  <!-- Defer + order before app.js so sa_event is installed before modules run -->
+  <script defer data-collect-dnt="true" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
   <script type="module" src="app.js"></script>
-  <!-- 100% privacy-first analytics -->
-  <script data-collect-dnt="true" async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+  <!-- 100% privacy-first analytics (script above) -->
   <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif?collect-dnt=true" alt="" referrerpolicy="no-referrer-when-downgrade"/></noscript>
 </body>
 </html>

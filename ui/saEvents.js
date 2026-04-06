@@ -29,23 +29,78 @@ export function trackExportPdf() {
   saEvent('export_pdf');
 }
 
-/** Built by / author site link (header or footer). */
-export function trackBuiltByClick() {
-  saEvent('link_built_by');
+/** Pipeline completed successfully. durationSec is wall-clock seconds. */
+export function trackAnalysisComplete(sector, durationSec) {
+  const meta = {};
+  if (sector) meta.sector = String(sector);
+  if (durationSec != null) meta.duration_sec = Math.round(durationSec);
+  saEvent('analysis_complete', meta);
 }
 
-/** GitHub repo link (header or footer). */
-export function trackGithubClick() {
-  saEvent('link_github');
+/** Pipeline errored or connection failed. */
+export function trackAnalysisError(sector, reason) {
+  const meta = {};
+  if (sector) meta.sector = String(sector);
+  if (reason) meta.reason = String(reason).slice(0, 120);
+  saEvent('analysis_error', meta);
+}
+
+const OUTBOUND_FALLBACK_MS = 2000;
+
+/**
+ * Outbound / new-tab links: fire `sa_event` with a callback so the event request
+ * can finish (see https://docs.simpleanalytics.com/events — "Event callbacks").
+ * Without this, beacons can be dropped when the browser follows the link immediately.
+ */
+function bindOutboundTrackedLink(anchor, eventName) {
+  anchor.addEventListener('click', (e) => {
+    const href = anchor.href;
+    if (!href) return;
+    e.preventDefault();
+
+    const openLink = () => {
+      if (anchor.target === '_blank') {
+        window.open(href, '_blank', 'noopener,noreferrer');
+      } else {
+        window.location.assign(href);
+      }
+    };
+
+    if (typeof window.sa_event !== 'function') {
+      openLink();
+      return;
+    }
+
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      openLink();
+    };
+
+    const fallback = window.setTimeout(finish, OUTBOUND_FALLBACK_MS);
+
+    try {
+      // Second arg must be metadata (object); callback is the third arg — same as
+      // https://scripts.simpleanalyticscdn.com/inline-events.js (not sa_event(name, cb)).
+      window.sa_event(eventName, {}, () => {
+        window.clearTimeout(fallback);
+        finish();
+      });
+    } catch {
+      window.clearTimeout(fallback);
+      finish();
+    }
+  });
 }
 
 /** Attach `link_built_by` / `link_github` to anchors with data-sa="built-by" | "github". */
 export function initOutboundLinkTracking() {
   document.querySelectorAll('a[data-sa="built-by"]').forEach((el) => {
-    el.addEventListener('click', () => trackBuiltByClick());
+    bindOutboundTrackedLink(el, 'link_built_by');
   });
   document.querySelectorAll('a[data-sa="github"]').forEach((el) => {
-    el.addEventListener('click', () => trackGithubClick());
+    bindOutboundTrackedLink(el, 'link_github');
   });
 }
 
