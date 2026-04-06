@@ -51,64 +51,6 @@ export function trackAnalysisError(sector, reason) {
   saEvent('analysis_error', meta);
 }
 
-const OUTBOUND_FALLBACK_MS = 2000;
-
-/**
- * Outbound / new-tab links: fire `sa_event` with a callback so the event request
- * can finish (see https://docs.simpleanalytics.com/events — "Event callbacks").
- * Without this, beacons can be dropped when the browser follows the link immediately.
- */
-function bindOutboundTrackedLink(anchor, eventName) {
-  anchor.addEventListener('click', (e) => {
-    const href = anchor.href;
-    if (!href) return;
-    e.preventDefault();
-
-    const openLink = () => {
-      if (anchor.target === '_blank') {
-        window.open(href, '_blank', 'noopener,noreferrer');
-      } else {
-        window.location.assign(href);
-      }
-    };
-
-    if (typeof window.sa_event !== 'function') {
-      openLink();
-      return;
-    }
-
-    let done = false;
-    const finish = () => {
-      if (done) return;
-      done = true;
-      openLink();
-    };
-
-    const fallback = window.setTimeout(finish, OUTBOUND_FALLBACK_MS);
-
-    try {
-      // SA's latest.js supports sa_event(name, callback) — callback is the second arg.
-      window.sa_event(eventName, () => {
-        window.clearTimeout(fallback);
-        finish();
-      });
-    } catch {
-      window.clearTimeout(fallback);
-      finish();
-    }
-  });
-}
-
-/** Attach `link_built_by` / `link_github` to anchors with data-sa="built-by" | "github". */
-export function initOutboundLinkTracking() {
-  document.querySelectorAll('a[data-sa="built-by"]').forEach((el) => {
-    bindOutboundTrackedLink(el, 'link_built_by');
-  });
-  document.querySelectorAll('a[data-sa="github"]').forEach((el) => {
-    bindOutboundTrackedLink(el, 'link_github');
-  });
-}
-
 /** Fires at 25%, 50%, 75%, and 100% of max vertical scroll depth (once each). */
 export function initScrollDepthTracking() {
   const milestones = [25, 50, 75, 100];
