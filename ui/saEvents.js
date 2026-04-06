@@ -29,6 +29,26 @@ export function trackExportPdf() {
   saEvent('export_pdf');
 }
 
+/** Built by / author site link (header or footer). */
+export function trackBuiltByClick() {
+  saEvent('link_built_by');
+}
+
+/** GitHub repo link (header or footer). */
+export function trackGithubClick() {
+  saEvent('link_github');
+}
+
+/** Attach `link_built_by` / `link_github` to anchors with data-sa="built-by" | "github". */
+export function initOutboundLinkTracking() {
+  document.querySelectorAll('a[data-sa="built-by"]').forEach((el) => {
+    el.addEventListener('click', () => trackBuiltByClick());
+  });
+  document.querySelectorAll('a[data-sa="github"]').forEach((el) => {
+    el.addEventListener('click', () => trackGithubClick());
+  });
+}
+
 /** Fires at 25%, 50%, 75%, and 100% of max vertical scroll depth (once each). */
 export function initScrollDepthTracking() {
   const milestones = [25, 50, 75, 100];
