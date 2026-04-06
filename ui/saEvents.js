@@ -4,12 +4,12 @@
    ============================================================ */
 
 function saEvent(name, metadata) {
-  if (typeof sa_event === 'undefined') return;
+  if (typeof window.sa_event !== 'function') return;
   try {
     if (metadata != null && typeof metadata === 'object' && Object.keys(metadata).length > 0) {
-      sa_event(name, metadata);
+      window.sa_event(name, metadata);
     } else {
-      sa_event(name);
+      window.sa_event(name);
     }
   } catch (e) {
     // Never let analytics errors surface to the user.
