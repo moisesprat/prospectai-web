@@ -4,6 +4,7 @@
    ============================================================ */
 
 function saEvent(name, metadata) {
+  console.log('[SA] saEvent called:', name, '| window.sa_event type:', typeof window.sa_event);
   if (typeof window.sa_event !== 'function') return;
   try {
     if (metadata != null && typeof metadata === 'object' && Object.keys(metadata).length > 0) {
@@ -11,8 +12,9 @@ function saEvent(name, metadata) {
     } else {
       window.sa_event(name);
     }
+    console.log('[SA] fired OK:', name);
   } catch (e) {
-    // Never let analytics errors surface to the user.
+    console.error('[SA] error:', e);
   }
 }
 
