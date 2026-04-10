@@ -354,7 +354,7 @@ export async function runAnalysis() {
           refreshAnalytics();
           const html = renderReport(event.report);
           setTimeout(() => {
-            report.show(sector, startTime, html);
+            report.show(sector, startTime, html, event.report);
             finish();
           }, 800);
           break;

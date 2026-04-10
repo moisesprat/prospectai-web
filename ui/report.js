@@ -7,13 +7,15 @@
 
 import { REPORT_TEMPLATES } from './data.js';
 import { trackExportPdf } from './saEvents.js';
+import { exportToPdf } from './pdfExporter.js';
 
 // DOM references — populated by render()
 let section, reportSectorEl, reportMetaEl, reportBodyEl, downloadBtn;
+let _reportData = null;
 
 /**
- * Triggers the browser print dialog scoped to the report only.
- * Adds a body class so @media print CSS can hide everything else.
+ * Triggers a direct PDF download using html2pdf.js.
+ * Falls back to window.print() if structured data is unavailable.
  */
 function triggerPDF() {
   trackExportPdf();
@@ -22,18 +24,13 @@ function triggerPDF() {
   downloadBtn.querySelector('.btn-icon').style.display = 'none';
   downloadBtn.querySelector('.btn-spinner').style.display = 'inline-block';
 
-  // Small delay lets the browser paint the "Preparing…" state before
-  // the print dialog blocks the thread.
-  setTimeout(() => {
-    document.body.classList.add('is-printing');
-    window.print();
-    document.body.classList.remove('is-printing');
-
-    downloadBtn.disabled = false;
-    downloadBtn.querySelector('.btn-label').textContent = 'Download PDF';
-    downloadBtn.querySelector('.btn-icon').style.display = '';
-    downloadBtn.querySelector('.btn-spinner').style.display = 'none';
-  }, 80);
+  exportToPdf(_reportData, reportSectorEl.textContent, reportMetaEl.textContent)
+    .finally(() => {
+      downloadBtn.disabled = false;
+      downloadBtn.querySelector('.btn-label').textContent = 'Download PDF';
+      downloadBtn.querySelector('.btn-icon').style.display = '';
+      downloadBtn.querySelector('.btn-spinner').style.display = 'none';
+    });
 }
 
 /**
@@ -81,7 +78,8 @@ export function render(container) {
  * @param {number} startTime  — pipeline start timestamp (ms)
  * @param {string} [html]     — optional HTML override (for backend response)
  */
-export function show(sector, startTime, html) {
+export function show(sector, startTime, html, data) {
+  _reportData = data ?? null;
   const elapsed = Math.round((Date.now() - startTime) / 1000);
   const m = Math.floor(elapsed / 60);
   const s = elapsed % 60;

@@ -51,6 +51,10 @@ function positionCard(pos) {
     ? `<div class="m-value up">${Number(pos.allocation_pct).toFixed(1)}%</div>`
     : `<div class="m-value" style="color:var(--text-dim)">—</div>`;
 
+  const currentPriceHtml = pos.current_price != null
+    ? `<div class="m-value">$${Number(pos.current_price).toFixed(2)}</div>`
+    : `<div class="m-value" style="color:var(--text-dim)">—</div>`;
+
   const ts = pos.trade_setup;
   const entryZone  = ts ? `$${fmt(ts.entry_zone_low)} – $${fmt(ts.entry_zone_high)}` : (pos.entry_zone ?? '—');
   const stopLoss   = ts ? `$${fmt(ts.stop_loss)}`   : (pos.stop_loss   != null ? `$${fmt(pos.stop_loss)}` : '—');
@@ -68,8 +72,9 @@ function positionCard(pos) {
         <span class="stock-rec" style="color:${actionColor}">${esc(action)}</span>
         ${reviewFreq ? `<span class="stock-score">${reviewFreq}</span>` : ''}
       </div>
-      <div class="metric-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="metric-row" style="grid-template-columns:repeat(5,1fr)">
         <div class="metric-box"><div class="m-label">Allocation</div>${allocHtml}</div>
+        <div class="metric-box"><div class="m-label">Current Price</div>${currentPriceHtml}</div>
         <div class="metric-box"><div class="m-label">Entry Zone</div><div class="m-value">${esc(entryZone)}</div></div>
         <div class="metric-box"><div class="m-label">Stop Loss</div><div class="m-value">${esc(stopLoss)}</div></div>
         <div class="metric-box"><div class="m-label">Take Profit</div><div class="m-value">${esc(takeProfit)}</div></div>
