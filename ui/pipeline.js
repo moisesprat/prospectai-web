@@ -27,8 +27,8 @@ const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL
   ?? 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
 
 // Progress % milestones keyed by agent index
-const PROGRESS_ON_START = [2,  27, 52, 77];
-const PROGRESS_ON_DONE  = [25, 50, 75, 99];
+const PROGRESS_ON_START = [2,  18, 35, 52, 68, 84];
+const PROGRESS_ON_DONE  = [16, 33, 50, 66, 82, 99];
 
 /** Status line: "Initializing…" only for this long, then "Processing…". */
 const INIT_STATUS_MS = 5_500;
@@ -72,15 +72,30 @@ const AGENT_IDLE_MESSAGES = [
     `Computing free cash flow yield for each ${sector} stock…`,
     `Scoring fundamental quality and competitive positioning…`,
   ],
-  // 3 — Investor Strategist
+  // 3 — Draft Strategist
   (sector) => [
-    `Synthesizing sentiment signals from Market Analyst…`,
-    `Integrating momentum scores from Technical Analyst…`,
-    `Weighting fundamental quality from Fundamental Analyst…`,
+    `Synthesizing sentiment, technical, and fundamental signals…`,
     `Computing composite scores (30% sentiment · 40% momentum · 30% fundamentals)…`,
-    `Determining portfolio allocation percentages…`,
-    `Formulating entry zones and stop-loss levels…`,
-    `Generating final ${sector} investment recommendations…`,
+    `Applying 40% single-position cap and iterative redistribution…`,
+    `Determining entry zones and stop-loss levels for ${sector} positions…`,
+    `Drafting initial portfolio allocation — pending critic review…`,
+  ],
+  // 4 — Critic
+  (sector) => [
+    `Cross-referencing draft positions against raw technical indicators…`,
+    `Checking RSI and Stochastic for overbought signals ignored in draft…`,
+    `Verifying allocation percentages match composite score ranking…`,
+    `Auditing rationales for claims not backed by specific data…`,
+    `Scanning for entry zone violations and concentration breaches…`,
+    `Issuing revision directives for flagged positions…`,
+  ],
+  // 5 — Final Strategist
+  (sector) => [
+    `Reading Critic's revision directives…`,
+    `Addressing CRITICAL and MAJOR critique findings…`,
+    `Revising affected positions with corrected actions and rationales…`,
+    `Re-running portfolio allocator with revised position decisions…`,
+    `Finalizing ${sector} investment report…`,
   ],
 ];
 
@@ -338,10 +353,9 @@ export async function runAnalysis() {
             const peek = event.preview.replace(/```[a-z]*/gi, '').trim().slice(0, 300);
             display += `\n\n${peek}${event.preview.length > 300 ? '…' : ''}`;
           }
-          // Type the output, then mark card green — fire-and-forget so the
-          // next agent_start event can activate the next card in parallel.
-          panel.typeAgentOutput(idx, display)
-               .then(() => panel.completeAgent(idx, event.tokens_est));
+          // Go green immediately when agent finishes — don't wait for typing animation.
+          panel.completeAgent(idx, event.tokens_est);
+          panel.typeAgentOutput(idx, display); // fire-and-forget
           break;
         }
 

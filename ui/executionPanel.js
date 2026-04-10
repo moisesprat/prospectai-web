@@ -10,16 +10,18 @@ const AGENT_DEFS = [
   { id: 'AGENT-01', name: 'Market Analyst',      role: 'macro_trends - sentiment - reddit_signals' },
   { id: 'AGENT-02', name: 'Technical Analyst',   role: 'price_action - indicators - momentum' },
   { id: 'AGENT-03', name: 'Fundamental Analyst', role: 'earnings - valuation - balance_sheet' },
-  { id: 'AGENT-04', name: 'Investor Strategist', role: 'portfolio_strategy - risk - recommendations' },
+  { id: 'AGENT-04', name: 'Draft Strategist',    role: 'portfolio_draft - initial_allocation - entry_zones' },
+  { id: 'AGENT-05', name: 'Critic',              role: 'adversarial_review - inconsistency_detection - challenge' },
+  { id: 'AGENT-06', name: 'Final Strategist',    role: 'revised_portfolio - critic_response - final_report' },
 ];
 
 // DOM references — populated by render()
 let panel;
 let execSectorEl, execMetaEl, progressFillEl, progressPctEl, statusLineEl;
-const cardEls   = new Array(4);
-const outputEls = new Array(4);
-const modelEls  = new Array(4);
-const tokenEls  = new Array(4);
+const cardEls   = new Array(6);
+const outputEls = new Array(6);
+const modelEls  = new Array(6);
+const tokenEls  = new Array(6);
 
 /**
  * Renders the execution panel into `container`.
@@ -138,12 +140,12 @@ export function setStatusLine(text) {
 }
 
 export function getStatusMessage(pct) {
-  if (pct < 15) return 'Initializing Market Analyst agent...';
-  if (pct < 30) return 'Market Analyst processing macro and sentiment data...';
-  if (pct < 45) return 'Technical Analyst computing price indicators...';
-  if (pct < 60) return 'Fundamental Analyst evaluating earnings and valuations...';
-  if (pct < 75) return 'Investor Strategist synthesizing all signals...';
-  if (pct < 90) return 'Constructing portfolio recommendations...';
+  if (pct < 18) return 'Market Analyst scanning sentiment and community signals...';
+  if (pct < 35) return 'Technical Analyst computing price indicators...';
+  if (pct < 52) return 'Fundamental Analyst evaluating earnings and valuations...';
+  if (pct < 66) return 'Draft Strategist constructing initial portfolio...';
+  if (pct < 82) return 'Critic reviewing draft for inconsistencies...';
+  if (pct < 95) return 'Final Strategist revising portfolio based on critique...';
   return 'Compiling final intelligence report...';
 }
 
