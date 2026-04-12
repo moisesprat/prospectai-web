@@ -1,5 +1,5 @@
 /* ============================================================
-   REPORT RENDERER  (ProspectAI v1.2.x schema)
+   REPORT RENDERER  (ProspectAI v1.3.x schema)
    Converts the pipeline_done JSON payload from the backend
    into the HTML string that report.show() injects into
    .report-body. All values are HTML-escaped before insertion.
@@ -9,10 +9,12 @@
      sector: string,
      positions: [{
        ticker, action, allocation_pct,
+       current_price?,
        trade_setup?: { direction, entry_zone_low, entry_zone_high, stop_loss, take_profit },
+       scaled_entry_setups?: [immediate_tranche, pullback_tranche],
        rationale, monitoring_triggers: string[], review_frequency
      }],
-     total_allocated_pct, cash_reserve_pct,
+     deployed_pct, reserved_pct, total_allocated_pct, cash_reserve_pct,
      overall_strategy, risk_level
    }
    ============================================================ */
@@ -27,11 +29,9 @@ const DISCLAIMER = `
 
 const ACTION_COLOR = {
   'LONG-BUY':       'var(--green)',
-  'BUY':            'var(--green)',
-  'HOLD':           'var(--amber)',
+  'SCALED-ENTRY':   'var(--green)',
   'WAIT-FOR-ENTRY': 'var(--amber)',
-  'SHORT-SELL':     'var(--red)',
-  'REDUCE':         'var(--red)',
+  'MONITOR':        'var(--amber)',
   'AVOID':          'var(--red)',
 };
 
@@ -41,6 +41,47 @@ function esc(val) {
 
 function fmt(num) {
   return num != null ? Number(num).toFixed(2) : '—';
+}
+
+/**
+ * Renders the two-tranche section for SCALED-ENTRY positions.
+ * Tranche 1 (IMMEDIATE · LIVE) is shown at full opacity.
+ * Tranche 2 (PULLBACK · PENDING) is dimmed to signal it has not fired.
+ */
+function scaledEntrySetupHtml(setups) {
+  if (!setups || setups.length < 2) return '';
+  const [imm, plb] = setups;
+  return `
+    <strong class="subsection-label">Tranche 1 — IMMEDIATE · LIVE</strong>
+    <div class="metric-row" style="grid-template-columns:repeat(3,1fr)">
+      <div class="metric-box">
+        <div class="m-label">Entry Price</div>
+        <div class="m-value">$${fmt(imm.entry_zone_low)}</div>
+      </div>
+      <div class="metric-box">
+        <div class="m-label">Stop Loss</div>
+        <div class="m-value">$${fmt(imm.stop_loss)}</div>
+      </div>
+      <div class="metric-box">
+        <div class="m-label">Take Profit</div>
+        <div class="m-value">$${fmt(imm.take_profit)}</div>
+      </div>
+    </div>
+    <strong class="subsection-label" style="color:var(--text-dim)">Tranche 2 — PULLBACK · PENDING</strong>
+    <div class="metric-row" style="grid-template-columns:repeat(3,1fr);opacity:0.7">
+      <div class="metric-box">
+        <div class="m-label">Entry Zone</div>
+        <div class="m-value">$${fmt(plb.entry_zone_low)} – $${fmt(plb.entry_zone_high)}</div>
+      </div>
+      <div class="metric-box">
+        <div class="m-label">Stop Loss</div>
+        <div class="m-value">$${fmt(plb.stop_loss)}</div>
+      </div>
+      <div class="metric-box">
+        <div class="m-label">Take Profit</div>
+        <div class="m-value">$${fmt(plb.take_profit)}</div>
+      </div>
+    </div>`;
 }
 
 function positionCard(pos) {
@@ -80,6 +121,7 @@ function positionCard(pos) {
         <div class="metric-box"><div class="m-label">Take Profit</div><div class="m-value">${esc(takeProfit)}</div></div>
       </div>
       ${pos.rationale ? `<p>${esc(pos.rationale)}</p>` : ''}
+      ${pos.scaled_entry_setups ? scaledEntrySetupHtml(pos.scaled_entry_setups) : ''}
       ${triggers ? `<strong class="subsection-label">Monitoring Triggers</strong><ul>${triggers}</ul>` : ''}
       ${risks    ? `<strong class="subsection-label">Key Risks</strong><ul>${risks}</ul>`             : ''}
     </div>`;
@@ -111,14 +153,42 @@ export function renderReport(data) {
   const positions = data.positions ?? data.stock_recommendations ?? [];
   const posHtml   = positions.map(positionCard).join('');
 
+  const deployedPct     = data.deployed_pct      ?? null;
+  const reservedPct     = data.reserved_pct      ?? null;
   const totalAllocated  = data.total_allocated_pct ?? null;
   const cashReserve     = data.cash_reserve_pct    ?? null;
   const strategy        = data.overall_strategy
                        ?? data.portfolio_summary?.portfolio_rationale
                        ?? '';
 
-  const activeCount  = positions.filter(p => !['AVOID', 'HOLD'].includes(p.action ?? p.recommendation)).length;
+  const activeCount  = positions.filter(p => !['AVOID', 'MONITOR'].includes(p.action ?? p.recommendation)).length;
   const totalCount   = positions.length;
+
+  // Build capital breakdown row — show deployed/reserved if available, else fall back to total/cash
+  const hasThreeBuckets = deployedPct != null && reservedPct != null;
+  const capitalMetrics  = hasThreeBuckets
+    ? `
+      <div class="metric-box">
+        <div class="m-label">Deployed</div>
+        <div class="m-value ${deployedPct > 0 ? 'up' : ''}">${deployedPct.toFixed(1)}%</div>
+      </div>
+      <div class="metric-box">
+        <div class="m-label">Reserved</div>
+        <div class="m-value ${reservedPct > 0 ? 'up' : ''}">${reservedPct.toFixed(1)}%</div>
+      </div>
+      <div class="metric-box">
+        <div class="m-label">Cash Buffer</div>
+        <div class="m-value">${cashReserve != null ? cashReserve.toFixed(1) + '%' : '—'}</div>
+      </div>`
+    : `
+      <div class="metric-box">
+        <div class="m-label">Allocated</div>
+        <div class="m-value ${totalAllocated > 0 ? 'up' : ''}">${totalAllocated != null ? totalAllocated.toFixed(1) + '%' : '—'}</div>
+      </div>
+      <div class="metric-box">
+        <div class="m-label">Cash Reserve</div>
+        <div class="m-value">${cashReserve != null ? cashReserve.toFixed(1) + '%' : '—'}</div>
+      </div>`;
 
   return `
     <h2>Executive Summary</h2>
@@ -131,14 +201,7 @@ export function renderReport(data) {
         <div class="m-label">Positions</div>
         <div class="m-value up">${activeCount} / ${totalCount}</div>
       </div>
-      <div class="metric-box">
-        <div class="m-label">Allocated</div>
-        <div class="m-value ${totalAllocated > 0 ? 'up' : ''}">${totalAllocated != null ? totalAllocated.toFixed(1) + '%' : '—'}</div>
-      </div>
-      <div class="metric-box">
-        <div class="m-label">Cash Reserve</div>
-        <div class="m-value">${cashReserve != null ? cashReserve.toFixed(1) + '%' : '—'}</div>
-      </div>
+      ${capitalMetrics}
     </div>
     ${strategy ? `<p>${esc(strategy)}</p>` : ''}
 
