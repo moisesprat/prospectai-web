@@ -308,6 +308,7 @@ export async function runAnalysis() {
           clearInitProgress();
           clearIdleTick();
           panel.activateAgent(idx, STATUS_PROCESSING);
+          panel.setTaskProgress(idx);
           if (event.model) panel.setAgentModel(idx, event.model);
           startAgentSegmentProgress(idx);
           startIdleMessages(idx);

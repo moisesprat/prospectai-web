@@ -139,6 +139,12 @@ export function setStatusLine(text) {
   statusLineEl.textContent = text;
 }
 
+export function setTaskProgress(i) {
+  const def = AGENT_DEFS[i];
+  if (!def) return;
+  setStatusLine(`Task ${i + 1} of 6  ·  ${def.name}`);
+}
+
 export function getStatusMessage(pct) {
   if (pct < 18) return 'Market Analyst scanning sentiment and community signals...';
   if (pct < 35) return 'Technical Analyst computing price indicators...';

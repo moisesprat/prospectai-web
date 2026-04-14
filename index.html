@@ -79,9 +79,11 @@
     <header>
       <div class="header-tag">Multi-Agent Investment Research System</div>
       <h1>Prospect<em>AI</em></h1>
-      <p class="header-sub">A CrewAI-powered pipeline of four specialized AI agents -- Market
-      Analyst, Technical Analyst, Fundamental Analyst, and Investor Strategist -- working
-      sequentially to generate sector intelligence reports.</p>
+      <p class="header-sub">Select a market sector and hit Run. Six specialized AI agents
+      analyze macro conditions, price action, and fundamentals — then an adversarial critic
+      stress-tests the conclusions before a final strategist delivers the report.
+      The result: a structured portfolio brief with a sector signal, stock picks,
+      and allocation rationale.</p>
       <div class="byline">
         <span>Built by</span>
         <a href="https://moisesprat.dev" target="_blank">Moises Prat</a>
@@ -89,6 +91,32 @@
         <a href="https://github.com/moisesprat/ProspectAI" target="_blank">github.com/moisesprat/ProspectAI</a>
       </div>
     </header>
+
+    <div class="sample-preview">
+      <div class="sp-label">Example output</div>
+      <div class="sp-grid">
+        <div class="sp-row">
+          <div class="sp-key">Sector</div>
+          <div class="sp-val">Technology (XLK)</div>
+        </div>
+        <div class="sp-row">
+          <div class="sp-key">Signal</div>
+          <div class="sp-val"><span class="sp-signal">▲ OVERWEIGHT</span></div>
+        </div>
+        <div class="sp-row">
+          <div class="sp-key">Top picks</div>
+          <div class="sp-val">
+            <span class="sp-ticker">NVDA</span>
+            <span class="sp-ticker">MSFT</span>
+            <span class="sp-ticker">GOOG</span>
+          </div>
+        </div>
+        <div class="sp-row">
+          <div class="sp-key">Report covers</div>
+          <div class="sp-val sp-muted">Macro sentiment · Price action &amp; indicators · Earnings &amp; valuation · Portfolio allocation · Adversarial review</div>
+        </div>
+      </div>
+    </div>
 
     <main id="app"></main>
   </div>

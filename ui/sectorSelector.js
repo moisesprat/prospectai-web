@@ -7,6 +7,15 @@ import { SECTORS } from './data.js';
 import { trackRunAnalysis, trackSectorSelect } from './saEvents.js';
 import { getIsRunning, getSelectedSector, setSelectedSector } from './state.js';
 
+const DIAGRAM_NODES = [
+  { id: 'AGENT-01', name: 'Market Analyst',      role: 'macro · sentiment',         critic: false },
+  { id: 'AGENT-02', name: 'Technical Analyst',   role: 'price action · momentum',   critic: false },
+  { id: 'AGENT-03', name: 'Fundamental Analyst', role: 'earnings · valuation',      critic: false },
+  { id: 'AGENT-04', name: 'Draft Strategist',    role: 'portfolio · allocation',    critic: false },
+  { id: 'AGENT-05', name: 'Critic',              role: 'adversarial · review',      critic: true  },
+  { id: 'AGENT-06', name: 'Final Strategist',    role: 'revised portfolio · final', critic: false },
+];
+
 let runBtn;
 let sectorBtns = [];
 
@@ -36,6 +45,12 @@ export function render(container, { onRun }) {
     sectorBtns.push(btn);
   });
 
+  const diagram = _buildDiagram();
+
+  const timeHint = document.createElement('div');
+  timeHint.className = 'time-hint';
+  timeHint.textContent = '6 agent tasks  ·  ~5 min to results';
+
   runBtn = document.createElement('button');
   runBtn.className = 'run-btn';
   runBtn.id = 'runBtn';
@@ -46,8 +61,33 @@ export function render(container, { onRun }) {
     onRun();
   });
 
-  section.append(label, grid, runBtn);
+  section.append(label, grid, diagram, timeHint, runBtn);
   container.appendChild(section);
+}
+
+function _buildDiagram() {
+  const wrap = document.createElement('div');
+  wrap.className = 'pipeline-diagram';
+
+  DIAGRAM_NODES.forEach((node, i) => {
+    if (i > 0) {
+      const connector = document.createElement('div');
+      connector.className = 'pipeline-connector';
+      connector.textContent = '→';
+      wrap.appendChild(connector);
+    }
+
+    const el = document.createElement('div');
+    el.className = node.critic ? 'pipeline-node pipeline-node--critic' : 'pipeline-node';
+    el.innerHTML = `
+      <div class="pipeline-node-id">${node.id}</div>
+      <div class="pipeline-node-name">${node.name}</div>
+      ${node.critic ? '<div class="pipeline-node-badge">Adversarial Quality Gate</div>' : ''}
+      <div class="pipeline-node-role">${node.role}</div>`;
+    wrap.appendChild(el);
+  });
+
+  return wrap;
 }
 
 function _handleSelect(btn, section) {
