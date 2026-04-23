@@ -169,6 +169,17 @@ h1 em {
   font-style: italic;
 }
 
+.header-version {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--amber-dim);
+  letter-spacing: .08em;
+  border: 1px solid var(--border2);
+  padding: 2px 8px;
+  margin-bottom: 16px;
+}
+
 .header-sub {
   font-family: var(--sans);
   font-size: 15px;
@@ -326,10 +337,6 @@ h1 em {
   color: var(--text);
 }
 
-.analytics-version {
-  color: var(--text-dim);
-  letter-spacing: .02em;
-}
 
 /* ============================================================
    SECTOR SELECTOR

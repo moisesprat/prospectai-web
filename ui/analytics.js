@@ -20,12 +20,10 @@ export function render(container) {
     <span class="analytics-label">analyses completed</span>
     <span class="analytics-sep" aria-hidden="true">·</span>
     <span class="analytics-leading">—</span>
-    <span class="analytics-sep" aria-hidden="true">·</span>
-    <span class="analytics-version">v—</span>
   `;
   countEl   = widgetEl.querySelector('.analytics-count');
   leadingEl = widgetEl.querySelector('.analytics-leading');
-  versionEl = widgetEl.querySelector('.analytics-version');
+  versionEl = document.getElementById('version-tag');
   container.appendChild(widgetEl);
   refresh();
 }
