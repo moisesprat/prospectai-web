@@ -737,17 +737,6 @@ h1 em {
   color: var(--green-dim);
 }
 
-.agent-tokens {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--text-dim);
-  margin-top: 8px;
-  letter-spacing: .03em;
-}
-
-.agent-card.done .agent-tokens {
-  color: var(--green-dim);
-}
 
 .agent-role {
   font-family: var(--mono);
