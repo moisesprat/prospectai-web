@@ -8,6 +8,7 @@
 import { REPORT_TEMPLATES } from './data.js';
 import { trackExportPdf } from './saEvents.js';
 import { exportToPdf } from './pdfExporter.js';
+import { renderMetrics } from './reportRenderer.js';
 
 // DOM references — populated by render()
 let section, reportSectorEl, reportMetaEl, reportBodyEl, downloadBtn;
@@ -106,8 +107,10 @@ export function render(container) {
  * @param {string} sector
  * @param {number} startTime  — pipeline start timestamp (ms)
  * @param {string} [html]     — optional HTML override (for backend response)
+ * @param {object} [data]     — structured report data
+ * @param {object} [metrics]  — execution_metrics from backend
  */
-export function show(sector, startTime, html, data) {
+export function show(sector, startTime, html, data, metrics) {
   _reportData = data ?? null;
   const elapsed = Math.round((Date.now() - startTime) / 1000);
   const m = Math.floor(elapsed / 60);
@@ -116,9 +119,13 @@ export function show(sector, startTime, html, data) {
   reportSectorEl.textContent = sector;
   reportMetaEl.innerHTML =
     'Generated: ' + new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC' +
-    `<br>Duration: ${m}m ${s}s  |  Agents: 4  |  Engine: CrewAI`;
+    `<br>Duration: ${m}m ${s}s  |  Agents: 6  |  Engine: CrewAI`;
 
   reportBodyEl.innerHTML = html ?? REPORT_TEMPLATES[sector] ?? REPORT_TEMPLATES.default;
+
+  if (metrics) {
+    reportBodyEl.insertAdjacentHTML('beforeend', renderMetrics(metrics));
+  }
 
   section.classList.add('visible', 'fade-in');
   setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);

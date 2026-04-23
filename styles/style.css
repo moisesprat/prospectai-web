@@ -1089,6 +1089,61 @@ h1 em {
 }
 
 /* ============================================================
+   EXECUTION METRICS TABLE (appended to report-body)
+   ============================================================ */
+.metrics-table-wrap {
+  overflow-x: auto;
+  margin: 8px 0 20px;
+}
+
+.metrics-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.metrics-table th,
+.metrics-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.metrics-table thead th {
+  color: var(--text-dim);
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-align: right;
+  background: var(--surface);
+  font-weight: 500;
+}
+
+.metrics-table th.mt-name,
+.metrics-table td.mt-name {
+  text-align: left;
+}
+
+.metrics-table td {
+  color: var(--text);
+}
+
+.metrics-table td.mt-num {
+  text-align: right;
+  color: var(--text-dim);
+}
+
+.metrics-table td.mt-total {
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.metrics-table tbody tr:hover {
+  background: rgba(255, 255, 255, .02);
+}
+
+/* ============================================================
    PRINT / PDF EXPORT
    Activated by body.is-printing (set by report.js triggerPDF).
    ============================================================ */

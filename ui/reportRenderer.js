@@ -19,6 +19,113 @@
    }
    ============================================================ */
 
+const PHASE_LABELS = {
+  market_analysis:      'Market Analysis',
+  technical_analysis:   'Technical Analysis',
+  fundamental_analysis: 'Fundamental Analysis',
+  draft_strategy:       'Draft Strategy',
+  critique_review:      'Critic Review',
+  final_strategy:       'Final Strategy',
+};
+
+function fmtElapsed(sec) {
+  if (sec == null) return '—';
+  return sec >= 60
+    ? `${Math.floor(sec / 60)}m ${(sec % 60).toFixed(1)}s`
+    : `${Number(sec).toFixed(1)}s`;
+}
+
+function fmtTok(n) {
+  return n ? Number(n).toLocaleString() : '—';
+}
+
+/**
+ * Renders an execution metrics block as an HTML string.
+ * @param {object} metrics — the `execution_metrics` dict from the backend
+ * @returns {string} HTML safe to append to .report-body
+ */
+export function renderMetrics(metrics) {
+  if (!metrics) return '';
+
+  const elapsed  = metrics.pipeline_elapsed_sec;
+  const totals   = metrics.totals   ?? {};
+  const phases   = metrics.phases   ?? [];
+  const byModel  = metrics.by_model ?? {};
+
+  const phaseRows = phases.map(p => `
+    <tr>
+      <td class="mt-name">${esc(PHASE_LABELS[p.name] ?? p.name)}</td>
+      <td class="mt-num">${fmtElapsed(p.elapsed_sec)}</td>
+      <td class="mt-num">${fmtTok(p.input_tokens)}</td>
+      <td class="mt-num">${fmtTok(p.output_tokens)}</td>
+      <td class="mt-num">${fmtTok(p.cached_tokens)}</td>
+      <td class="mt-num mt-total">${fmtTok(p.total_tokens)}</td>
+    </tr>`).join('');
+
+  const modelEntries = Object.entries(byModel);
+  const modelRows = modelEntries.map(([model, t]) => `
+    <tr>
+      <td class="mt-name">${esc(model)}</td>
+      <td class="mt-num">${fmtTok(t.input_tokens)}</td>
+      <td class="mt-num">${fmtTok(t.output_tokens)}</td>
+      <td class="mt-num">${fmtTok(t.cached_tokens)}</td>
+      <td class="mt-num mt-total">${fmtTok(t.total_tokens)}</td>
+    </tr>`).join('');
+
+  return `
+    <h2>Execution Metrics</h2>
+    <div class="metric-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="metric-box">
+        <div class="m-label">Pipeline Time</div>
+        <div class="m-value">${fmtElapsed(elapsed)}</div>
+      </div>
+      <div class="metric-box">
+        <div class="m-label">Total Tokens</div>
+        <div class="m-value up">${fmtTok(totals.total_tokens)}</div>
+      </div>
+      <div class="metric-box">
+        <div class="m-label">Input Tokens</div>
+        <div class="m-value">${fmtTok(totals.input_tokens)}</div>
+      </div>
+      <div class="metric-box">
+        <div class="m-label">Cached Tokens</div>
+        <div class="m-value" style="color:var(--green)">${fmtTok(totals.cached_tokens)}</div>
+      </div>
+    </div>
+    <strong class="subsection-label">Phase Breakdown</strong>
+    <div class="metrics-table-wrap">
+      <table class="metrics-table">
+        <thead>
+          <tr>
+            <th class="mt-name">Phase</th>
+            <th class="mt-num">Elapsed</th>
+            <th class="mt-num">Input</th>
+            <th class="mt-num">Output</th>
+            <th class="mt-num">Cached</th>
+            <th class="mt-num mt-total">Total</th>
+          </tr>
+        </thead>
+        <tbody>${phaseRows}</tbody>
+      </table>
+    </div>
+    ${modelEntries.length ? `
+    <strong class="subsection-label">By Model</strong>
+    <div class="metrics-table-wrap">
+      <table class="metrics-table">
+        <thead>
+          <tr>
+            <th class="mt-name">Model</th>
+            <th class="mt-num">Input</th>
+            <th class="mt-num">Output</th>
+            <th class="mt-num">Cached</th>
+            <th class="mt-num mt-total">Total</th>
+          </tr>
+        </thead>
+        <tbody>${modelRows}</tbody>
+      </table>
+    </div>` : ''}`;
+}
+
 const DISCLAIMER = `
   <div class="disclaimer-box">
     <p><strong>DISCLAIMER:</strong> This report was generated autonomously by an AI
