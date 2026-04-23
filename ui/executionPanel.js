@@ -176,6 +176,13 @@ export function completeAgent(i, tokensEst) {
   }
 }
 
+/** Replaces the estimated token count with the real value from execution_metrics. */
+export function updateAgentTokens(i, realTokens) {
+  if (realTokens == null || realTokens === 0) return;
+  tokenEls[i].textContent = `${Number(realTokens).toLocaleString()} tok`;
+  tokenEls[i].style.display = '';
+}
+
 /**
  * Updates the active agent's output with live step text (no typing animation).
  * Called repeatedly as agent_step SSE events arrive.

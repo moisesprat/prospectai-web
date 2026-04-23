@@ -367,6 +367,12 @@ export async function runAnalysis() {
           panel.setProgress(100, 'Pipeline complete. Generating report…');
           trackAnalysisComplete(sector, (Date.now() - startTime) / 1000);
           refreshAnalytics();
+          // Replace per-agent estimated token counts with real values from metrics.
+          if (event.metrics?.phases) {
+            event.metrics.phases.forEach((phase, i) => {
+              panel.updateAgentTokens(i, phase.total_tokens);
+            });
+          }
           const html = renderReport(event.report);
           setTimeout(() => {
             report.show(sector, startTime, html, event.report, event.metrics ?? null);
