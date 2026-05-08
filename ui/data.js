@@ -7,6 +7,7 @@
 
 export const SECTORS = [
   { ticker: 'XLK',  name: 'Technology' },
+  { ticker: 'SOXX', name: 'Semiconductors' },
   { ticker: 'XLV',  name: 'Healthcare' },
   { ticker: 'XLE',  name: 'Energy' },
   { ticker: 'XLF',  name: 'Financials' },
