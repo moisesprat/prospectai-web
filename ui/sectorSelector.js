@@ -5,7 +5,7 @@
 
 import { SECTORS } from './data.js';
 import { trackRunAnalysis, trackSectorSelect } from './saEvents.js';
-import { getIsRunning, getSelectedSector, setSelectedSector } from './state.js';
+import { getIsRunning, getSelectedSector, setSelectedSector, getRiskProfile, setRiskProfile } from './state.js';
 
 const DIAGRAM_NODES = [
   { id: 'AGENT-01', name: 'Market Analyst',      role: 'macro · sentiment',         critic: false },
@@ -18,6 +18,7 @@ const DIAGRAM_NODES = [
 
 let runBtn;
 let sectorBtns = [];
+let riskBtns = [];
 
 /**
  * Renders the sector selector section into `container`.
@@ -47,6 +48,31 @@ export function render(container, { onRun }) {
 
   const diagram = _buildDiagram();
 
+  const riskLabel = document.createElement('div');
+  riskLabel.className = 'section-label';
+  riskLabel.textContent = '02 / Select a risk profile';
+
+  const riskGrid = document.createElement('div');
+  riskGrid.className = 'risk-profile-grid';
+
+  [
+    { value: 'conservative', label: 'Conservative', hint: 'tight stops · spread positions' },
+    { value: 'aggressive',   label: 'Aggressive',   hint: 'wide targets · concentrated bets' },
+  ].forEach(({ value, label: btnLabel, hint }) => {
+    const btn = document.createElement('button');
+    btn.className = 'risk-btn' + (value === getRiskProfile() ? ' selected' : '');
+    btn.dataset.profile = value;
+    btn.innerHTML = `<span class="risk-btn-label">${btnLabel}</span><span class="risk-btn-hint">${hint}</span>`;
+    btn.addEventListener('click', () => {
+      if (getIsRunning()) return;
+      riskBtns.forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      setRiskProfile(value);
+    });
+    riskGrid.appendChild(btn);
+    riskBtns.push(btn);
+  });
+
   const timeHint = document.createElement('div');
   timeHint.className = 'time-hint';
   timeHint.textContent = '6 agent tasks  ·  ~5 min to results';
@@ -61,7 +87,7 @@ export function render(container, { onRun }) {
     onRun();
   });
 
-  section.append(label, grid, diagram, timeHint, runBtn);
+  section.append(label, grid, riskLabel, riskGrid, diagram, timeHint, runBtn);
   container.appendChild(section);
 }
 
@@ -102,10 +128,12 @@ function _handleSelect(btn, section) {
 export function disableControls() {
   runBtn.disabled = true;
   sectorBtns.forEach(b => (b.disabled = true));
+  riskBtns.forEach(b => (b.disabled = true));
 }
 
 export function enableControls(label = 'Run Analysis') {
   runBtn.disabled = false;
   runBtn.querySelector('span').textContent = label;
   sectorBtns.forEach(b => (b.disabled = false));
+  riskBtns.forEach(b => (b.disabled = false));
 }

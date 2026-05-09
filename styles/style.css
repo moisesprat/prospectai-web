@@ -362,6 +362,62 @@ h1 em {
   margin-bottom: 32px;
 }
 
+.risk-profile-grid {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.risk-btn {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 12px 20px;
+  cursor: pointer;
+  text-align: left;
+  transition: all .15s ease;
+  max-width: 240px;
+}
+
+.risk-btn .risk-btn-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .04em;
+  margin-bottom: 3px;
+}
+
+.risk-btn .risk-btn-hint {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .04em;
+}
+
+.risk-btn:hover {
+  border-color: var(--amber-dim);
+  color: var(--text);
+  background: #0F1520;
+}
+
+.risk-btn.selected {
+  border-color: var(--amber);
+  color: var(--amber);
+  background: var(--amber-glow);
+}
+
+.risk-btn.selected .risk-btn-hint {
+  color: var(--amber-dim);
+}
+
+.risk-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
 .sector-btn {
   background: var(--surface);
   border: 1px solid var(--border2);

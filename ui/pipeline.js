@@ -11,7 +11,7 @@
      error         — {message}
    ============================================================ */
 
-import { getSelectedSector, getIsRunning, setIsRunning } from './state.js';
+import { getSelectedSector, getIsRunning, setIsRunning, getRiskProfile } from './state.js';
 import { trackAnalysisComplete, trackAnalysisError } from './saEvents.js';
 import * as panel from './executionPanel.js';
 import * as report from './report.js';
@@ -278,7 +278,7 @@ export async function runAnalysis() {
   }, INIT_STATUS_MS);
 
   await new Promise((resolve) => {
-    const url    = `${BACKEND_URL}/api/analyze?sector=${encodeURIComponent(sector)}`;
+    const url    = `${BACKEND_URL}/api/analyze?sector=${encodeURIComponent(sector)}&risk_profile=${encodeURIComponent(getRiskProfile())}`;
     const source = new EventSource(url);
 
     /** True once `pipeline_done` or JSON `error` is handled — avoids treating normal SSE close as failure. */
