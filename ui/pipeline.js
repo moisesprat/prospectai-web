@@ -283,6 +283,8 @@ export async function runAnalysis() {
 
     /** True once `pipeline_done` or JSON `error` is handled — avoids treating normal SSE close as failure. */
     let streamSettled = false;
+    let consecutiveErrors = 0;
+    const MAX_ERRORS = 3;
 
     function finish() {
       source.close();
@@ -298,6 +300,10 @@ export async function runAnalysis() {
     }
 
     source.onmessage = (e) => {
+      if (consecutiveErrors > 0) {
+        consecutiveErrors = 0;
+        if (pastInitStatus) panel.setStatusLine(STATUS_PROCESSING);
+      }
       let event;
       try { event = JSON.parse(e.data); } catch { return; }
 
@@ -392,6 +398,11 @@ export async function runAnalysis() {
     source.onerror = () => {
       // End of stream after success still closes the connection and fires `error` in many browsers.
       if (streamSettled) return;
+      consecutiveErrors++;
+      if (consecutiveErrors < MAX_ERRORS) {
+        panel.setStatusLine(`Connection interrupted — reconnecting (${consecutiveErrors}/${MAX_ERRORS})…`);
+        return;
+      }
       streamSettled = true;
       clearSmoothProgress();
       clearInitProgress();
