@@ -107,6 +107,14 @@ let idleTick = null;
 /** Cycling contextual messages while an agent is running between step callbacks. */
 let idleMessageTimer = null;
 let idleMessageIdx = 0;
+/** Track which agents are currently running (handles parallel execution). */
+const runningAgents = new Set();
+/** Agents whose agent_done has been processed — prevents regression on reconnect. */
+const completedAgents = new Set();
+/** Which agent index currently owns the progress animation and idle messages. */
+let animationOwner = -1;
+/** High-water mark for progress bar — never goes backwards. */
+let progressHighWater = 0;
 
 const IDLE_CREEP_MAX = 7.5;
 const IDLE_CREEP_STEP = 0.14;
@@ -202,7 +210,7 @@ function startIdleCreep() {
 /** Smooth bar from PROGRESS_ON_START[idx] toward (almost) PROGRESS_ON_DONE[idx]. */
 function startAgentSegmentProgress(agentIndex) {
   clearSmoothProgress();
-  const from = PROGRESS_ON_START[agentIndex] ?? 0;
+  const from = Math.max(PROGRESS_ON_START[agentIndex] ?? 0, progressHighWater);
   const done = PROGRESS_ON_DONE[agentIndex] ?? 99;
   const softEnd = Math.max(from, done - 0.55);
   const creepCap = done - 0.1;
@@ -218,6 +226,7 @@ function startAgentSegmentProgress(agentIndex) {
       const over = elapsed - SEGMENT_DURATION_MS;
       pct = Math.min(creepCap, softEnd + over / OVERTIME_MS_PER_PCT);
     }
+    progressHighWater = Math.max(progressHighWater, pct);
     panel.setProgressFill(pct);
     smoothRaf = requestAnimationFrame(frame);
   }
@@ -264,6 +273,11 @@ export async function runAnalysis() {
   disableControls();
   setTimeout(() => panel.scrollIntoView(), 100);
 
+  runningAgents.clear();
+  completedAgents.clear();
+  animationOwner = -1;
+  progressHighWater = 0;
+
   const startTime = Date.now();
   panel.updateMeta(startTime);
   const metaInterval = setInterval(() => panel.updateMeta(startTime), 1_000);
@@ -283,8 +297,6 @@ export async function runAnalysis() {
 
     /** True once `pipeline_done` or JSON `error` is handled — avoids treating normal SSE close as failure. */
     let streamSettled = false;
-    let consecutiveErrors = 0;
-    const MAX_ERRORS = 3;
 
     function finish() {
       source.close();
@@ -300,10 +312,6 @@ export async function runAnalysis() {
     }
 
     source.onmessage = (e) => {
-      if (consecutiveErrors > 0) {
-        consecutiveErrors = 0;
-        if (pastInitStatus) panel.setStatusLine(STATUS_PROCESSING);
-      }
       let event;
       try { event = JSON.parse(e.data); } catch { return; }
 
@@ -311,13 +319,20 @@ export async function runAnalysis() {
 
         case 'agent_start': {
           const idx = event.agent_index;
+          if (completedAgents.has(idx)) break;
           clearInitProgress();
           clearIdleTick();
+          runningAgents.add(idx);
           panel.activateAgent(idx, STATUS_PROCESSING);
-          panel.setTaskProgress(idx);
           if (event.model) panel.setAgentModel(idx, event.model);
-          startAgentSegmentProgress(idx);
-          startIdleMessages(idx);
+          // Only take over animations if this is the highest-index running agent
+          // (avoids the second parallel agent killing the first's progress)
+          if (idx >= animationOwner) {
+            animationOwner = idx;
+            panel.setTaskProgress(idx);
+            startAgentSegmentProgress(idx);
+            startIdleMessages(idx);
+          }
           if (!pastInitStatus) {
             panel.setStatusLine(STATUS_INIT);
           }
@@ -326,14 +341,16 @@ export async function runAnalysis() {
 
         case 'agent_step': {
           const idx = event.agent_index;
+          if (completedAgents.has(idx)) break;
+          const ownsAnimation = (idx === animationOwner);
           if (event.step_type === 'action') {
             // Tool call — show it, pause idle cycle briefly then resume
-            clearIdleMessages();
+            if (ownsAnimation) clearIdleMessages();
             panel.setAgentStep(idx, formatActionStep(event));
-            idleMessageTimer = setTimeout(() => startIdleMessages(idx), 4_000);
+            if (ownsAnimation) idleMessageTimer = setTimeout(() => startIdleMessages(idx), 4_000);
           } else if (event.step_type === 'finish') {
             // Agent wrapping up — stop idle cycle and stream the output in parts
-            clearIdleMessages();
+            if (ownsAnimation) clearIdleMessages();
             if (event.preview) {
               showTextInParts(idx, event.preview, null);
             } else {
@@ -341,19 +358,30 @@ export async function runAnalysis() {
             }
           } else {
             // Unknown fallback — show raw briefly then resume idle
-            clearIdleMessages();
+            if (ownsAnimation) clearIdleMessages();
             panel.setAgentStep(idx, event.raw ? event.raw.slice(0, 200) : '…');
-            idleMessageTimer = setTimeout(() => startIdleMessages(idx), 4_000);
+            if (ownsAnimation) idleMessageTimer = setTimeout(() => startIdleMessages(idx), 4_000);
           }
           break;
         }
 
         case 'agent_done': {
           const idx = event.agent_index;
+          if (completedAgents.has(idx)) break;
+          completedAgents.add(idx);
           const pct = PROGRESS_ON_DONE[idx] ?? 99;
-          clearIdleMessages();
-          clearSmoothProgress();
-          panel.setProgress(pct, pastInitStatus ? STATUS_PROCESSING : STATUS_INIT);
+          runningAgents.delete(idx);
+
+          // Only clear animations if this agent owned them
+          if (animationOwner === idx) {
+            clearIdleMessages();
+            clearSmoothProgress();
+          }
+
+          // Progress bar never goes backwards
+          progressHighWater = Math.max(progressHighWater, pct);
+          panel.setProgress(progressHighWater, pastInitStatus ? STATUS_PROCESSING : STATUS_INIT);
+
           // Build display: handoff message + optional content preview
           let display = event.summary || 'Analysis complete.';
           if (event.preview) {
@@ -363,6 +391,15 @@ export async function runAnalysis() {
           // Go green immediately when agent finishes — don't wait for typing animation.
           panel.completeAgent(idx);
           panel.typeAgentOutput(idx, display); // fire-and-forget
+
+          // If another agent is still running, transfer animation ownership to it
+          if (runningAgents.size > 0 && animationOwner === idx) {
+            const nextOwner = Math.max(...runningAgents);
+            animationOwner = nextOwner;
+            panel.setTaskProgress(nextOwner);
+            startAgentSegmentProgress(nextOwner);
+            startIdleMessages(nextOwner);
+          }
           break;
         }
 
@@ -370,6 +407,15 @@ export async function runAnalysis() {
           streamSettled = true;
           clearSmoothProgress();
           clearIdleTick();
+          clearIdleMessages();
+          // Force-complete any agents whose agent_done was missed in transit
+          for (let i = 0; i < 6; i++) {
+            if (!completedAgents.has(i)) {
+              completedAgents.add(i);
+              panel.completeAgent(i);
+              panel.setAgentStep(i, 'Analysis complete.');
+            }
+          }
           panel.setProgress(100, 'Pipeline complete. Generating report…');
           trackAnalysisComplete(sector, (Date.now() - startTime) / 1000);
           refreshAnalytics();
@@ -396,13 +442,12 @@ export async function runAnalysis() {
     };
 
     source.onerror = () => {
-      // End of stream after success still closes the connection and fires `error` in many browsers.
+      // Normal stream end after pipeline_done fires onerror in most browsers.
       if (streamSettled) return;
-      consecutiveErrors++;
-      if (consecutiveErrors < MAX_ERRORS) {
-        panel.setStatusLine(`Connection interrupted — reconnecting (${consecutiveErrors}/${MAX_ERRORS})…`);
-        return;
-      }
+      // EventSource auto-reconnects on error, which would start a SECOND pipeline
+      // on the backend (the URL triggers a new analysis). Close immediately to
+      // prevent duplicate runs and lost events.
+      source.close();
       streamSettled = true;
       clearSmoothProgress();
       clearInitProgress();
@@ -410,7 +455,7 @@ export async function runAnalysis() {
       clearIdleTick();
       clearIdleMessages();
       trackAnalysisError(sector, 'connection_failed');
-      panel.setProgress(0, 'Connection failed. Check backend and try again.');
+      panel.setProgress(0, 'Connection lost. Please try again.');
       finish();
     };
   });
