@@ -367,6 +367,27 @@ h1 em {
   color: var(--muted);
 }
 
+.rw-rec {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 6px;
+  letter-spacing: .03em;
+}
+
+.rw-trigger {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.rw-price {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
 @media (min-width: 640px) {
   .rw-cards {
     flex-wrap: wrap;
