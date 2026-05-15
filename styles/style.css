@@ -338,12 +338,30 @@ h1 em {
   gap: 4px;
 }
 
+.rw-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .rw-ticker {
   font-family: var(--mono);
   font-size: 13px;
   font-weight: 600;
   color: var(--text);
   letter-spacing: .06em;
+}
+
+.rw-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--green);
+  border: 1px solid var(--green-dim);
+  padding: 1px 5px;
+  letter-spacing: .08em;
+  border-radius: 2px;
 }
 
 .rw-sector {
@@ -358,34 +376,18 @@ h1 em {
   font-size: 14px;
   font-weight: 600;
   color: var(--green);
-  margin-top: 4px;
-}
-
-.rw-time {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--muted);
-}
-
-.rw-rec {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--text-dim);
-  margin-top: 6px;
-  letter-spacing: .03em;
-}
-
-.rw-trigger {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--text-dim);
+  margin-top: 2px;
 }
 
 .rw-price {
   font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 11px;
   color: var(--text);
+}
+
+.rw-arrow {
+  color: var(--muted);
+  margin: 0 2px;
 }
 
 @media (min-width: 640px) {

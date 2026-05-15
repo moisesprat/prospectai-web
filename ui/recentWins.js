@@ -17,10 +17,6 @@ function relativeTime(isoString) {
   return weeks === 1 ? '1w ago' : `${weeks}w ago`;
 }
 
-function formatShortDate(isoString) {
-  return new Date(isoString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-
 function formatPrice(value) {
   return `$${Number(value).toFixed(2)}`;
 }
@@ -48,13 +44,13 @@ export async function render(parent, beforeEl) {
     <div class="rw-cards">
       ${wins.map(w => `
         <div class="rw-card">
-          <div class="rw-ticker">${w.ticker}</div>
-          <div class="rw-sector">${w.sector}</div>
+          <div class="rw-top">
+            <span class="rw-ticker">${w.ticker}</span>
+            <span class="rw-tag">${w.recommended_action}</span>
+          </div>
+          <div class="rw-sector">${w.sector} · ${relativeTime(w.recommended_at)}</div>
           <div class="rw-roi">+${w.roi_pct.toFixed(1)}%</div>
-          <div class="rw-time">${relativeTime(w.recommended_at)}</div>
-          <div class="rw-rec">Recommended as ${w.recommended_action} by ProspectAI · ${formatShortDate(w.recommended_at)}</div>
-          ${w.trigger_price != null ? `<div class="rw-trigger">Entry suggested at ${formatPrice(w.trigger_price)}</div>` : ''}
-          <div class="rw-price">${formatPrice(w.current_price)}</div>
+          <div class="rw-price">${w.trigger_price != null ? `${formatPrice(w.trigger_price)} <span class="rw-arrow">→</span> ` : ''}${formatPrice(w.current_price)}</div>
         </div>
       `).join('')}
     </div>
