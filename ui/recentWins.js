@@ -7,14 +7,17 @@
 const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL
   ?? 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
 
-function relativeTime(isoString) {
-  const diff = Date.now() - new Date(isoString).getTime();
-  const days = Math.floor(diff / 86_400_000);
-  if (days < 1) return 'today';
-  if (days === 1) return '1d ago';
-  if (days < 7) return `${days}d ago`;
-  const weeks = Math.floor(days / 7);
-  return weeks === 1 ? '1w ago' : `${weeks}w ago`;
+const MONTH_ABBREVIATIONS = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+];
+
+function formatRecommendedDate(isoString) {
+  const d = new Date(isoString);
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const month = MONTH_ABBREVIATIONS[d.getUTCMonth()];
+  const year = String(d.getUTCFullYear() % 100).padStart(2, '0');
+  return `${day}-${month}-${year}`;
 }
 
 function formatPrice(value) {
@@ -47,8 +50,9 @@ export async function render(parent, beforeEl) {
           <div class="rw-top">
             <span class="rw-ticker">${w.ticker}</span>
             <span class="rw-tag">${w.recommended_action}</span>
+            <span class="rw-date">· ${formatRecommendedDate(w.recommended_at)}</span>
           </div>
-          <div class="rw-sector">${w.sector} · ${relativeTime(w.recommended_at)}</div>
+          <div class="rw-sector">${w.sector}</div>
           <div class="rw-roi">+${w.roi_pct.toFixed(1)}%</div>
           <div class="rw-price">${w.trigger_price != null ? `${formatPrice(w.trigger_price)} <span class="rw-arrow">→</span> ` : ''}${formatPrice(w.current_price)}</div>
         </div>
