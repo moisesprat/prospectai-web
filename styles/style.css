@@ -1163,8 +1163,21 @@ h1 em {
   margin: 24px 0;
 }
 
+.metric-row-5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+@media (max-width: 900px) {
+  .metric-row-5 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 500px) {
   .metric-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .metric-row-5 {
     grid-template-columns: 1fr 1fr;
   }
 }

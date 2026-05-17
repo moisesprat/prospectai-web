@@ -160,7 +160,7 @@ function scaledEntrySetupHtml(setups) {
   const [imm, plb] = setups;
   return `
     <strong class="subsection-label">Tranche 1 — IMMEDIATE · LIVE</strong>
-    <div class="metric-row" style="grid-template-columns:repeat(3,1fr)">
+    <div class="metric-row">
       <div class="metric-box">
         <div class="m-label">Entry Price</div>
         <div class="m-value">$${fmt(imm.entry_zone_low)}</div>
@@ -175,7 +175,7 @@ function scaledEntrySetupHtml(setups) {
       </div>
     </div>
     <strong class="subsection-label" style="color:var(--text-dim)">Tranche 2 — PULLBACK · PENDING</strong>
-    <div class="metric-row" style="grid-template-columns:repeat(3,1fr);opacity:0.7">
+    <div class="metric-row" style="opacity:0.7">
       <div class="metric-box">
         <div class="m-label">Entry Zone</div>
         <div class="m-value">$${fmt(plb.entry_zone_low)} – $${fmt(plb.entry_zone_high)}</div>
@@ -220,7 +220,7 @@ function positionCard(pos) {
         <span class="stock-rec" style="color:${actionColor}">${esc(action)}</span>
         ${reviewFreq ? `<span class="stock-score">${reviewFreq}</span>` : ''}
       </div>
-      <div class="metric-row" style="grid-template-columns:repeat(5,1fr)">
+      <div class="metric-row metric-row-5">
         <div class="metric-box"><div class="m-label">Allocation</div>${allocHtml}</div>
         <div class="metric-box"><div class="m-label">Current Price</div>${currentPriceHtml}</div>
         <div class="metric-box"><div class="m-label">Entry Zone</div><div class="m-value">${esc(entryZone)}</div></div>
