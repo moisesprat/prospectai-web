@@ -315,15 +315,40 @@ h1 em {
 }
 
 .rw-cards {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  overflow: hidden;
+  width: 100%;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
 }
 
-.rw-cards::-webkit-scrollbar {
-  display: none;
+@media (prefers-reduced-motion: reduce) {
+  .rw-cards {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .rw-cards::-webkit-scrollbar { display: none; }
+}
+
+.rw-track {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  .rw-track {
+    animation: marquee var(--ticker-duration, 30s) linear infinite;
+  }
+
+  .recent-wins:hover .rw-track {
+    animation-play-state: paused;
+  }
 }
 
 .rw-card {
@@ -395,13 +420,6 @@ h1 em {
 .rw-arrow {
   color: var(--muted);
   margin: 0 2px;
-}
-
-@media (min-width: 640px) {
-  .rw-cards {
-    flex-wrap: wrap;
-    overflow-x: visible;
-  }
 }
 
 /* ============================================================
