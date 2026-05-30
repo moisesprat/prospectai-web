@@ -49,7 +49,7 @@ function activateTab(hash) {
   document.querySelectorAll('.stats-tab').forEach(btn => {
     const isActive = btn.dataset.hash === target;
     btn.setAttribute('aria-selected', String(isActive));
-    document.getElementById(btn.dataset.panel).hidden = !isActive;
+    document.getElementById(btn.dataset.panel).classList.toggle('is-active', isActive);
   });
 }
 

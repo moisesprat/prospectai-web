@@ -73,35 +73,49 @@
 /* ── Tab bar ─────────────────────────────────────────────────── */
 .stats-tabs {
   display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--border);
+  gap: 2px;
+  border-bottom: 2px solid var(--border2);
+  margin-top: 32px;
   margin-bottom: 0;
 }
 
 .stats-tab {
-  padding: 14px 20px;
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
+  /* reset all button defaults */
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;       /* overlap the tab bar's bottom border */
+  padding: 10px 24px 12px;
   font-family: var(--mono);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: .08em;
+  letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--text-dim);
   cursor: pointer;
-  transition: color .15s, border-color .15s;
+  transition: color .15s, border-color .15s, background .15s;
+  border-radius: 0;
+  outline: none;
 }
-.stats-tab:hover { color: var(--text); }
+.stats-tab:hover {
+  color: var(--text);
+  background: rgba(255,255,255,.03);
+}
 .stats-tab[aria-selected="true"] {
   color: var(--amber);
   border-bottom-color: var(--amber);
+  background: rgba(240,165,0,.04);
 }
 
 /* ── Tab panels ──────────────────────────────────────────────── */
-.stats-panel { display: block; }
-.stats-panel[hidden] { display: none; }
+/* Use .is-active class instead of hidden attribute — avoids cross-browser
+   cascade conflicts between display:block and the [hidden] attribute. */
+.stats-panel { display: none; }
+.stats-panel.is-active { display: block; }
 
 /* ── Empty state ─────────────────────────────────────────────── */
 .stats-empty {
