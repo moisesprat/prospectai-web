@@ -51,6 +51,11 @@ export function trackAnalysisError(sector, reason) {
   saEvent('analysis_error', meta);
 }
 
+/** User navigated to the Stats page. */
+export function trackStatsPageOpen() {
+  saEvent('stats_page_open');
+}
+
 /** Fires at 25%, 50%, 75%, and 100% of max vertical scroll depth (once each). */
 export function initScrollDepthTracking() {
   const milestones = [25, 50, 75, 100];

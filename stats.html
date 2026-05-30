@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProspectAI Stats — Usage & Track Record</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/stats.css">
+  <script data-collect-dnt="true" async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</head>
+<body>
+
+  <div class="disclaimer-bar">
+    <strong>WARNING: NOT AN INVESTMENT TOOL.</strong> This is a technical demonstration of
+    multi-agent AI systems. All output is AI-generated and must not be used as financial advice.
+  </div>
+
+  <div class="wrap">
+
+    <!-- ── HEADER ─────────────────────────────────────────────────────── -->
+    <header class="stats-header">
+      <a href="/" class="stats-back-link">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to ProspectAI
+      </a>
+      <div class="stats-title-row">
+        <div>
+          <div class="header-tag">Analytics Dashboard</div>
+          <h1 class="stats-h1">Prospect<em>AI</em> Stats</h1>
+        </div>
+        <span class="stats-live-badge">LIVE</span>
+      </div>
+      <p class="stats-subtitle">Usage metrics and LONG-BUY prediction track record — updated on every page load.</p>
+    </header>
+
+    <!-- ── SUMMARY CARDS ──────────────────────────────────────────────── -->
+    <section class="stats-section" id="summary-section">
+      <div class="stats-cards-grid">
+
+        <!-- Total analyses -->
+        <div class="stats-card stats-card--hero">
+          <div class="stats-card-label">Total Analyses</div>
+          <div class="stats-card-value" id="total-analyses">—</div>
+          <div class="stats-card-sub">pipeline runs completed</div>
+        </div>
+
+        <!-- By sector -->
+        <div class="stats-card stats-card--sector">
+          <div class="stats-card-label">By Sector</div>
+          <ul class="stats-sector-list" id="sector-list">
+            <li class="stats-sector-item"><span class="stats-sector-name">—</span><span class="stats-sector-count">—</span></li>
+          </ul>
+        </div>
+
+        <!-- By risk profile -->
+        <div class="stats-card stats-card--risk">
+          <div class="stats-card-label">By Risk Profile</div>
+          <ul class="stats-risk-list" id="risk-list">
+            <li class="stats-risk-item"><span class="stats-risk-name">—</span><span class="stats-risk-count">—</span></li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── ACTION-TYPE CHARTS ──────────────────────────────────────────── -->
+    <section class="stats-section" id="charts-section" hidden>
+      <h2 class="stats-section-title">Recommendation Distribution</h2>
+      <p class="stats-section-sub">How action types are distributed across all runs and by sector.</p>
+
+      <!-- Overall donut -->
+      <div class="stats-charts-row">
+        <div class="stats-chart-card stats-chart-card--overall">
+          <div class="stats-chart-title">Overall</div>
+          <div class="stats-donut-wrap">
+            <svg class="stats-donut" id="donut-overall" viewBox="0 0 120 120" width="120" height="120"></svg>
+            <div class="stats-donut-center" id="donut-overall-center"></div>
+          </div>
+          <ul class="stats-legend" id="legend-overall"></ul>
+        </div>
+      </div>
+
+      <!-- Per-sector donuts -->
+      <div class="stats-sector-donuts" id="sector-donuts"></div>
+    </section>
+
+    <!-- ── LONG-BUY TRACK RECORD ──────────────────────────────────────── -->
+    <section class="stats-section" id="history-section">
+      <h2 class="stats-section-title">LONG-BUY Track Record</h2>
+      <p class="stats-section-sub">All LONG-BUY predictions with live prices and ROI, sorted best-first.</p>
+
+      <div class="stats-table-wrap" id="history-table-wrap">
+        <div class="stats-loading" id="history-loading">Loading track record…</div>
+        <table class="stats-table" id="history-table" hidden>
+          <thead>
+            <tr>
+              <th class="col-rank">#</th>
+              <th class="col-ticker">Ticker</th>
+              <th class="col-sector">Sector</th>
+              <th class="col-date">Predicted</th>
+              <th class="col-entry">Entry Price</th>
+              <th class="col-current">Current</th>
+              <th class="col-roi">ROI</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody"></tbody>
+        </table>
+        <div class="stats-error" id="history-error" hidden>Could not load track record.</div>
+      </div>
+    </section>
+
+  </div><!-- /wrap -->
+
+  <script type="module" src="ui/stats.js"></script>
+</body>
+</html>

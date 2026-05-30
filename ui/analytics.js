@@ -20,6 +20,14 @@ export function render(container) {
     <span class="analytics-label">analyses completed</span>
     <span class="analytics-sep" aria-hidden="true">·</span>
     <span class="analytics-leading">—</span>
+    <a href="stats.html" class="stats-page-link" aria-label="View ProspectAI Stats">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="1" y="8" width="3" height="7" rx="1" fill="currentColor"/>
+        <rect x="6" y="5" width="3" height="10" rx="1" fill="currentColor"/>
+        <rect x="11" y="2" width="3" height="13" rx="1" fill="currentColor"/>
+      </svg>
+      ProspectAI Stats
+    </a>
   `;
   countEl   = widgetEl.querySelector('.analytics-count');
   leadingEl = widgetEl.querySelector('.analytics-leading');
