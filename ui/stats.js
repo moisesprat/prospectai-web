@@ -18,6 +18,8 @@ const RISK_LABELS = {
   moderate:     'Moderate',
 };
 
+const TABS = ['activity', 'decisions', 'performance'];
+
 /* ── Formatting helpers ──────────────────────────────────────── */
 
 function fmtDate(iso) {
@@ -34,6 +36,44 @@ function fmtPrice(v) {
   return `$${Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
+function fmtRoi(roi) {
+  if (roi == null) return { text: '—', cls: '' };
+  if (roi >= 0) return { text: `+${roi.toFixed(1)}%`, cls: 'stats-kpi-value--pos' };
+  return { text: `−${Math.abs(roi).toFixed(1)}%`, cls: 'stats-kpi-value--neg' };
+}
+
+/* ── Tab navigation ──────────────────────────────────────────── */
+
+function activateTab(hash) {
+  const target = TABS.includes(hash) ? hash : 'activity';
+  document.querySelectorAll('.stats-tab').forEach(btn => {
+    const isActive = btn.dataset.hash === target;
+    btn.setAttribute('aria-selected', String(isActive));
+    document.getElementById(btn.dataset.panel).hidden = !isActive;
+  });
+}
+
+function initTabs() {
+  const initial = (window.location.hash.slice(1) || '').toLowerCase();
+  const resolved = TABS.includes(initial) ? initial : 'activity';
+  activateTab(resolved);
+  if (!initial || !TABS.includes(initial)) {
+    history.replaceState(null, '', `#${resolved}`);
+  }
+
+  document.querySelectorAll('.stats-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const hash = btn.dataset.hash;
+      activateTab(hash);
+      history.pushState(null, '', `#${hash}`);
+    });
+  });
+
+  window.addEventListener('popstate', () => {
+    activateTab((window.location.hash.slice(1) || 'activity').toLowerCase());
+  });
+}
+
 /* ── SVG Donut ───────────────────────────────────────────────── */
 
 function renderDonut(svgEl, slices, radius, strokeWidth) {
@@ -42,15 +82,12 @@ function renderDonut(svgEl, slices, radius, strokeWidth) {
   const cy = svgEl.viewBox.baseVal.height / 2;
   const circ = 2 * Math.PI * radius;
   const total = slices.reduce((s, sl) => s + sl.value, 0);
-
   if (total === 0) return;
 
   let offset = 0;
   for (const sl of slices) {
-    const pct  = sl.value / total;
-    const dash = pct * circ;
+    const dash = (sl.value / total) * circ;
     const gap  = circ - dash;
-
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('cx', cx);
     circle.setAttribute('cy', cy);
@@ -68,8 +105,8 @@ function renderDonut(svgEl, slices, radius, strokeWidth) {
 function buildLegend(listEl, slices, total) {
   listEl.innerHTML = '';
   for (const sl of slices) {
-    const pct  = total > 0 ? ((sl.value / total) * 100).toFixed(1) : '0.0';
-    const li   = document.createElement('li');
+    const pct = total > 0 ? ((sl.value / total) * 100).toFixed(1) : '0.0';
+    const li  = document.createElement('li');
     li.className = 'stats-legend-item';
     li.innerHTML = `
       <span class="stats-legend-dot" style="background:${sl.colour}"></span>
@@ -87,17 +124,15 @@ function buildSlices(counts) {
     .map(a => ({ label: a, value: counts[a], colour: ACTION_COLOURS[a] }));
 }
 
-/* ── Summary cards ───────────────────────────────────────────── */
+/* ── Activity tab — summary cards ────────────────────────────── */
 
 function renderSummary(data) {
   document.getElementById('total-analyses').textContent =
     (data.total ?? 0).toLocaleString();
 
-  // By sector — sorted descending
   const sectorList = document.getElementById('sector-list');
   sectorList.innerHTML = '';
-  const sectors = Object.entries(data.by_sector ?? {})
-    .sort((a, b) => b[1] - a[1]);
+  const sectors = Object.entries(data.by_sector ?? {}).sort((a, b) => b[1] - a[1]);
   for (const [name, count] of sectors) {
     const li = document.createElement('li');
     li.className = 'stats-sector-item';
@@ -105,11 +140,9 @@ function renderSummary(data) {
     sectorList.appendChild(li);
   }
 
-  // By risk profile
   const riskList = document.getElementById('risk-list');
   riskList.innerHTML = '';
-  const risks = Object.entries(data.by_risk_profile ?? {})
-    .sort((a, b) => b[1] - a[1]);
+  const risks = Object.entries(data.by_risk_profile ?? {}).sort((a, b) => b[1] - a[1]);
   for (const [key, count] of risks) {
     const li = document.createElement('li');
     li.className = 'stats-risk-item';
@@ -118,14 +151,22 @@ function renderSummary(data) {
   }
 }
 
-/* ── Charts ──────────────────────────────────────────────────── */
+/* ── Decisions tab — donut charts ────────────────────────────── */
 
 function renderCharts(actionBreakdown) {
-  if (!actionBreakdown || Object.keys(actionBreakdown).length === 0) return;
+  const empty   = document.getElementById('charts-empty');
+  const content = document.getElementById('charts-content');
 
-  document.getElementById('charts-section').hidden = false;
+  if (!actionBreakdown || Object.keys(actionBreakdown).length === 0) {
+    empty.hidden   = false;
+    content.hidden = true;
+    return;
+  }
 
-  // Aggregate overall counts
+  empty.hidden   = true;
+  content.hidden = false;
+
+  // Aggregate overall
   const overall = {};
   for (const sectorData of Object.values(actionBreakdown)) {
     for (const [action, count] of Object.entries(sectorData.counts ?? {})) {
@@ -135,8 +176,7 @@ function renderCharts(actionBreakdown) {
   const overallTotal  = Object.values(overall).reduce((s, v) => s + v, 0);
   const overallSlices = buildSlices(overall);
 
-  const svgOverall = document.getElementById('donut-overall');
-  renderDonut(svgOverall, overallSlices, 44, 22);
+  renderDonut(document.getElementById('donut-overall'), overallSlices, 44, 22);
   document.getElementById('donut-overall-center').innerHTML =
     `${overallTotal}<span>total</span>`;
   buildLegend(document.getElementById('legend-overall'), overallSlices, overallTotal);
@@ -161,15 +201,64 @@ function renderCharts(actionBreakdown) {
       <ul class="stats-legend"></ul>
     `;
     container.appendChild(card);
-
-    const svgEl  = card.querySelector('.stats-donut');
-    const legend = card.querySelector('.stats-legend');
-    renderDonut(svgEl, slices, 33, 16);
-    buildLegend(legend, slices, total);
+    renderDonut(card.querySelector('.stats-donut'), slices, 33, 16);
+    buildLegend(card.querySelector('.stats-legend'), slices, total);
   }
 }
 
-/* ── Track record table ──────────────────────────────────────── */
+/* ── Performance tab — KPI cards ─────────────────────────────── */
+
+function renderPerformanceKpis(history) {
+  const valid   = history.filter(r => r.roi_pct != null);
+  const positive = valid.filter(r => r.roi_pct > 0);
+
+  // Win rate
+  const winRateEl = document.getElementById('kpi-win-rate-val');
+  if (valid.length > 0) {
+    winRateEl.textContent = `${((positive.length / valid.length) * 100).toFixed(1)}%`;
+  } else {
+    winRateEl.textContent = '—';
+  }
+
+  // Avg return
+  const avgEl = document.getElementById('kpi-avg-return-val');
+  if (valid.length > 0) {
+    const avg = valid.reduce((s, r) => s + r.roi_pct, 0) / valid.length;
+    const { text, cls } = fmtRoi(avg);
+    avgEl.textContent = text;
+    avgEl.className   = `stats-kpi-value ${cls}`;
+  } else {
+    avgEl.textContent = '—';
+  }
+
+  // Best pick
+  const bestEl    = document.getElementById('kpi-best-pick-val');
+  const bestSubEl = document.getElementById('kpi-best-pick-sub');
+  if (valid.length > 0) {
+    const best = valid.reduce((a, b) => b.roi_pct > a.roi_pct ? b : a);
+    const { text, cls } = fmtRoi(best.roi_pct);
+    bestEl.textContent    = best.ticker;
+    bestEl.className      = `stats-kpi-value ${cls}`;
+    bestSubEl.textContent = text;
+  } else {
+    bestEl.textContent = '—';
+  }
+
+  // Worst pick
+  const worstEl    = document.getElementById('kpi-worst-pick-val');
+  const worstSubEl = document.getElementById('kpi-worst-pick-sub');
+  if (valid.length > 0) {
+    const worst = valid.reduce((a, b) => b.roi_pct < a.roi_pct ? b : a);
+    const { text, cls } = fmtRoi(worst.roi_pct);
+    worstEl.textContent    = worst.ticker;
+    worstEl.className      = `stats-kpi-value ${cls}`;
+    worstSubEl.textContent = text;
+  } else {
+    worstEl.textContent = '—';
+  }
+}
+
+/* ── Performance tab — track record table ────────────────────── */
 
 function renderHistory(history) {
   const loading = document.getElementById('history-loading');
@@ -181,12 +270,11 @@ function renderHistory(history) {
   tbody.innerHTML = '';
 
   history.forEach((row, i) => {
-    const roi   = row.roi_pct;
-    const isPos = roi != null && roi > 0;
+    const roi    = row.roi_pct;
+    const isPos  = roi != null && roi > 0;
     const isNull = roi == null;
 
-    let roiBadge;
-    let barHtml = '';
+    let roiBadge, barHtml = '';
     if (isNull) {
       roiBadge = `<span class="roi-badge roi-badge--null">—</span>`;
     } else if (isPos) {
@@ -214,39 +302,38 @@ function renderHistory(history) {
 /* ── Init ────────────────────────────────────────────────────── */
 
 async function init() {
-  // Fire SA event immediately, before any data fetch
   trackStatsPageOpen();
+  initTabs();
 
-  // Fetch analytics and history in parallel
   const [analyticsRes, historyRes] = await Promise.allSettled([
     fetch(`${BACKEND_URL}/api/analytics`),
     fetch(`${BACKEND_URL}/api/long-buy-history`),
   ]);
 
-  // Summary cards + charts
   if (analyticsRes.status === 'fulfilled' && analyticsRes.value.ok) {
     try {
       const data = await analyticsRes.value.json();
       renderSummary(data);
       renderCharts(data.action_breakdown ?? {});
-    } catch {
-      // non-critical
-    }
+    } catch { /* non-critical */ }
   }
 
-  // Track record table
-  const historyEl = document.getElementById('history-loading');
+  const historyLoadingEl = document.getElementById('history-loading');
   if (historyRes.status === 'fulfilled' && historyRes.value.ok) {
     try {
       const data = await historyRes.value.json();
-      renderHistory(data.history ?? []);
+      const history = data.history ?? [];
+      renderHistory(history);
+      renderPerformanceKpis(history);
     } catch {
-      historyEl.hidden = true;
+      historyLoadingEl.hidden = true;
       document.getElementById('history-error').hidden = false;
+      renderPerformanceKpis([]);
     }
   } else {
-    historyEl.hidden = true;
+    historyLoadingEl.hidden = true;
     document.getElementById('history-error').hidden = false;
+    renderPerformanceKpis([]);
   }
 }
 

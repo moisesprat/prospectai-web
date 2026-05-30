@@ -70,6 +70,91 @@
   margin: 12px 0 0;
 }
 
+/* ── Tab bar ─────────────────────────────────────────────────── */
+.stats-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+
+.stats-tab {
+  padding: 14px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.stats-tab:hover { color: var(--text); }
+.stats-tab[aria-selected="true"] {
+  color: var(--amber);
+  border-bottom-color: var(--amber);
+}
+
+/* ── Tab panels ──────────────────────────────────────────────── */
+.stats-panel { display: block; }
+.stats-panel[hidden] { display: none; }
+
+/* ── Empty state ─────────────────────────────────────────────── */
+.stats-empty {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  padding: 32px 0;
+}
+
+/* ── KPI cards ───────────────────────────────────────────────── */
+.stats-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+}
+@media (max-width: 900px) {
+  .stats-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 500px) {
+  .stats-kpi-grid { grid-template-columns: 1fr; }
+}
+
+.stats-kpi-card {
+  padding: 18px 20px;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--border2);
+}
+.stats-kpi-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+.stats-kpi-value {
+  font-family: var(--mono);
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--amber);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.stats-kpi-value--pos { color: var(--roi-positive); }
+.stats-kpi-value--neg { color: var(--roi-negative); }
+.stats-kpi-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+
 /* ── Sections ────────────────────────────────────────────────── */
 .stats-section {
   padding: 40px 0;
