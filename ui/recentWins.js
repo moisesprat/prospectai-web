@@ -40,12 +40,24 @@ function renderCards(wins) {
 }
 
 export async function render(parent, beforeEl) {
+  // Show skeleton placeholder while fetching
+  const skeleton = document.createElement('div');
+  skeleton.className = 'rw-skeleton';
+  skeleton.innerHTML = `
+    <div class="rw-skeleton-card"></div>
+    <div class="rw-skeleton-card"></div>
+    <div class="rw-skeleton-card"></div>
+  `;
+  parent.insertBefore(skeleton, beforeEl);
+
   let data;
   try {
     const res = await fetch(`${BACKEND_URL}/api/long-buy-wins`);
+    skeleton.remove();
     if (!res.ok) return;
     data = await res.json();
   } catch {
+    skeleton.remove();
     return;
   }
 

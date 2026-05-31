@@ -286,6 +286,37 @@ h1 em {
 /* ============================================================
    RECENT WINS
    ============================================================ */
+/* ── Skeleton loader (shared with stats.html) ─────────────────── */
+@keyframes skeleton-pulse {
+  0%   { opacity: .35; }
+  50%  { opacity: .65; }
+  100% { opacity: .35; }
+}
+.skeleton {
+  background: var(--border2);
+  border-radius: 3px;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+  display: inline-block;
+}
+
+.rw-skeleton {
+  padding: 24px 0 28px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  overflow: hidden;
+}
+.rw-skeleton-card {
+  flex-shrink: 0;
+  width: 160px;
+  height: 80px;
+  background: var(--border2);
+  border-radius: 3px;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+.rw-skeleton-card:nth-child(2) { animation-delay: .2s; }
+.rw-skeleton-card:nth-child(3) { animation-delay: .4s; }
+
 .recent-wins {
   padding: 24px 0 28px;
   border-bottom: 1px solid var(--border);

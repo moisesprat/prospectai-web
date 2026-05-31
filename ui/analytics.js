@@ -8,6 +8,8 @@
 const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL
   ?? 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
 
+const SKELETON_SPAN = '<span class="skeleton" style="width:38px;height:13px;border-radius:2px;vertical-align:middle"></span>';
+
 let countEl, leadingEl, versionEl, widgetEl;
 
 /** Renders the analytics widget into `container` and fetches initial data. */
@@ -16,7 +18,7 @@ export function render(container) {
   widgetEl.className = 'analytics-bar';
   widgetEl.innerHTML = `
     <span class="analytics-dot" aria-hidden="true"></span>
-    <span class="analytics-count">—</span>
+    <span class="analytics-count">${SKELETON_SPAN}</span>
     <span class="analytics-label">analyses completed</span>
     <span class="analytics-sep" aria-hidden="true">·</span>
     <span class="analytics-leading">—</span>
@@ -32,6 +34,12 @@ export function render(container) {
   countEl   = widgetEl.querySelector('.analytics-count');
   leadingEl = widgetEl.querySelector('.analytics-leading');
   versionEl = document.getElementById('version-tag');
+
+  // Show skeleton in version tag while fetching
+  if (versionEl) {
+    versionEl.innerHTML = SKELETON_SPAN;
+  }
+
   container.appendChild(widgetEl);
   refresh();
 }
@@ -50,11 +58,17 @@ export async function refresh() {
       leadingEl.textContent = data.leading_sector
         ? `${data.leading_sector} leads`
         : 'No runs yet';
+    } else {
+      countEl.textContent = '—';
     }
 
-    if (versionRes.ok) {
-      const data = await versionRes.json();
-      versionEl.textContent = data.version ? `v${data.version}` : 'v—';
+    if (versionEl) {
+      if (versionRes.ok) {
+        const data = await versionRes.json();
+        versionEl.textContent = data.version ? `v${data.version}` : 'v—';
+      } else {
+        versionEl.textContent = 'v—';
+      }
     }
 
     // Brief highlight animation on update
@@ -62,6 +76,8 @@ export async function refresh() {
     void widgetEl.offsetWidth; // reflow to restart animation
     widgetEl.classList.add('analytics-updated');
   } catch {
-    // Analytics is non-critical — fail silently
+    // Analytics is non-critical — clear skeletons on failure
+    countEl.textContent = '—';
+    if (versionEl) versionEl.textContent = 'v—';
   }
 }

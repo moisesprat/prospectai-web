@@ -117,7 +117,6 @@ function buildLegend(listEl, slices, total) {
     li.innerHTML = `
       <span class="stats-legend-dot" style="background:${sl.colour}"></span>
       <span class="stats-legend-label">${sl.label}</span>
-      <span class="stats-legend-count">${sl.value}</span>
       <span class="stats-legend-pct">${pct}%</span>
     `;
     listEl.appendChild(li);
