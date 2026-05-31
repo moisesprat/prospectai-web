@@ -241,6 +241,21 @@
 /* ── Version column ──────────────────────────────────────────── */
 .col-version { color: var(--muted); font-size: 10px; white-space: nowrap; }
 
+/* ── Sortable column headers ─────────────────────────────────── */
+.col-sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.col-sortable:hover { color: var(--text); }
+.sort-arrow {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.sort-arrow.active { color: var(--amber); }
+
 /* ── KPI cards ───────────────────────────────────────────────── */
 .stats-kpi-grid {
   display: grid;

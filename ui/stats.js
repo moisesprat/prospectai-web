@@ -251,6 +251,65 @@ function renderCharts(actionBreakdown) {
   renderDecisionsDonut('__overall__');
 }
 
+/* ── Performance tab — sort state ───────────────────────────── */
+
+let _perfHistory  = [];
+let _sort         = { col: 'roi', dir: 'desc' };
+let _sortInited   = false;
+
+function sortHistory(history, col, dir) {
+  return [...history].sort((a, b) => {
+    if (col === 'roi') {
+      const nullA = a.roi_pct == null;
+      const nullB = b.roi_pct == null;
+      if (nullA && nullB) return 0;
+      if (nullA) return 1;   // nulls always last
+      if (nullB) return -1;
+      return dir === 'desc' ? b.roi_pct - a.roi_pct : a.roi_pct - b.roi_pct;
+    }
+    // date sort
+    const ta = new Date(a.recommended_at).getTime();
+    const tb = new Date(b.recommended_at).getTime();
+    return dir === 'desc' ? tb - ta : ta - tb;
+  });
+}
+
+function updateSortHeaders(col, dir) {
+  const roiArrow  = document.querySelector('#th-roi .sort-arrow');
+  const dateArrow = document.querySelector('#th-date .sort-arrow');
+  if (!roiArrow || !dateArrow) return;
+
+  if (col === 'roi') {
+    roiArrow.textContent  = dir === 'desc' ? '↓' : '↑';
+    roiArrow.classList.add('active');
+    dateArrow.textContent = '↕';
+    dateArrow.classList.remove('active');
+  } else {
+    dateArrow.textContent = dir === 'desc' ? '↓' : '↑';
+    dateArrow.classList.add('active');
+    roiArrow.textContent  = '↕';
+    roiArrow.classList.remove('active');
+  }
+}
+
+function initSortHeaders() {
+  if (_sortInited) return;
+  _sortInited = true;
+
+  ['roi', 'date'].forEach(col => {
+    document.getElementById(`th-${col}`).addEventListener('click', () => {
+      if (_sort.col === col) {
+        _sort.dir = _sort.dir === 'desc' ? 'asc' : 'desc';
+      } else {
+        _sort.col = col;
+        _sort.dir = 'desc';
+      }
+      updateSortHeaders(_sort.col, _sort.dir);
+      renderHistory(sortHistory(_perfHistory, _sort.col, _sort.dir), false);
+    });
+  });
+}
+
 /* ── Performance tab — data quality helpers ──────────────────── */
 
 function deduplicateHistory(history) {
@@ -321,12 +380,19 @@ function renderPerformanceKpis(history) {
 
 /* ── Performance tab — track record table ────────────────────── */
 
-function renderHistory(history) {
+function renderHistory(history, storeAndInit = true) {
   document.getElementById('history-loading').hidden = true;
   const table = document.getElementById('history-table');
   const tbody = document.getElementById('history-tbody');
   table.hidden    = false;
   tbody.innerHTML = '';
+
+  if (storeAndInit) {
+    _perfHistory = history;
+    _sort = { col: 'roi', dir: 'desc' };
+    updateSortHeaders('roi', 'desc');
+    initSortHeaders();
+  }
 
   history.forEach((row, i) => {
     const roi    = row.roi_pct;
