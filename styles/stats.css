@@ -125,6 +125,122 @@
   padding: 32px 0;
 }
 
+/* ── Skeleton loaders ────────────────────────────────────────── */
+@keyframes skeleton-pulse {
+  0%   { opacity: .35; }
+  50%  { opacity: .65; }
+  100% { opacity: .35; }
+}
+.skeleton {
+  background: var(--border2);
+  border-radius: 3px;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+  display: inline-block;
+}
+.skeleton--line  { height: 12px; width: 100%; margin: 4px 0; }
+.skeleton--value { height: 2.4rem; width: 70px; margin: 4px 0; }
+.skeleton--block { height: 120px; width: 100%; margin: 8px 0; }
+.skeleton--bar   { height: 10px; border-radius: 2px; }
+
+/* ── Horizontal bar chart (sector coverage) ──────────────────── */
+.stat-bar-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.stat-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.stat-bar-label {
+  width: 130px;
+  flex-shrink: 0;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stat-bar-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.stat-bar-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 2px;
+  transition: width .4s ease;
+}
+.stat-bar-count {
+  width: 32px;
+  text-align: right;
+  color: var(--amber);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ── Risk profile donut in Activity tab ──────────────────────── */
+.stats-risk-donut-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+/* ── Decisions filter dropdown ───────────────────────────────── */
+.stats-chart-filter {
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 32px 6px 10px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236B7F96'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  outline: none;
+}
+.stats-chart-filter:focus { border-color: var(--amber-dim); }
+
+/* ── Decisions single-donut layout ──────────────────────────── */
+.stats-decisions-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.stats-decisions-inner {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+/* ── Performance disclaimer ──────────────────────────────────── */
+.stats-disclaimer {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  border-left: 2px solid var(--amber-dim);
+  padding: 8px 12px;
+  margin: 0 0 20px;
+  background: rgba(240,165,0,.03);
+  line-height: 1.6;
+}
+
+/* ── Version column ──────────────────────────────────────────── */
+.col-version { color: var(--muted); font-size: 10px; white-space: nowrap; }
+
 /* ── KPI cards ───────────────────────────────────────────────── */
 .stats-kpi-grid {
   display: grid;

@@ -9,9 +9,13 @@ const ACTION_COLOURS = {
   'MONITOR':        '#8c8c8c',
   'AVOID':          '#c0392b',
 };
-
 const ACTION_ORDER = ['LONG-BUY', 'WAIT-FOR-ENTRY', 'MONITOR', 'AVOID'];
 
+const RISK_COLOURS = {
+  conservative: '#4a7c59',
+  aggressive:   '#e0a040',
+  moderate:     '#8c8c8c',
+};
 const RISK_LABELS = {
   conservative: 'Conservative',
   aggressive:   'Aggressive',
@@ -29,6 +33,12 @@ function fmtDate(iso) {
   const month = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()];
   const year  = String(d.getUTCFullYear()).slice(-2);
   return `${day}-${month}-${year}`;
+}
+
+function utcDateStr(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
 }
 
 function fmtPrice(v) {
@@ -57,15 +67,12 @@ function initTabs() {
   const initial = (window.location.hash.slice(1) || '').toLowerCase();
   const resolved = TABS.includes(initial) ? initial : 'activity';
   activateTab(resolved);
-  if (!initial || !TABS.includes(initial)) {
-    history.replaceState(null, '', `#${resolved}`);
-  }
+  if (!initial || !TABS.includes(initial)) history.replaceState(null, '', `#${resolved}`);
 
   document.querySelectorAll('.stats-tab').forEach(btn => {
     btn.addEventListener('click', () => {
-      const hash = btn.dataset.hash;
-      activateTab(hash);
-      history.pushState(null, '', `#${hash}`);
+      activateTab(btn.dataset.hash);
+      history.pushState(null, '', `#${btn.dataset.hash}`);
     });
   });
 
@@ -78,16 +85,15 @@ function initTabs() {
 
 function renderDonut(svgEl, slices, radius, strokeWidth) {
   svgEl.innerHTML = '';
-  const cx = svgEl.viewBox.baseVal.width / 2;
-  const cy = svgEl.viewBox.baseVal.height / 2;
-  const circ = 2 * Math.PI * radius;
+  const cx    = svgEl.viewBox.baseVal.width / 2;
+  const cy    = svgEl.viewBox.baseVal.height / 2;
+  const circ  = 2 * Math.PI * radius;
   const total = slices.reduce((s, sl) => s + sl.value, 0);
   if (total === 0) return;
 
   let offset = 0;
   for (const sl of slices) {
-    const dash = (sl.value / total) * circ;
-    const gap  = circ - dash;
+    const dash   = (sl.value / total) * circ;
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('cx', cx);
     circle.setAttribute('cy', cy);
@@ -95,7 +101,7 @@ function renderDonut(svgEl, slices, radius, strokeWidth) {
     circle.setAttribute('fill', 'none');
     circle.setAttribute('stroke', sl.colour);
     circle.setAttribute('stroke-width', strokeWidth);
-    circle.setAttribute('stroke-dasharray', `${dash} ${gap}`);
+    circle.setAttribute('stroke-dasharray', `${dash} ${circ - dash}`);
     circle.setAttribute('stroke-dashoffset', -offset);
     svgEl.appendChild(circle);
     offset += dash;
@@ -124,34 +130,93 @@ function buildSlices(counts) {
     .map(a => ({ label: a, value: counts[a], colour: ACTION_COLOURS[a] }));
 }
 
-/* ── Activity tab — summary cards ────────────────────────────── */
+/* ── Activity tab — sector bar chart + risk donut ────────────── */
 
 function renderSummary(data) {
+  // Total runs
   document.getElementById('total-analyses').textContent =
     (data.total ?? 0).toLocaleString();
 
-  const sectorList = document.getElementById('sector-list');
-  sectorList.innerHTML = '';
-  const sectors = Object.entries(data.by_sector ?? {}).sort((a, b) => b[1] - a[1]);
+  // Sector coverage — horizontal bar chart
+  const sectorEl  = document.getElementById('sector-chart');
+  const sectors   = Object.entries(data.by_sector ?? {}).sort((a, b) => b[1] - a[1]);
+  const maxCount  = sectors.length > 0 ? sectors[0][1] : 1;
+  const barList   = document.createElement('ul');
+  barList.className = 'stat-bar-list';
   for (const [name, count] of sectors) {
-    const li = document.createElement('li');
-    li.className = 'stats-sector-item';
-    li.innerHTML = `<span class="stats-sector-name">${name}</span><span class="stats-sector-count">${count}</span>`;
-    sectorList.appendChild(li);
+    const pct  = Math.round((count / maxCount) * 100);
+    const li   = document.createElement('li');
+    li.className = 'stat-bar-row';
+    li.innerHTML = `
+      <span class="stat-bar-label" title="${name}">${name}</span>
+      <div class="stat-bar-track">
+        <div class="stat-bar-fill" style="width:${pct}%"></div>
+      </div>
+      <span class="stat-bar-count">${count}</span>
+    `;
+    barList.appendChild(li);
   }
+  sectorEl.innerHTML = '';
+  sectorEl.appendChild(barList);
 
-  const riskList = document.getElementById('risk-list');
-  riskList.innerHTML = '';
-  const risks = Object.entries(data.by_risk_profile ?? {}).sort((a, b) => b[1] - a[1]);
-  for (const [key, count] of risks) {
-    const li = document.createElement('li');
-    li.className = 'stats-risk-item';
-    li.innerHTML = `<span class="stats-risk-name">${RISK_LABELS[key] ?? key}</span><span class="stats-risk-count">${count}</span>`;
-    riskList.appendChild(li);
-  }
+  // Risk profile — SVG donut
+  const riskWrap = document.getElementById('risk-donut-wrap');
+  const risks    = Object.entries(data.by_risk_profile ?? {}).sort((a, b) => b[1] - a[1]);
+  const riskTotal = risks.reduce((s, [, v]) => s + v, 0);
+  const riskSlices = risks.map(([key, value]) => ({
+    label:  RISK_LABELS[key] ?? key,
+    value,
+    colour: RISK_COLOURS[key] ?? '#8c8c8c',
+  }));
+
+  const svgSize = 90;
+  riskWrap.innerHTML = `
+    <div style="position:relative;width:${svgSize}px;height:${svgSize}px;flex-shrink:0">
+      <svg id="donut-risk" viewBox="0 0 ${svgSize} ${svgSize}" width="${svgSize}" height="${svgSize}"
+           style="transform:rotate(-90deg)"></svg>
+      <div class="stats-donut-center" style="font-size:13px">
+        ${riskTotal}<span style="font-size:9px">runs</span>
+      </div>
+    </div>
+    <ul class="stats-legend" id="legend-risk"></ul>
+  `;
+  renderDonut(document.getElementById('donut-risk'), riskSlices, 33, 16);
+  buildLegend(document.getElementById('legend-risk'), riskSlices, riskTotal);
 }
 
-/* ── Decisions tab — donut charts ────────────────────────────── */
+/* ── Decisions tab — single donut with sector filter ─────────── */
+
+let _actionBreakdown = {};
+
+function renderDecisionsDonut(sectorKey) {
+  const svgEl    = document.getElementById('donut-decisions');
+  const centerEl = document.getElementById('donut-decisions-center');
+  const legendEl = document.getElementById('legend-decisions');
+  const titleEl  = document.getElementById('decisions-chart-title');
+
+  let counts, total, label;
+  if (sectorKey === '__overall__') {
+    counts = {};
+    for (const sd of Object.values(_actionBreakdown)) {
+      for (const [a, c] of Object.entries(sd.counts ?? {})) {
+        counts[a] = (counts[a] ?? 0) + c;
+      }
+    }
+    total = Object.values(counts).reduce((s, v) => s + v, 0);
+    label = 'Overall';
+  } else {
+    const sd = _actionBreakdown[sectorKey] ?? {};
+    counts = sd.counts ?? {};
+    total  = sd.total ?? 0;
+    label  = sectorKey;
+  }
+
+  titleEl.textContent  = label;
+  centerEl.innerHTML   = `${total}<span>signals</span>`;
+  const slices = buildSlices(counts);
+  renderDonut(svgEl, slices, 44, 22);
+  buildLegend(legendEl, slices, total);
+}
 
 function renderCharts(actionBreakdown) {
   const empty   = document.getElementById('charts-empty');
@@ -163,64 +228,62 @@ function renderCharts(actionBreakdown) {
     return;
   }
 
+  _actionBreakdown = actionBreakdown;
   empty.hidden   = true;
   content.hidden = false;
 
-  // Aggregate overall
-  const overall = {};
-  for (const sectorData of Object.values(actionBreakdown)) {
-    for (const [action, count] of Object.entries(sectorData.counts ?? {})) {
-      overall[action] = (overall[action] ?? 0) + count;
-    }
+  // Populate sector dropdown — Overall + sorted sector keys
+  const select  = document.getElementById('chart-sector-filter');
+  const sectors = Object.keys(actionBreakdown).sort();
+  // Keep existing Overall option, add sectors
+  select.innerHTML = '<option value="__overall__">Overall</option>';
+  for (const s of sectors) {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = s;
+    select.appendChild(opt);
   }
-  const overallTotal  = Object.values(overall).reduce((s, v) => s + v, 0);
-  const overallSlices = buildSlices(overall);
 
-  renderDonut(document.getElementById('donut-overall'), overallSlices, 44, 22);
-  document.getElementById('donut-overall-center').innerHTML =
-    `${overallTotal}<span>total</span>`;
-  buildLegend(document.getElementById('legend-overall'), overallSlices, overallTotal);
+  // Wire change handler
+  select.addEventListener('change', () => renderDecisionsDonut(select.value));
 
-  // Per-sector donuts
-  const container = document.getElementById('sector-donuts');
-  container.innerHTML = '';
-  for (const [sector, sectorData] of Object.entries(actionBreakdown)) {
-    const counts = sectorData.counts ?? {};
-    const total  = sectorData.total ?? 0;
-    const slices = buildSlices(counts);
-    if (slices.length === 0) continue;
+  // Render initial Overall donut
+  renderDecisionsDonut('__overall__');
+}
 
-    const card = document.createElement('div');
-    card.className = 'stats-chart-card stats-chart-card--sector';
-    card.innerHTML = `
-      <div class="stats-chart-title">${sector}</div>
-      <div class="stats-donut-wrap stats-donut-wrap--sm">
-        <svg class="stats-donut stats-donut--sm" viewBox="0 0 90 90" width="90" height="90"></svg>
-        <div class="stats-donut-center" style="font-size:14px">${total}<span style="font-size:9px">runs</span></div>
-      </div>
-      <ul class="stats-legend"></ul>
-    `;
-    container.appendChild(card);
-    renderDonut(card.querySelector('.stats-donut'), slices, 33, 16);
-    buildLegend(card.querySelector('.stats-legend'), slices, total);
+/* ── Performance tab — data quality helpers ──────────────────── */
+
+function deduplicateHistory(history) {
+  const seen = new Map();
+  // Sort newest first so we keep latest per group
+  const sorted = [...history].sort((a, b) =>
+    new Date(b.recommended_at) - new Date(a.recommended_at)
+  );
+  for (const row of sorted) {
+    const key = `${row.ticker}|${utcDateStr(row.recommended_at)}|${row.trigger_price}`;
+    if (!seen.has(key)) seen.set(key, row);
   }
+  return [...seen.values()];
+}
+
+function excludeRecentHistory(history) {
+  const now     = new Date();
+  const cutoff  = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  cutoff.setUTCDate(cutoff.getUTCDate() - 5);
+  return history.filter(r => new Date(r.recommended_at) < cutoff);
 }
 
 /* ── Performance tab — KPI cards ─────────────────────────────── */
 
 function renderPerformanceKpis(history) {
-  const valid   = history.filter(r => r.roi_pct != null);
+  const valid    = history.filter(r => r.roi_pct != null);
   const positive = valid.filter(r => r.roi_pct > 0);
 
-  // Win rate
   const winRateEl = document.getElementById('kpi-win-rate-val');
-  if (valid.length > 0) {
-    winRateEl.textContent = `${((positive.length / valid.length) * 100).toFixed(1)}%`;
-  } else {
-    winRateEl.textContent = '—';
-  }
+  winRateEl.textContent = valid.length > 0
+    ? `${((positive.length / valid.length) * 100).toFixed(1)}%`
+    : '—';
 
-  // Avg return
   const avgEl = document.getElementById('kpi-avg-return-val');
   if (valid.length > 0) {
     const avg = valid.reduce((s, r) => s + r.roi_pct, 0) / valid.length;
@@ -231,7 +294,6 @@ function renderPerformanceKpis(history) {
     avgEl.textContent = '—';
   }
 
-  // Best pick
   const bestEl    = document.getElementById('kpi-best-pick-val');
   const bestSubEl = document.getElementById('kpi-best-pick-sub');
   if (valid.length > 0) {
@@ -244,7 +306,6 @@ function renderPerformanceKpis(history) {
     bestEl.textContent = '—';
   }
 
-  // Worst pick
   const worstEl    = document.getElementById('kpi-worst-pick-val');
   const worstSubEl = document.getElementById('kpi-worst-pick-sub');
   if (valid.length > 0) {
@@ -261,12 +322,10 @@ function renderPerformanceKpis(history) {
 /* ── Performance tab — track record table ────────────────────── */
 
 function renderHistory(history) {
-  const loading = document.getElementById('history-loading');
-  const table   = document.getElementById('history-table');
-  const tbody   = document.getElementById('history-tbody');
-
-  loading.hidden = true;
-  table.hidden   = false;
+  document.getElementById('history-loading').hidden = true;
+  const table = document.getElementById('history-table');
+  const tbody = document.getElementById('history-tbody');
+  table.hidden    = false;
   tbody.innerHTML = '';
 
   history.forEach((row, i) => {
@@ -294,9 +353,15 @@ function renderHistory(history) {
       <td class="col-entry">${fmtPrice(row.trigger_price)}</td>
       <td class="col-current">${fmtPrice(row.current_price)}</td>
       <td class="col-roi"><div class="roi-cell">${roiBadge}${barHtml}</div></td>
+      <td class="col-version">${row.prospectai_version ?? '—'}</td>
     `;
     tbody.appendChild(tr);
   });
+
+  // Disclaimer + row count
+  document.getElementById('perf-disclaimer').hidden = false;
+  document.getElementById('perf-row-count').textContent =
+    ` · ${history.length} signals · entries within 5 days and duplicates excluded`;
 }
 
 /* ── Init ────────────────────────────────────────────────────── */
@@ -310,28 +375,36 @@ async function init() {
     fetch(`${BACKEND_URL}/api/long-buy-history`),
   ]);
 
+  // Activity + Decisions
   if (analyticsRes.status === 'fulfilled' && analyticsRes.value.ok) {
     try {
       const data = await analyticsRes.value.json();
       renderSummary(data);
       renderCharts(data.action_breakdown ?? {});
     } catch { /* non-critical */ }
+  } else {
+    // Clear skeletons on failure
+    document.getElementById('total-analyses').textContent = '—';
+    document.getElementById('sector-chart').innerHTML = '';
+    document.getElementById('risk-donut-wrap').innerHTML = '';
   }
 
-  const historyLoadingEl = document.getElementById('history-loading');
+  // Performance
+  const loadingEl = document.getElementById('history-loading');
   if (historyRes.status === 'fulfilled' && historyRes.value.ok) {
     try {
-      const data = await historyRes.value.json();
-      const history = data.history ?? [];
-      renderHistory(history);
-      renderPerformanceKpis(history);
+      const data    = await historyRes.value.json();
+      const raw     = data.history ?? [];
+      const cleaned = excludeRecentHistory(deduplicateHistory(raw));
+      renderHistory(cleaned);
+      renderPerformanceKpis(cleaned);
     } catch {
-      historyLoadingEl.hidden = true;
+      loadingEl.hidden = true;
       document.getElementById('history-error').hidden = false;
       renderPerformanceKpis([]);
     }
   } else {
-    historyLoadingEl.hidden = true;
+    loadingEl.hidden = true;
     document.getElementById('history-error').hidden = false;
     renderPerformanceKpis([]);
   }
