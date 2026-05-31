@@ -296,17 +296,18 @@ function initSortHeaders() {
   if (_sortInited) return;
   _sortInited = true;
 
-  ['roi', 'date'].forEach(col => {
-    document.getElementById(`th-${col}`).addEventListener('click', () => {
-      if (_sort.col === col) {
-        _sort.dir = _sort.dir === 'desc' ? 'asc' : 'desc';
-      } else {
-        _sort.col = col;
-        _sort.dir = 'desc';
-      }
-      updateSortHeaders(_sort.col, _sort.dir);
-      renderHistory(sortHistory(_perfHistory, _sort.col, _sort.dir), false);
-    });
+  // Use event delegation on thead — avoids timing issues with hidden table
+  const thead = document.querySelector('#history-table thead');
+  if (!thead) return;
+
+  thead.addEventListener('click', e => {
+    const th = e.target.closest('#th-roi, #th-date');
+    if (!th) return;
+    const col = th.id === 'th-roi' ? 'roi' : 'date';
+    _sort.dir = (_sort.col === col && _sort.dir === 'desc') ? 'asc' : 'desc';
+    _sort.col = col;
+    updateSortHeaders(_sort.col, _sort.dir);
+    renderHistory(sortHistory(_perfHistory, _sort.col, _sort.dir), false);
   });
 }
 
@@ -390,8 +391,9 @@ function renderHistory(history, storeAndInit = true) {
   if (storeAndInit) {
     _perfHistory = history;
     _sort = { col: 'roi', dir: 'desc' };
-    updateSortHeaders('roi', 'desc');
+    history = sortHistory(history, 'roi', 'desc'); // apply initial sort before rendering
     initSortHeaders();
+    updateSortHeaders('roi', 'desc');
   }
 
   history.forEach((row, i) => {
