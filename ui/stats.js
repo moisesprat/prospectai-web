@@ -173,8 +173,8 @@ function renderSummary(data) {
     <div style="position:relative;width:${svgSize}px;height:${svgSize}px;flex-shrink:0">
       <svg id="donut-risk" viewBox="0 0 ${svgSize} ${svgSize}" width="${svgSize}" height="${svgSize}"
            style="transform:rotate(-90deg)"></svg>
-      <div class="stats-donut-center" style="font-size:13px">
-        ${riskTotal}<span style="font-size:9px">runs</span>
+      <div class="stats-donut-center" style="font-size:9px;color:var(--text-dim)">
+        profile
       </div>
     </div>
     <ul class="stats-legend" id="legend-risk"></ul>
@@ -211,7 +211,7 @@ function renderDecisionsDonut(sectorKey) {
   }
 
   titleEl.textContent  = label;
-  centerEl.innerHTML   = `${total}<span>signals</span>`;
+  centerEl.innerHTML   = `<span style="font-size:9px;color:var(--text-dim)">${label}</span>`;
   const slices = buildSlices(counts);
   renderDonut(svgEl, slices, 44, 22);
   buildLegend(legendEl, slices, total);
