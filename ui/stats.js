@@ -411,6 +411,10 @@ function renderHistory(history, storeAndInit = true) {
       roiBadge = `<span class="roi-badge roi-badge--neg">−${Math.abs(roi).toFixed(1)}%</span>`;
     }
 
+    const reportCell = row.report_url
+      ? `<a href="${row.report_url}" target="_blank" rel="noopener noreferrer" class="report-link">View</a>`
+      : '—';
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td class="col-rank">${i + 1}</td>
@@ -421,6 +425,7 @@ function renderHistory(history, storeAndInit = true) {
       <td class="col-current">${fmtPrice(row.current_price)}</td>
       <td class="col-roi"><div class="roi-cell">${roiBadge}${barHtml}</div></td>
       <td class="col-version">${row.prospectai_version ?? '—'}</td>
+      <td class="col-report">${reportCell}</td>
     `;
     tbody.appendChild(tr);
   });

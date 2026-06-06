@@ -241,6 +241,68 @@
 /* ── Version column ──────────────────────────────────────────── */
 .col-version { color: var(--muted); font-size: 10px; white-space: nowrap; }
 
+/* ── Report column ───────────────────────────────────────────── */
+.col-report { white-space: nowrap; }
+.report-link {
+  color: var(--green);
+  font-size: 11px;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color .15s;
+}
+.report-link:hover { border-bottom-color: var(--green); }
+
+/* ── Report history cards (reports.html) ─────────────────────── */
+#reports-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.report-card {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 14px 18px;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color .18s, background .18s;
+}
+.report-card:hover {
+  border-color: var(--green-dim);
+  background: rgba(74, 124, 89, .05);
+}
+.report-card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.report-card-sector {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.report-card-version {
+  font-size: 10px;
+  color: var(--green);
+  background: rgba(74,124,89,.12);
+  border: 1px solid var(--green-dim);
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-left: auto;
+}
+.report-card-meta {
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.report-card-sep { color: var(--border2); }
+
 /* ── Sortable column headers ─────────────────────────────────── */
 .col-sortable {
   cursor: pointer;
