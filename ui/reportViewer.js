@@ -50,10 +50,14 @@ async function init() {
   const report  = data.result ?? data;
   const metrics = data.execution_metrics ?? null;
   const sector  = report.sector ?? '—';
+  const runAt   = metrics?.run_at ?? null;
 
   // Update header
-  document.getElementById('viewer-sector').textContent  = sector;
-  document.getElementById('viewer-run-id').textContent  = runId.slice(0, 8) + '…';
+  document.getElementById('viewer-sector').textContent = sector;
+  document.getElementById('viewer-run-id').textContent = runId.slice(0, 8) + '…';
+  document.getElementById('viewer-date').textContent   = runAt
+    ? new Date(runAt).toISOString().slice(0, 16).replace('T', ' ') + ' UTC'
+    : '—';
 
   // Render body
   document.getElementById('viewer-loading').hidden = true;

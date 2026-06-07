@@ -420,8 +420,11 @@ export async function runAnalysis() {
           trackAnalysisComplete(sector, (Date.now() - startTime) / 1000);
           refreshAnalytics();
           const html = renderReport(event.report);
+          const reportUrl = event.run_id
+            ? `${window.location.origin}/report.html?id=${event.run_id}`
+            : null;
           setTimeout(() => {
-            report.show(sector, startTime, html, event.report, event.metrics ?? null, event.report_url ?? null);
+            report.show(sector, startTime, html, event.report, event.metrics ?? null, reportUrl);
             finish();
           }, 800);
           break;

@@ -9,17 +9,13 @@ import { REPORT_TEMPLATES } from './data.js';
 import { trackExportPdf } from './saEvents.js';
 import { exportToPdf } from './pdfExporter.js';
 import { renderMetrics } from './reportRenderer.js';
-import { addEntry as addMyReportsEntry, refresh as refreshMyReports } from './myReports.js';
-
-const MY_REPORTS_KEY = 'prospectai_my_reports';
 
 // DOM references — populated by render()
 let section, reportSectorEl, reportMetaEl, reportBodyEl, downloadBtn;
 let twitterShareBtn, linkedinShareBtn;
-let openReportBtn, saveReportBtn;
+let openReportBtn;
 let _reportData = null;
 let _linkedinShareText = '';
-let _currentReportUrl = null;
 
 /**
  * Triggers a direct PDF download using html2pdf.js.
@@ -65,13 +61,6 @@ export function render(container) {
         </svg>
         <span>Open Report</span>
       </a>
-      <button class="save-report-btn" hidden>
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span class="save-label">Save to My Reports</span>
-      </button>
       <button class="download-btn" title="Save report as PDF">
         <svg class="btn-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
           <path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -102,17 +91,7 @@ export function render(container) {
   downloadBtn     = reportHeader.querySelector('.download-btn');
   twitterShareBtn  = reportHeader.querySelector('.share-btn--twitter');
   linkedinShareBtn = reportHeader.querySelector('.share-btn--linkedin');
-  openReportBtn   = reportHeader.querySelector('.open-report-btn');
-  saveReportBtn   = reportHeader.querySelector('.save-report-btn');
-
-  saveReportBtn.addEventListener('click', () => {
-    if (!_currentReportUrl) return;
-    const sector = reportSectorEl.textContent;
-    addMyReportsEntry({ report_url: _currentReportUrl, sector, run_at: new Date().toISOString() });
-    refreshMyReports();
-    saveReportBtn.querySelector('.save-label').textContent = 'Saved ✓';
-    saveReportBtn.disabled = true;
-  });
+  openReportBtn = reportHeader.querySelector('.open-report-btn');
 
   downloadBtn.addEventListener('click', triggerPDF);
   linkedinShareBtn.addEventListener('click', (e) => {
@@ -143,7 +122,6 @@ export function render(container) {
  */
 export function show(sector, startTime, html, data, metrics, reportUrl = null) {
   _reportData = data ?? null;
-  _currentReportUrl = reportUrl;
 
   // Wire Open Report link
   if (reportUrl) {
@@ -151,17 +129,6 @@ export function show(sector, startTime, html, data, metrics, reportUrl = null) {
     openReportBtn.hidden = false;
   } else {
     openReportBtn.hidden = true;
-  }
-
-  // Reset Save button
-  if (reportUrl) {
-    const saved = JSON.parse(localStorage.getItem('prospectai_my_reports') || '[]');
-    const alreadySaved = saved.some(e => e.report_url === reportUrl);
-    saveReportBtn.hidden = false;
-    saveReportBtn.disabled = alreadySaved;
-    saveReportBtn.querySelector('.save-label').textContent = alreadySaved ? 'Saved ✓' : 'Save to My Reports';
-  } else {
-    saveReportBtn.hidden = true;
   }
 
   const elapsed = Math.round((Date.now() - startTime) / 1000);

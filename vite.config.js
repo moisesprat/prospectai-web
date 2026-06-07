@@ -1,10 +1,19 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'path';
 
 const MODAL_URL = 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
 
 export default defineConfig({
-  // Proxy /api requests to the Modal backend in dev.
-  // This sidesteps CORS — the browser talks to localhost, Vite forwards to Modal.
+  build: {
+    rollupOptions: {
+      input: {
+        main:    resolve(__dirname, 'index.html'),
+        stats:   resolve(__dirname, 'stats.html'),
+        report:  resolve(__dirname, 'report.html'),
+        reports: resolve(__dirname, 'reports.html'),
+      },
+    },
+  },
   server: {
     proxy: {
       '/api': {
