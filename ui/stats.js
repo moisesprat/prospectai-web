@@ -1,4 +1,5 @@
 import { trackStatsPageOpen } from './saEvents.js';
+import { initNav } from './nav.js';
 
 const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL
   ?? 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
@@ -439,6 +440,7 @@ function renderHistory(history, storeAndInit = true) {
 /* ── Init ────────────────────────────────────────────────────── */
 
 async function init() {
+  initNav();
   trackStatsPageOpen();
   initTabs();
 

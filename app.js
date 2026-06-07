@@ -9,6 +9,7 @@ import { render as renderReport }         from './ui/report.js';
 import { render as renderAnalytics }      from './ui/analytics.js';
 import { render as renderRecentWins }     from './ui/recentWins.js';
 import { initScrollDepthTracking } from './ui/saEvents.js';
+import { initNav } from './ui/nav.js';
 import { runAnalysis }                    from './ui/pipeline.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const header = document.querySelector('header');
   const samplePreview = document.querySelector('.sample-preview');
 
+  initNav();
   renderAnalytics(header);
   renderRecentWins(samplePreview.parentNode, samplePreview);
   initScrollDepthTracking();

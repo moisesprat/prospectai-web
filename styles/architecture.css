@@ -1,0 +1,317 @@
+/* ============================================================
+   ARCHITECTURE PAGE
+   ============================================================ */
+
+.arch-header { margin-bottom: 40px; }
+.arch-header p {
+  color: var(--text-dim);
+  max-width: 580px;
+  font-size: 13px;
+  margin-top: 8px;
+  line-height: 1.7;
+}
+
+/* ── Run controls ─────────────────────────────────────────── */
+.arch-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+}
+
+.arch-sector-select {
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 7px 12px;
+  cursor: pointer;
+  flex: 1;
+  min-width: 160px;
+}
+.arch-sector-select:focus { outline: none; border-color: var(--amber-dim); }
+
+.arch-run-btn {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--amber-dim);
+  color: var(--amber);
+  padding: 7px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background .18s, border-color .18s, transform .15s;
+  white-space: nowrap;
+}
+.arch-run-btn:hover:not(:disabled) {
+  background: var(--amber-glow);
+  border-color: var(--amber);
+  transform: translateY(-1px);
+}
+.arch-run-btn:disabled { opacity: .45; cursor: default; transform: none; }
+
+.arch-status {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  flex: 1;
+  text-align: right;
+  min-width: 120px;
+}
+.arch-status--running { color: var(--amber); }
+.arch-status--done    { color: var(--green); }
+
+/* ── Pipeline flow ────────────────────────────────────────── */
+.arch-flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  position: relative;
+}
+
+.arch-connector {
+  width: 2px;
+  height: 28px;
+  background: var(--border2);
+  position: relative;
+  overflow: hidden;
+}
+.arch-connector::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--green);
+  transition: top 0.4s ease;
+}
+.arch-connector--lit::after { top: 0; }
+
+/* Parallel row (Technical + Fundamental side by side) */
+.arch-parallel {
+  display: grid;
+  grid-template-columns: 1fr 64px 1fr;
+  align-items: start;
+  width: 100%;
+  max-width: 700px;
+}
+.arch-parallel-connectors {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 0;
+}
+.arch-parallel-join {
+  width: 2px;
+  height: 28px;
+  background: var(--border2);
+  position: relative;
+  overflow: hidden;
+}
+.arch-parallel-join::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: 0; right: 0; bottom: 0;
+  background: var(--green);
+  transition: top 0.4s ease;
+}
+.arch-parallel-join--lit::after { top: 0; }
+
+/* Horizontal bridge connecting parallel columns to center */
+.arch-bridge {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0;
+  width: 100%;
+}
+.arch-bridge-line {
+  height: 2px;
+  flex: 1;
+  background: var(--border2);
+  margin-top: 52px; /* align with node mid-top */
+  position: relative;
+  overflow: hidden;
+}
+.arch-bridge-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--green);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.arch-bridge-line--right::after { transform-origin: right; }
+.arch-bridge-line--lit::after { transform: scaleX(1); }
+
+/* ── Agent node ───────────────────────────────────────────── */
+.arch-node {
+  width: 100%;
+  max-width: 460px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 16px 20px;
+  transition: border-color .3s, background .3s, box-shadow .3s;
+  position: relative;
+}
+.arch-parallel .arch-node { max-width: none; }
+
+.arch-node--running {
+  border-color: var(--amber);
+  background: rgba(240, 165, 0, 0.04);
+  box-shadow: 0 0 20px rgba(240, 165, 0, 0.08);
+  animation: arch-pulse 1.6s ease-in-out infinite;
+}
+.arch-node--done {
+  border-color: var(--green-dim);
+  background: rgba(0, 200, 150, 0.04);
+  box-shadow: 0 0 16px rgba(0, 200, 150, 0.06);
+  animation: none;
+}
+
+@keyframes arch-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(240,165,0,0); }
+  50%       { box-shadow: 0 0 24px rgba(240,165,0,0.14); }
+}
+
+.arch-node-phase {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.arch-node-name {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.arch-node--running .arch-node-name { color: var(--amber); }
+.arch-node--done    .arch-node-name { color: var(--green); }
+
+.arch-node-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 10px;
+}
+.arch-node-tool {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  background: var(--border);
+  border-radius: 3px;
+  padding: 2px 7px;
+}
+.arch-node-model {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--amber-dim);
+  background: var(--amber-glow);
+  border-radius: 3px;
+  padding: 2px 7px;
+}
+
+.arch-node-status {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .06em;
+}
+.arch-node--running .arch-node-status { color: var(--amber); }
+.arch-node--done    .arch-node-status { color: var(--green); }
+
+/* ── Report result ────────────────────────────────────────── */
+.arch-result {
+  margin-top: 32px;
+  padding: 16px 20px;
+  background: rgba(0, 200, 150, 0.05);
+  border: 1px solid var(--green-dim);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  opacity: 0;
+  transition: opacity .4s;
+}
+.arch-result--visible { opacity: 1; }
+.arch-result-text {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--green);
+}
+.arch-result-link {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--green);
+  border: 1px solid var(--green-dim);
+  padding: 6px 14px;
+  border-radius: 4px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .15s;
+}
+.arch-result-link:hover { background: rgba(0,200,150,.1); }
+
+/* ── Tech stack section ───────────────────────────────────── */
+.arch-stack {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 48px;
+}
+.arch-stack-card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+.arch-stack-layer {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.arch-stack-name {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.arch-stack-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .arch-parallel { grid-template-columns: 1fr; gap: 0; }
+  .arch-parallel-connectors { display: none; }
+  .arch-bridge { display: none; }
+}

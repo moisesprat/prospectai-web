@@ -33,6 +33,9 @@
   --mono:        'IBM Plex Mono', monospace;
   --serif:       'DM Serif Display', serif;
   --sans:        'IBM Plex Sans', sans-serif;
+  --disclaimer-h: 34px;
+  --nav-h:        44px;
+  --topbar-h:     78px;
 }
 
 /* ============================================================
@@ -56,6 +59,7 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
+  padding-top: var(--topbar-h);
 }
 
 /* Grid background texture */
@@ -112,15 +116,77 @@ body::before {
    DISCLAIMER BAR
    ============================================================ */
 .disclaimer-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: var(--disclaimer-h);
   background: #1A0A00;
   border-bottom: 1px solid #5A2800;
-  padding: 8px 24px;
-  text-align: center;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--mono);
   font-size: 11px;
   color: #C06020;
   letter-spacing: .04em;
 }
+
+/* ── Site navigation ──────────────────────────────────────── */
+.site-nav {
+  position: fixed;
+  top: var(--disclaimer-h);
+  left: 0;
+  right: 0;
+  z-index: 999;
+  height: var(--nav-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+}
+
+.site-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.site-nav-brand {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+.site-nav-brand em { color: var(--amber); font-style: normal; }
+
+.site-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.site-nav-link {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 3px;
+  transition: color .15s, background .15s;
+  white-space: nowrap;
+}
+.site-nav-link:hover { color: var(--text); background: var(--border); }
+.site-nav-link.active { color: var(--amber); background: var(--amber-glow); }
 
 .disclaimer-bar strong {
   color: #E07030;

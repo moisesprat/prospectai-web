@@ -7,10 +7,11 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main:    resolve(__dirname, 'index.html'),
-        stats:   resolve(__dirname, 'stats.html'),
-        report:  resolve(__dirname, 'report.html'),
-        reports: resolve(__dirname, 'reports.html'),
+        main:         resolve(__dirname, 'index.html'),
+        stats:        resolve(__dirname, 'stats.html'),
+        report:       resolve(__dirname, 'report.html'),
+        reports:      resolve(__dirname, 'reports.html'),
+        architecture: resolve(__dirname, 'architecture.html'),
       },
     },
   },

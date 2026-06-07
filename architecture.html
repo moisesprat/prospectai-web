@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProspectAI Architecture — 6-Agent Pipeline</title>
+  <meta name="description" content="How ProspectAI works: a 6-agent CrewAI pipeline with parallel analysis phases, adversarial critic review, and self-correcting final strategy. Built by Moises Prat.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/architecture.css">
+  <script data-collect-dnt="true" async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</head>
+<body>
+
+  <div class="disclaimer-bar">
+    <strong>WARNING: NOT AN INVESTMENT TOOL.</strong> This is a technical demonstration of
+    multi-agent AI systems. All output is AI-generated and must not be used as financial advice.
+  </div>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="site-nav-inner wrap">
+      <a href="/" class="site-nav-brand">Prospect<em>AI</em></a>
+      <div class="site-nav-links">
+        <a href="/" class="site-nav-link" data-navpage="home">Home</a>
+        <a href="stats.html" class="site-nav-link" data-navpage="stats">Stats</a>
+        <a href="reports.html" class="site-nav-link" data-navpage="reports">Reports</a>
+        <a href="architecture.html" class="site-nav-link" data-navpage="architecture">Architecture</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+
+    <header class="arch-header">
+      <div class="header-tag">System Architecture</div>
+      <h1>Prospect<em>AI</em> Pipeline</h1>
+      <p>A 6-agent CrewAI flow that runs market analysis, technical and fundamental research in parallel, drafts a portfolio strategy, stress-tests it with an adversarial critic, then produces a revised final report. Select a sector and run it live to watch the pipeline animate.</p>
+    </header>
+
+    <!-- ── Run controls ──────────────────────────────────────── -->
+    <div class="arch-controls">
+      <select id="arch-sector-select" class="arch-sector-select" aria-label="Select sector">
+        <option value="Technology">Technology (XLK)</option>
+        <option value="Semiconductors">Semiconductors (SOXX)</option>
+        <option value="Healthcare">Healthcare (XLV)</option>
+        <option value="Energy">Energy (XLE)</option>
+        <option value="Financials">Financials (XLF)</option>
+        <option value="Consumer Discretionary">Consumer Discretionary (XLY)</option>
+        <option value="Industrials">Industrials (XLI)</option>
+        <option value="Real Estate">Real Estate (XLRE)</option>
+        <option value="Utilities">Utilities (XLU)</option>
+      </select>
+      <button id="arch-run-btn" class="arch-run-btn">Run Pipeline →</button>
+      <span id="arch-status" class="arch-status">Select a sector and run to animate the pipeline.</span>
+    </div>
+
+    <!-- ── Animated pipeline flow ────────────────────────────── -->
+    <div class="arch-flow">
+
+      <!-- Phase 1 — Market Analyst -->
+      <div class="arch-node" id="arch-node-0">
+        <div class="arch-node-phase">Phase 1</div>
+        <div class="arch-node-name">Market Analyst</div>
+        <div class="arch-node-tools">
+          <span class="arch-node-tool">RedditSentimentTool</span>
+          <span class="arch-node-tool">SerperDevTool</span>
+          <span class="arch-node-model">Haiku</span>
+        </div>
+        <span class="arch-node-status"></span>
+      </div>
+
+      <!-- Connector: splits into parallel -->
+      <div class="arch-connector" id="arch-conn-0"></div>
+
+      <!-- Phase 2 + 3 — Parallel -->
+      <div class="arch-parallel">
+        <!-- Left: Technical Analyst -->
+        <div>
+          <div class="arch-bridge">
+            <div class="arch-bridge-line arch-bridge-line--right" id="arch-conn-left-bridge"></div>
+          </div>
+          <div class="arch-node" id="arch-node-1">
+            <div class="arch-node-phase">Phase 2 — Parallel</div>
+            <div class="arch-node-name">Technical Analyst</div>
+            <div class="arch-node-tools">
+              <span class="arch-node-tool">TechnicalAnalysisTool</span>
+              <span class="arch-node-tool">yfinance</span>
+              <span class="arch-node-model">Haiku</span>
+            </div>
+            <span class="arch-node-status"></span>
+          </div>
+          <div class="arch-bridge">
+            <div class="arch-bridge-line arch-bridge-line--right" id="arch-conn-left-join"></div>
+          </div>
+        </div>
+
+        <!-- Center connectors -->
+        <div class="arch-parallel-connectors">
+          <div style="height:52px"></div>
+          <div class="arch-parallel-join" id="arch-conn-join"></div>
+        </div>
+
+        <!-- Right: Fundamental Analyst -->
+        <div>
+          <div class="arch-bridge">
+            <div class="arch-bridge-line" id="arch-conn-right-bridge"></div>
+          </div>
+          <div class="arch-node" id="arch-node-2">
+            <div class="arch-node-phase">Phase 3 — Parallel</div>
+            <div class="arch-node-name">Fundamental Analyst</div>
+            <div class="arch-node-tools">
+              <span class="arch-node-tool">FundamentalDataTool</span>
+              <span class="arch-node-tool">FundamentalGraderTool</span>
+              <span class="arch-node-model">Haiku</span>
+            </div>
+            <span class="arch-node-status"></span>
+          </div>
+          <div class="arch-bridge">
+            <div class="arch-bridge-line" id="arch-conn-right-join"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Connector: join → Draft Strategist -->
+      <div class="arch-connector" id="arch-conn-3"></div>
+
+      <!-- Phase 4 — Draft Strategist -->
+      <div class="arch-node" id="arch-node-3">
+        <div class="arch-node-phase">Phase 4</div>
+        <div class="arch-node-name">Draft Strategist</div>
+        <div class="arch-node-tools">
+          <span class="arch-node-tool">CompositeScoreTool</span>
+          <span class="arch-node-tool">PortfolioAllocatorTool</span>
+          <span class="arch-node-model">Sonnet</span>
+        </div>
+        <span class="arch-node-status"></span>
+      </div>
+
+      <div class="arch-connector" id="arch-conn-4"></div>
+
+      <!-- Phase 5 — Critic -->
+      <div class="arch-node" id="arch-node-4" style="border-color:var(--border2)">
+        <div class="arch-node-phase">Phase 5 — Adversarial Quality Gate</div>
+        <div class="arch-node-name">Critic</div>
+        <div class="arch-node-tools">
+          <span class="arch-node-tool">Reasoning only</span>
+          <span class="arch-node-model">Sonnet</span>
+        </div>
+        <span class="arch-node-status"></span>
+      </div>
+
+      <div class="arch-connector" id="arch-conn-5"></div>
+
+      <!-- Phase 6 — Final Strategist -->
+      <div class="arch-node" id="arch-node-5">
+        <div class="arch-node-phase">Phase 6</div>
+        <div class="arch-node-name">Final Strategist</div>
+        <div class="arch-node-tools">
+          <span class="arch-node-tool">PortfolioAllocatorTool</span>
+          <span class="arch-node-model">Sonnet</span>
+        </div>
+        <span class="arch-node-status"></span>
+      </div>
+
+    </div><!-- /arch-flow -->
+
+    <!-- Report result after run -->
+    <div class="arch-result" id="arch-result">
+      <span class="arch-result-text">✓ Pipeline complete — report generated</span>
+      <a id="arch-result-link" class="arch-result-link" href="#" target="_blank" rel="noopener noreferrer">Open Report →</a>
+    </div>
+
+    <!-- ── Tech stack ─────────────────────────────────────────── -->
+    <h2 class="stats-section-title" style="margin-top:56px">Tech Stack</h2>
+    <div class="arch-stack">
+      <div class="arch-stack-card">
+        <div class="arch-stack-layer">Orchestration</div>
+        <div class="arch-stack-name">CrewAI Flow</div>
+        <div class="arch-stack-desc">Multi-agent pipeline with parallel phase execution and structured Pydantic output validation at each step.</div>
+      </div>
+      <div class="arch-stack-card">
+        <div class="arch-stack-layer">LLM</div>
+        <div class="arch-stack-name">Anthropic Claude</div>
+        <div class="arch-stack-desc">Haiku for data-gathering phases (1–3), Sonnet for reasoning phases (4–6). Per-agent model override via env vars.</div>
+      </div>
+      <div class="arch-stack-card">
+        <div class="arch-stack-layer">Market Data</div>
+        <div class="arch-stack-name">yfinance + Reddit</div>
+        <div class="arch-stack-desc">OHLCV price history, fundamentals, and sector sentiment from Reddit (PRAW) with SerperDev fallback.</div>
+      </div>
+      <div class="arch-stack-card">
+        <div class="arch-stack-layer">Backend</div>
+        <div class="arch-stack-name">Modal + FastAPI</div>
+        <div class="arch-stack-desc">Serverless GPU-optional container. Streams agent progress via SSE. Persists analytics and LONG-BUY signals to Modal Dicts.</div>
+      </div>
+      <div class="arch-stack-card">
+        <div class="arch-stack-layer">Report Storage</div>
+        <div class="arch-stack-name">Cloudflare R2</div>
+        <div class="arch-stack-desc">Pipeline results stored as JSON (YYYY/MM/DD/run_id.json) in a private R2 bucket. Served via backend proxy.</div>
+      </div>
+      <div class="arch-stack-card">
+        <div class="arch-stack-layer">Frontend</div>
+        <div class="arch-stack-name">Cloudflare Pages</div>
+        <div class="arch-stack-desc">Static SPA built with Vite. No framework — vanilla ES modules. Real-time updates via EventSource.</div>
+      </div>
+    </div>
+
+  </div><!-- /wrap -->
+
+  <script type="module" src="ui/architecturePage.js"></script>
+</body>
+</html>

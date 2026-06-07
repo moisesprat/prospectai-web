@@ -4,6 +4,9 @@
    one card per entry in the report history page.
    ============================================================ */
 
+import { initNav } from './nav.js';
+initNav();
+
 const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL
   ?? 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
 
