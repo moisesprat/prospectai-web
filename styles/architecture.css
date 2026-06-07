@@ -11,65 +11,19 @@
   line-height: 1.7;
 }
 
-/* ── Run controls ─────────────────────────────────────────── */
-.arch-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 36px;
-  padding: 16px 20px;
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-radius: 6px;
-}
-
-.arch-sector-select {
-  font-family: var(--mono);
-  font-size: 12px;
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--border2);
-  border-radius: 4px;
-  padding: 7px 12px;
-  cursor: pointer;
-  flex: 1;
-  min-width: 160px;
-}
-.arch-sector-select:focus { outline: none; border-color: var(--amber-dim); }
-
-.arch-run-btn {
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  background: transparent;
-  border: 1px solid var(--amber-dim);
-  color: var(--amber);
-  padding: 7px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background .18s, border-color .18s, transform .15s;
-  white-space: nowrap;
-}
-.arch-run-btn:hover:not(:disabled) {
-  background: var(--amber-glow);
-  border-color: var(--amber);
-  transform: translateY(-1px);
-}
-.arch-run-btn:disabled { opacity: .45; cursor: default; transform: none; }
-
-.arch-status {
+/* ── Demo note ────────────────────────────────────────────── */
+.arch-demo-note {
   font-family: var(--mono);
   font-size: 11px;
   color: var(--text-dim);
-  flex: 1;
-  text-align: right;
-  min-width: 120px;
+  margin-bottom: 32px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
 }
-.arch-status--running { color: var(--amber); }
-.arch-status--done    { color: var(--green); }
+.arch-demo-note a { color: var(--amber); text-decoration: none; }
+.arch-demo-note a:hover { text-decoration: underline; }
 
 /* ── Pipeline flow ────────────────────────────────────────── */
 .arch-flow {
@@ -242,38 +196,6 @@
 .arch-node--running .arch-node-status { color: var(--amber); }
 .arch-node--done    .arch-node-status { color: var(--green); }
 
-/* ── Report result ────────────────────────────────────────── */
-.arch-result {
-  margin-top: 32px;
-  padding: 16px 20px;
-  background: rgba(0, 200, 150, 0.05);
-  border: 1px solid var(--green-dim);
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  opacity: 0;
-  transition: opacity .4s;
-}
-.arch-result--visible { opacity: 1; }
-.arch-result-text {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--green);
-}
-.arch-result-link {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--green);
-  border: 1px solid var(--green-dim);
-  padding: 6px 14px;
-  border-radius: 4px;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: background .15s;
-}
-.arch-result-link:hover { background: rgba(0,200,150,.1); }
 
 /* ── Tech stack section ───────────────────────────────────── */
 .arch-stack {

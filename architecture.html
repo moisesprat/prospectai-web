@@ -38,22 +38,8 @@
       <p>A 6-agent CrewAI flow that runs market analysis, technical and fundamental research in parallel, drafts a portfolio strategy, stress-tests it with an adversarial critic, then produces a revised final report. Select a sector and run it live to watch the pipeline animate.</p>
     </header>
 
-    <!-- ── Run controls ──────────────────────────────────────── -->
-    <div class="arch-controls">
-      <select id="arch-sector-select" class="arch-sector-select" aria-label="Select sector">
-        <option value="Technology">Technology (XLK)</option>
-        <option value="Semiconductors">Semiconductors (SOXX)</option>
-        <option value="Healthcare">Healthcare (XLV)</option>
-        <option value="Energy">Energy (XLE)</option>
-        <option value="Financials">Financials (XLF)</option>
-        <option value="Consumer Discretionary">Consumer Discretionary (XLY)</option>
-        <option value="Industrials">Industrials (XLI)</option>
-        <option value="Real Estate">Real Estate (XLRE)</option>
-        <option value="Utilities">Utilities (XLU)</option>
-      </select>
-      <button id="arch-run-btn" class="arch-run-btn">Run Pipeline →</button>
-      <span id="arch-status" class="arch-status">Select a sector and run to animate the pipeline.</span>
-    </div>
+    <!-- ── Demo indicator ────────────────────────────────────── -->
+    <p class="arch-demo-note">The diagram below animates automatically to show the execution flow. Run a real analysis from the <a href="/">Home</a> page.</p>
 
     <!-- ── Animated pipeline flow ────────────────────────────── -->
     <div class="arch-flow">
@@ -165,11 +151,6 @@
 
     </div><!-- /arch-flow -->
 
-    <!-- Report result after run -->
-    <div class="arch-result" id="arch-result">
-      <span class="arch-result-text">✓ Pipeline complete — report generated</span>
-      <a id="arch-result-link" class="arch-result-link" href="#" target="_blank" rel="noopener noreferrer">Open Report →</a>
-    </div>
 
     <!-- ── Tech stack ─────────────────────────────────────────── -->
     <h2 class="stats-section-title" style="margin-top:56px">Tech Stack</h2>

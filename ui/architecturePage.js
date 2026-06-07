@@ -1,16 +1,12 @@
 /* ============================================================
-   ARCHITECTURE PAGE
-   Renders the animated pipeline diagram and drives it via SSE
-   when the user triggers a run.
+   ARCHITECTURE PAGE — demo animation (no backend connection)
+   Cycles through the 6 agent nodes automatically to illustrate
+   the pipeline execution flow.
    ============================================================ */
 
 import { initNav } from './nav.js';
 initNav();
 
-const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL
-  ?? 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
-
-/* agent index → node element id */
 const NODE_IDS = [
   'arch-node-0',  // Market Analyst
   'arch-node-1',  // Technical Analyst
@@ -20,18 +16,20 @@ const NODE_IDS = [
   'arch-node-5',  // Final Strategist
 ];
 
-/* connector ids that light up when an agent completes */
 const CONNECTOR_IDS = [
-  'arch-conn-0',  // after Market Analyst → splits to parallel
-  'arch-conn-1',  // after Technical (left bridge)
-  'arch-conn-2',  // after Fundamental (right bridge)
-  'arch-conn-3',  // after parallel join → Draft Strategist
-  'arch-conn-4',  // after Draft → Critic
-  'arch-conn-5',  // after Critic → Final
+  'arch-conn-0',
+  'arch-conn-left-bridge',
+  'arch-conn-right-bridge',
+  'arch-conn-join',
+  'arch-conn-3',
+  'arch-conn-4',
+  'arch-conn-5',
 ];
 
-let runBtn, statusEl, resultEl, resultLink;
-let source = null;
+// How long each phase stays "running" before completing (ms)
+const PHASE_DURATIONS = [3000, 3500, 3500, 2500, 2500, 2500];
+// Pause between full loop replays
+const LOOP_PAUSE_MS = 2500;
 
 function setNodeState(idx, state) {
   const el = document.getElementById(NODE_IDS[idx]);
@@ -41,116 +39,74 @@ function setNodeState(idx, state) {
   const statusSpan = el.querySelector('.arch-node-status');
   if (statusSpan) {
     statusSpan.textContent = state === 'running' ? '● RUNNING'
-      : state === 'done' ? '✓ DONE' : '';
+      : state === 'done'    ? '✓ DONE'
+      : '';
   }
 }
 
-function litConnector(id) {
+function lightConnector(id) {
   const el = document.getElementById(id);
   if (el) el.classList.add('arch-connector--lit', 'arch-parallel-join--lit', 'arch-bridge-line--lit');
 }
 
-function resetAll() {
+function reset() {
   NODE_IDS.forEach((_, i) => setNodeState(i, null));
   CONNECTOR_IDS.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('arch-connector--lit', 'arch-parallel-join--lit', 'arch-bridge-line--lit');
   });
-  resultEl.classList.remove('arch-result--visible');
-  resultLink.href = '#';
 }
 
-function finish(sector, runId) {
-  runBtn.disabled = false;
-  runBtn.textContent = 'Run Again →';
-  statusEl.className = 'arch-status arch-status--done';
-  statusEl.textContent = 'Pipeline complete';
-  if (runId) {
-    resultLink.href = `${window.location.origin}/report.html?id=${runId}`;
-    resultEl.classList.add('arch-result--visible');
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function runDemo() {
+  while (true) {
+    reset();
+    await delay(800);
+
+    // Phase 1 — Market Analyst
+    setNodeState(0, 'running');
+    await delay(PHASE_DURATIONS[0]);
+    setNodeState(0, 'done');
+    lightConnector('arch-conn-0');
+    await delay(300);
+    lightConnector('arch-conn-left-bridge');
+    lightConnector('arch-conn-right-bridge');
+
+    // Phase 2 + 3 — Technical & Fundamental in parallel
+    setNodeState(1, 'running');
+    setNodeState(2, 'running');
+    await delay(PHASE_DURATIONS[1]);
+    setNodeState(1, 'done');
+    setNodeState(2, 'done');
+    await delay(250);
+    lightConnector('arch-conn-join');
+    await delay(300);
+    lightConnector('arch-conn-3');
+
+    // Phase 4 — Draft Strategist
+    setNodeState(3, 'running');
+    await delay(PHASE_DURATIONS[3]);
+    setNodeState(3, 'done');
+    lightConnector('arch-conn-4');
+
+    // Phase 5 — Critic
+    setNodeState(4, 'running');
+    await delay(PHASE_DURATIONS[4]);
+    setNodeState(4, 'done');
+    lightConnector('arch-conn-5');
+
+    // Phase 6 — Final Strategist
+    setNodeState(5, 'running');
+    await delay(PHASE_DURATIONS[5]);
+    setNodeState(5, 'done');
+
+    // Hold completed state, then loop
+    await delay(LOOP_PAUSE_MS);
   }
 }
 
-function run(sector) {
-  if (source) { source.close(); source = null; }
-  resetAll();
-  runBtn.disabled = true;
-  runBtn.textContent = 'Running…';
-  statusEl.className = 'arch-status arch-status--running';
-  statusEl.textContent = 'Connecting…';
-
-  const url = `${BACKEND_URL}/api/analyze?sector=${encodeURIComponent(sector)}&risk_profile=conservative`;
-  source = new EventSource(url);
-  let settled = false;
-
-  source.onmessage = (e) => {
-    let event;
-    try { event = JSON.parse(e.data); } catch { return; }
-
-    switch (event.type) {
-      case 'agent_start': {
-        const idx = event.agent_index;
-        setNodeState(idx, 'running');
-        statusEl.textContent = `Phase ${idx + 1} — ${event.agent_name}…`;
-        break;
-      }
-      case 'agent_done': {
-        const idx = event.agent_index;
-        setNodeState(idx, 'done');
-        // light up the outgoing connector(s)
-        if (idx === 0) {
-          // Market Analyst done → light bridge lines to parallel agents
-          litConnector('arch-conn-left-bridge');
-          litConnector('arch-conn-right-bridge');
-        } else if (idx === 1 || idx === 2) {
-          // when BOTH parallel agents are done, light the join connector
-          const otherDone = document.getElementById(NODE_IDS[idx === 1 ? 2 : 1])
-            ?.classList.contains('arch-node--done');
-          if (otherDone) litConnector('arch-conn-join');
-        } else {
-          litConnector(`arch-conn-${idx}`);
-        }
-        break;
-      }
-      case 'pipeline_done': {
-        settled = true;
-        source.close();
-        source = null;
-        // ensure all nodes are marked done
-        NODE_IDS.forEach((_, i) => setNodeState(i, 'done'));
-        finish(sector, event.run_id ?? null);
-        break;
-      }
-      case 'error': {
-        settled = true;
-        source.close();
-        source = null;
-        runBtn.disabled = false;
-        runBtn.textContent = 'Retry →';
-        statusEl.className = 'arch-status';
-        statusEl.textContent = `Error: ${event.message}`;
-        break;
-      }
-    }
-  };
-
-  source.onerror = () => {
-    if (settled) return;
-    source.close();
-    source = null;
-    runBtn.disabled = false;
-    runBtn.textContent = 'Retry →';
-    statusEl.className = 'arch-status';
-    statusEl.textContent = 'Connection lost — try again';
-  };
-}
-
 document.addEventListener('DOMContentLoaded', () => {
-  runBtn    = document.getElementById('arch-run-btn');
-  statusEl  = document.getElementById('arch-status');
-  resultEl  = document.getElementById('arch-result');
-  resultLink = document.getElementById('arch-result-link');
-
-  const select = document.getElementById('arch-sector-select');
-  runBtn.addEventListener('click', () => run(select.value));
+  // Small initial delay so the page renders before animation starts
+  setTimeout(runDemo, 600);
 });
