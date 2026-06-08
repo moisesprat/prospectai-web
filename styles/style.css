@@ -440,7 +440,7 @@ h1 em {
   }
 
   .rw-track {
-    animation: marquee var(--ticker-duration, 30s) linear infinite;
+    animation: marquee var(--ticker-duration, 46s) linear infinite;
   }
 
   .recent-wins:hover .rw-track {
