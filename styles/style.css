@@ -38,6 +38,14 @@
   --topbar-h:     78px;
 }
 
+/* Safe mobile default — prevents flash before JS measures actual height */
+@media (max-width: 600px) {
+  :root {
+    --disclaimer-h: 70px;
+    --topbar-h:     114px;
+  }
+}
+
 /* ============================================================
    RESET & BASE
    ============================================================ */
@@ -121,13 +129,10 @@ body::before {
   left: 0;
   right: 0;
   z-index: 1000;
-  height: var(--disclaimer-h);
   background: #1A0A00;
   border-bottom: 1px solid #5A2800;
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 8px 24px;
+  text-align: center;
   font-family: var(--mono);
   font-size: 11px;
   color: #C06020;

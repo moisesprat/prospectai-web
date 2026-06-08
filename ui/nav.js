@@ -3,13 +3,21 @@
    just below the disclaimer bar regardless of its height.
    ============================================================ */
 
-function updateHeights() {
-  const disclaimer = document.querySelector('.disclaimer-bar');
-  if (!disclaimer) return;
-  const h = disclaimer.offsetHeight;
+function applyHeights(h) {
   const root = document.documentElement;
   root.style.setProperty('--disclaimer-h', `${h}px`);
   root.style.setProperty('--topbar-h', `${h + 44}px`);
+}
+
+function observeDisclaimer() {
+  const disclaimer = document.querySelector('.disclaimer-bar');
+  if (!disclaimer) return;
+  // Measure immediately so the nav snaps into place on first paint
+  applyHeights(disclaimer.offsetHeight);
+  // Then track every resize (text reflow, orientation change, font load)
+  new ResizeObserver(entries => {
+    applyHeights(Math.round(entries[0].contentRect.height + /* border+padding */ 16));
+  }).observe(disclaimer);
 }
 
 export function initNav() {
@@ -23,7 +31,10 @@ export function initNav() {
     a.classList.toggle('active', a.dataset.navpage === page);
   });
 
-  // Measure disclaimer height now and on every resize
-  updateHeights();
-  window.addEventListener('resize', updateHeights);
+  // Start observing once DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', observeDisclaimer);
+  } else {
+    observeDisclaimer();
+  }
 }
