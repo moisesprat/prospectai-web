@@ -129,6 +129,13 @@
           <span id="perf-row-count"></span>
         </p>
 
+        <!-- Sector filter -->
+        <div class="stats-filter-row" id="perf-filter-row" hidden>
+          <select id="perf-sector-filter" class="stats-chart-filter" aria-label="Filter performance by sector">
+            <option value="__all__">All Sectors</option>
+          </select>
+        </div>
+
         <!-- KPI cards -->
         <div class="stats-kpi-grid">
           <div class="stats-kpi-card">
@@ -180,6 +187,7 @@
             </thead>
             <tbody id="history-tbody"></tbody>
           </table>
+          <div class="stats-empty" id="history-empty" hidden>No signals yet for this sector.</div>
           <div class="stats-error" id="history-error" hidden>Could not load signal performance data.</div>
         </div>
       </section>

@@ -251,8 +251,9 @@ function renderCharts(actionBreakdown) {
   renderDecisionsDonut('__overall__');
 }
 
-/* ── Performance tab — sort state ───────────────────────────── */
+/* ── Performance tab — sort state + raw history ─────────────── */
 
+let _allHistory   = [];
 let _perfHistory  = [];
 let _sort         = { col: 'roi', dir: 'desc' };
 let _sortInited   = false;
@@ -309,6 +310,40 @@ function initSortHeaders() {
     updateSortHeaders(_sort.col, _sort.dir);
     renderHistory(sortHistory(_perfHistory, _sort.col, _sort.dir), false);
   });
+}
+
+/* ── Performance tab — sector filter helpers ─────────────────── */
+
+function getFilteredHistory(sector) {
+  if (sector === '__all__') return _allHistory;
+  return _allHistory.filter(r => r.sector === sector);
+}
+
+function applyDataRules(history) {
+  return excludeRecentHistory(deduplicateHistory(history));
+}
+
+function populateSectorDropdown(raw) {
+  const sectors = [...new Set(raw.map(r => r.sector).filter(Boolean))].sort();
+  const select    = document.getElementById('perf-sector-filter');
+  const filterRow = document.getElementById('perf-filter-row');
+
+  select.innerHTML = '<option value="__all__">All Sectors</option>';
+  for (const s of sectors) {
+    const opt = document.createElement('option');
+    opt.value       = s;
+    opt.textContent = s;
+    select.appendChild(opt);
+  }
+
+  if (sectors.length > 0) {
+    filterRow.hidden = false;
+    select.addEventListener('change', () => {
+      const ruled = applyDataRules(getFilteredHistory(select.value));
+      renderHistory(ruled);
+      renderPerformanceKpis(ruled);
+    });
+  }
 }
 
 /* ── Performance tab — data quality helpers ──────────────────── */
@@ -383,10 +418,26 @@ function renderPerformanceKpis(history) {
 
 function renderHistory(history, storeAndInit = true) {
   document.getElementById('history-loading').hidden = true;
-  const table = document.getElementById('history-table');
-  const tbody = document.getElementById('history-tbody');
-  table.hidden    = false;
+  const table    = document.getElementById('history-table');
+  const tbody    = document.getElementById('history-tbody');
+  const emptyEl  = document.getElementById('history-empty');
   tbody.innerHTML = '';
+
+  if (history.length === 0) {
+    table.hidden   = true;
+    emptyEl.hidden = false;
+    document.getElementById('perf-disclaimer').hidden = false;
+    document.getElementById('perf-row-count').textContent =
+      ' · 0 signals · entries within 5 days and duplicates excluded';
+    if (storeAndInit) {
+      _perfHistory = [];
+      _sort = { col: 'roi', dir: 'desc' };
+    }
+    return;
+  }
+
+  emptyEl.hidden = true;
+  table.hidden   = false;
 
   if (storeAndInit) {
     _perfHistory = history;
@@ -467,9 +518,10 @@ async function init() {
   const loadingEl = document.getElementById('history-loading');
   if (historyRes.status === 'fulfilled' && historyRes.value.ok) {
     try {
-      const data    = await historyRes.value.json();
-      const raw     = data.history ?? [];
-      const cleaned = excludeRecentHistory(deduplicateHistory(raw));
+      const data = await historyRes.value.json();
+      _allHistory  = data.history ?? [];
+      populateSectorDropdown(_allHistory);
+      const cleaned = applyDataRules(_allHistory);
       renderHistory(cleaned);
       renderPerformanceKpis(cleaned);
     } catch {

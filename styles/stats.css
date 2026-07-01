@@ -226,6 +226,14 @@
   flex-wrap: wrap;
 }
 
+/* ── Performance sector filter ───────────────────────────────── */
+.stats-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
 /* ── Performance disclaimer ──────────────────────────────────── */
 .stats-disclaimer {
   font-family: var(--mono);
