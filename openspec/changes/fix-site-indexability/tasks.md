@@ -33,7 +33,7 @@
 
 ## 6. GitHub Action, deploy, and verification
 
-- [x] 6.1 Add `.github/workflows/generate-sitemap.yml`: checkout, setup Node, run `npm run generate`, and commit-and-push any resulting diff to `main` with `contents: write` permission and a `[skip ci]`-tagged commit message
+- [x] 6.1 Add `.github/workflows/generate-sitemap.yml`: checkout, setup Node, run `npm run generate`, and commit-and-push any resulting diff to `main` with `contents: write` permission (job guarded by `github.actor != 'github-actions[bot]'`, not a `[skip ci]` message tag — that collides with Cloudflare Pages' own skip-deploy convention)
 - [x] 6.2 Configure the workflow to trigger on `push` to `main` and on a schedule (every 15 minutes), guarding the commit step so it only runs (and only pushes) when generated content actually differs from what's committed
 - [x] 6.3 Run `npm run generate` locally and inspect the regenerated `stats.html`, `reports.html`, `sitemap.xml` for correct static content before relying on the Action
 - [x] 6.4 Push and confirm the Action runs successfully, commits land on `main`, and Cloudflare Pages auto-deploys from the resulting commit (no Cloudflare configuration change needed)

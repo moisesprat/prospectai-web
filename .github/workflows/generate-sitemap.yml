@@ -19,7 +19,12 @@ concurrency:
 
 jobs:
   generate:
-    if: github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip ci]')
+    # Guard against re-triggering on the bot's own push using the commit
+    # author, not a commit-message marker like "[skip ci]" — Cloudflare
+    # Pages treats that bracket tag (case-insensitively, anywhere in the
+    # message) as an instruction to skip deploying the commit entirely,
+    # which silently broke every scheduled deploy.
+    if: github.event_name != 'push' || github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,5 +47,5 @@ jobs:
             exit 0
           fi
           git add sitemap.xml stats.html reports.html
-          git commit -m "chore: regenerate sitemap and static content [skip ci]"
+          git commit -m "chore: regenerate sitemap and static content"
           git push origin HEAD:main
