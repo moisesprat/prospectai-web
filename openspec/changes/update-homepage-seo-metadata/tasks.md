@@ -20,5 +20,5 @@
 
 - [x] 4.1 View-source `index.html` locally and confirm no remaining "5-agent" references anywhere in `<head>`
 - [x] 4.2 Validate the JSON-LD block is still well-formed JSON (e.g. `python3 -c "import json; json.load(open('...'))"` on the extracted block, or a schema.org validator)
-- [ ] 4.3 Commit, push, and confirm Cloudflare Pages deploys the change
-- [ ] 4.4 Spot-check the deployed page's title/description/OG tags via `curl` or a social share debugger (e.g. LinkedIn Post Inspector) to confirm the new copy renders correctly
+- [x] 4.3 Commit, push, and confirm Cloudflare Pages deploys the change
+- [x] 4.4 Spot-check the deployed page's title/description/OG tags via `curl` or a social share debugger (e.g. LinkedIn Post Inspector) to confirm the new copy renders correctly
