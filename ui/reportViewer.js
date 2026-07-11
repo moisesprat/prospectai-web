@@ -36,6 +36,13 @@ async function init() {
   // Update page title once we know the run ID
   document.title = `ProspectAI Report — ${runId.slice(0, 8)}…`;
 
+  // Each report is a distinct piece of content — point the canonical tag at
+  // this specific report.html?id=... URL instead of the bare report.html
+  // that ships in the static HTML, so Google indexes reports individually
+  // rather than treating them all as duplicates of one generic page.
+  document.querySelector('link[rel="canonical"]').href =
+    `https://prospect-ai.moisesprat.dev/report.html?id=${encodeURIComponent(runId)}`;
+
   let data;
   try {
     const res = await fetch(`${BACKEND_URL}/api/report/${encodeURIComponent(runId)}`);
