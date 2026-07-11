@@ -36,6 +36,6 @@
 - [x] 6.1 Add `.github/workflows/generate-sitemap.yml`: checkout, setup Node, run `npm run generate`, and commit-and-push any resulting diff to `main` with `contents: write` permission and a `[skip ci]`-tagged commit message
 - [x] 6.2 Configure the workflow to trigger on `push` to `main` and on a schedule (every 15 minutes), guarding the commit step so it only runs (and only pushes) when generated content actually differs from what's committed
 - [x] 6.3 Run `npm run generate` locally and inspect the regenerated `stats.html`, `reports.html`, `sitemap.xml` for correct static content before relying on the Action
-- [ ] 6.4 Push and confirm the Action runs successfully, commits land on `main`, and Cloudflare Pages auto-deploys from the resulting commit (no Cloudflare configuration change needed)
-- [ ] 6.5 Verify with `curl -s https://prospect-ai.moisesprat.dev/stats.html` and `.../reports.html` that real content (not skeletons) is present, and that `/sitemap.xml` lists current pages
-- [ ] 6.6 Spot-check all five pages' canonical tags in production match their own URLs
+- [x] 6.4 Push and confirm the Action runs successfully, commits land on `main`, and Cloudflare Pages auto-deploys from the resulting commit (no Cloudflare configuration change needed)
+- [x] 6.5 Verify with `curl -s https://prospect-ai.moisesprat.dev/stats.html` and `.../reports.html` that real content (not skeletons) is present, and that `/sitemap.xml` lists current pages
+- [x] 6.6 Spot-check all five pages' canonical tags in production match their own URLs
