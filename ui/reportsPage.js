@@ -5,19 +5,11 @@
    ============================================================ */
 
 import { initNav } from './nav.js';
+import { renderReportsGridHTML } from './reportsRender.js';
 initNav();
 
 const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL
   ?? 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
-
-function fmtDate(iso) {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  const day   = String(d.getUTCDate()).padStart(2, '0');
-  const month = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()];
-  const year  = String(d.getUTCFullYear()).slice(-2);
-  return `${day}-${month}-${year}`;
-}
 
 async function loadReports() {
   const loadingEl = document.getElementById('reports-loading');
@@ -37,32 +29,13 @@ async function loadReports() {
       return;
     }
 
-    gridEl.hidden = false;
-    for (const r of reports) {
-      const card = document.createElement('a');
-      card.className = 'report-card';
-      card.href      = `${window.location.origin}/report.html?id=${r.run_id}`;
-      card.target    = '_blank';
-      card.rel       = 'noopener noreferrer';
-      card.innerHTML = `
-        <div class="report-card-top">
-          <span class="report-card-sector">${r.sector || '—'}</span>
-          <span class="report-card-version">${r.prospectai_version ? 'v' + r.prospectai_version : 'v—'}</span>
-        </div>
-        <div class="report-card-meta">
-          <span>${fmtDate(r.run_at)}</span>
-          <span class="report-card-sep">·</span>
-          <span>${r.ticker_count ?? 0} stocks</span>
-          <span class="report-card-sep">·</span>
-          <span style="color:#4a7c59">${r.long_buy_count ?? 0} LONG-BUY</span>
-          <span class="report-card-sep">·</span>
-          <span style="color:#4a7c59">View Report →</span>
-        </div>`;
-      gridEl.appendChild(card);
-    }
+    gridEl.hidden      = false;
+    gridEl.innerHTML   = renderReportsGridHTML(reports, window.location.origin);
+    gridEl.dataset.ssr = '1';
   } catch {
     loadingEl.hidden = true;
-    errorEl.hidden   = false;
+    // Leave any server-rendered grid content in place rather than wiping it.
+    if (gridEl.dataset.ssr !== '1') errorEl.hidden = false;
   }
 }
 

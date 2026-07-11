@@ -1,0 +1,46 @@
+name: Regenerate sitemap and static content
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Every 15 minutes — keeps stats.html / reports.html / sitemap.xml fresh
+    # even when no code is pushed, since backend report data changes
+    # independently of commits to this repo.
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generate-sitemap
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    if: github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip ci]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate sitemap and static content
+        run: node scripts/build-static.mjs
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- sitemap.xml stats.html reports.html; then
+            echo "No content changes, skipping commit."
+            exit 0
+          fi
+          git add sitemap.xml stats.html reports.html
+          git commit -m "chore: regenerate sitemap and static content [skip ci]"
+          git push origin HEAD:main
