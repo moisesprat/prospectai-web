@@ -12,5 +12,5 @@
 
 - [x] 3.1 View-source `architecture.html` locally and confirm title/H1 match exactly and no old "ProspectAI Architecture — 6-Agent Pipeline"/"ProspectAI Pipeline" copy remains
 - [x] 3.2 Validate the JSON-LD block is well-formed JSON and `@type` is `TechArticle` (e.g. `python3 -c "import json; json.load(...)"` on the extracted block)
-- [ ] 3.3 Commit, push, and confirm Cloudflare Pages deploys the change
-- [ ] 3.4 Spot-check the deployed page's title/H1/meta description/JSON-LD via `curl`
+- [x] 3.3 Commit, push, and confirm Cloudflare Pages deploys the change
+- [x] 3.4 Spot-check the deployed page's title/H1/meta description/JSON-LD via `curl`
