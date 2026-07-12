@@ -1,0 +1,83 @@
+/* ── Pattern pages — code excerpt block ──────────────────── */
+.pattern-code-attribution {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.pattern-code {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 16px;
+  overflow-x: auto;
+  margin: 8px 0 24px;
+}
+
+.pattern-code code {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre;
+}
+
+/* ── Pattern pages — related-links row ───────────────────── */
+.pattern-related {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 24px 0 8px;
+}
+
+.pattern-related a {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--amber);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 6px 10px;
+  text-decoration: none;
+}
+
+.pattern-related a:hover {
+  border-color: var(--amber);
+}
+
+/* ── Hub page — pattern card grid ────────────────────────── */
+.pattern-hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.pattern-hub-card {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 16px;
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+
+.pattern-hub-card:hover {
+  border-color: var(--amber);
+}
+
+.pattern-hub-card-title {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--amber);
+  margin-bottom: 6px;
+}
+
+.pattern-hub-card-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}

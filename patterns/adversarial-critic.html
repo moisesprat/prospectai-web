@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adversarial Critic Pattern: How AI Agents Challenge Their Own Output</title>
+  <meta name="description" content="How ProspectAI's Critic agent adversarially reviews a draft AI investment strategy, forcing a full revision pass before any recommendation is finalized.">
+  <link rel="canonical" href="https://prospect-ai.moisesprat.dev/patterns/adversarial-critic">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/style.css">
+  <link rel="stylesheet" href="/styles/architecture.css">
+  <link rel="stylesheet" href="/styles/patterns.css">
+  <script data-collect-dnt="true" async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+
+  <!-- ── JSON-LD STRUCTURED DATA (Google rich results) ───────── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Adversarial Critic Pattern: How AI Agents Challenge Their Own Output",
+    "description": "How ProspectAI's Critic agent adversarially reviews a draft AI investment strategy, forcing a full revision pass before any recommendation is finalized.",
+    "author": {
+      "@type": "Person",
+      "name": "Moises Prat",
+      "url": "https://moisesprat.dev"
+    },
+    "mainEntityOfPage": "https://prospect-ai.moisesprat.dev/patterns/adversarial-critic"
+  }
+  </script>
+</head>
+<body>
+
+  <div class="disclaimer-bar">
+    <strong>WARNING: NOT AN INVESTMENT TOOL.</strong> This is a technical demonstration of
+    multi-agent AI systems. All output is AI-generated and must not be used as financial advice.
+  </div>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="site-nav-inner wrap">
+      <a href="/" class="site-nav-brand">Prospect<em>AI</em></a>
+      <div class="site-nav-links">
+        <a href="/" class="site-nav-link" data-navpage="home">Home</a>
+        <a href="/stats.html" class="site-nav-link" data-navpage="stats">Stats</a>
+        <a href="/reports.html" class="site-nav-link" data-navpage="reports">Reports</a>
+        <a href="/architecture.html" class="site-nav-link" data-navpage="architecture">Architecture</a>
+        <a href="/patterns/" class="site-nav-link" data-navpage="patterns">Patterns</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+
+    <header class="arch-header">
+      <div class="header-tag">Architecture Pattern</div>
+      <h1>Adversarial Critic Pattern: How AI Agents Challenge Their Own Output</h1>
+      <p>A generator-critic pattern for multi-agent AI pipelines: one agent proposes a draft, a structurally separate agent is instructed to actively try to break it, and a third pass reconciles both before anything ships.</p>
+    </header>
+
+    <div class="report-body">
+      <h2>What it is</h2>
+      <p>Most LLM pipelines generate an answer in a single pass and ship it. The adversarial critic pattern splits generation and evaluation into two separate agents with opposing incentives: a Draft Strategist agent proposes a solution, and a Critic agent — with no tools, no delegation, and an explicit adversarial goal — is asked to find every reason the draft is wrong rather than confirm it's right. A third, final pass is then forced to consume both the original draft and the critique and produce a revised, defensible output.</p>
+
+      <h2>How ProspectAI implements it</h2>
+      <p>ProspectAI's <code>CriticAgent</code> is a minimal CrewAI <code>Agent</code> — no tools attached, pure textual reasoning against the draft portfolio strategy already produced by <code>InvestorStrategicAgent</code>:</p>
+
+      <span class="pattern-code-attribution">ProspectAI / agents/critic_agent.py</span>
+      <pre class="pattern-code"><code>from .base_agent import BaseAgent
+from crewai import Agent
+
+
+class CriticAgent(BaseAgent):
+    """Adversarial reviewer that challenges the Draft Strategist's portfolio."""
+
+    def __init__(self, config_path: str = None):
+        super().__init__(agent_key="critic", config_path=config_path)
+
+    def create_agent(self) -&gt; Agent:
+        return Agent(
+            role=self.role,
+            goal=self.goal,
+            backstory=self.backstory,
+            verbose=self.verbose,
+            allow_delegation=self.allow_delegation,
+            llm=self._get_llm(),
+            max_iter=self.max_iter,
+        )</code></pre>
+
+      <p>The orchestration layer (a CrewAI <code>Flow</code>) is what actually enforces the two-pass structure: <code>critique_review</code> runs after the draft strategy and validates the critic's output against a strict <code>CriticOutput</code> schema (<code>per_ticker_critiques</code>, <code>revision_directives</code>); <code>final_strategy</code> is then required to build its prompt context from <em>both</em> the original draft and the critique — it cannot skip straight from draft to final without the adversarial pass in between:</p>
+
+      <span class="pattern-code-attribution">ProspectAI / prospect_ai_flow.py, lines 474-508</span>
+      <pre class="pattern-code"><code>@listen(draft_strategy)
+async def critique_review(self):
+    ...
+    self.state.critique_output = self._extract_pydantic(
+        result, CriticOutput, "critique_review"
+    )
+    return result.raw or ""
+
+@listen(critique_review)
+async def final_strategy(self):
+    ...
+    ctx = "\n\n".join([
+        self._fmt_ctx("Draft Strategy Output", self._slim_draft()),
+        self._fmt_ctx("Critic Review Output", self._slim_critique()),
+    ])
+    task = self._factory.build_task(
+        "final_strategy", self.state.sector, self.state.today,
+        ctx, risk_profile=self.state.risk_profile,
+    )</code></pre>
+
+      <h2>Why it matters</h2>
+      <p>Decoupling "propose" and "attack" into separate LLM calls with separate prompts (and in ProspectAI's case, the same higher-reasoning model tier for both — see <a href="/patterns/model-tiering">model tiering</a>) measurably improves output quality versus a single-pass generation, because the critic isn't anchored by having just written the answer itself. The cost is real: an extra LLM call's worth of latency and tokens per run. For a system producing investment recommendations from an LLM — output that can't be validated against ground truth in real time — that trade-off favors correctness over speed.</p>
+    </div>
+
+    <h2 class="stats-section-title" style="margin-top:56px">Related Patterns</h2>
+    <div class="pattern-related">
+      <a href="/patterns/parallel-execution">Parallel Agent Execution →</a>
+      <a href="/patterns/output-validation">LLM Output Validation →</a>
+      <a href="/patterns/model-tiering">Model Tiering →</a>
+      <a href="/architecture.html">Full Architecture →</a>
+    </div>
+
+  </div><!-- /wrap -->
+
+  <script type="module">
+    import { initNav } from '/ui/nav.js';
+    initNav();
+  </script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Model Tiering: Matching LLM Cost to Task Complexity in Multi-Agent Systems</title>
+  <meta name="description" content="How ProspectAI assigns cheaper, faster models to data-gathering agents and higher-reasoning models to strategy agents to balance cost against quality.">
+  <link rel="canonical" href="https://prospect-ai.moisesprat.dev/patterns/model-tiering">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/style.css">
+  <link rel="stylesheet" href="/styles/architecture.css">
+  <link rel="stylesheet" href="/styles/patterns.css">
+  <script data-collect-dnt="true" async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+
+  <!-- ── JSON-LD STRUCTURED DATA (Google rich results) ───────── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Model Tiering: Matching LLM Cost to Task Complexity in Multi-Agent Systems",
+    "description": "How ProspectAI assigns cheaper, faster models to data-gathering agents and higher-reasoning models to strategy agents to balance cost against quality.",
+    "author": {
+      "@type": "Person",
+      "name": "Moises Prat",
+      "url": "https://moisesprat.dev"
+    },
+    "mainEntityOfPage": "https://prospect-ai.moisesprat.dev/patterns/model-tiering"
+  }
+  </script>
+</head>
+<body>
+
+  <div class="disclaimer-bar">
+    <strong>WARNING: NOT AN INVESTMENT TOOL.</strong> This is a technical demonstration of
+    multi-agent AI systems. All output is AI-generated and must not be used as financial advice.
+  </div>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="site-nav-inner wrap">
+      <a href="/" class="site-nav-brand">Prospect<em>AI</em></a>
+      <div class="site-nav-links">
+        <a href="/" class="site-nav-link" data-navpage="home">Home</a>
+        <a href="/stats.html" class="site-nav-link" data-navpage="stats">Stats</a>
+        <a href="/reports.html" class="site-nav-link" data-navpage="reports">Reports</a>
+        <a href="/architecture.html" class="site-nav-link" data-navpage="architecture">Architecture</a>
+        <a href="/patterns/" class="site-nav-link" data-navpage="patterns">Patterns</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+
+    <header class="arch-header">
+      <div class="header-tag">Architecture Pattern</div>
+      <h1>Model Tiering: Matching LLM Cost to Task Complexity in Multi-Agent Systems</h1>
+      <p>Rather than running every agent on the same LLM, model tiering assigns cheaper, faster models to mechanical data-gathering work and reserves the most capable (and expensive) model for the agents that must actually reason and make judgment calls.</p>
+    </header>
+
+    <div class="report-body">
+      <h2>What it is</h2>
+      <p>A single multi-agent pipeline rarely needs uniform model capability at every step. Some agents mostly call tools and lightly structure the results; others must synthesize several prior agents' output into a genuine decision. Model tiering matches LLM choice to that difficulty gradient — cheap/fast models where the task is mechanical, expensive/high-reasoning models where it isn't — rather than defaulting to "the best model everywhere," which is simpler but wastes cost on tasks that don't need it.</p>
+
+      <h2>How ProspectAI implements it</h2>
+      <p>ProspectAI's <code>config/agents.yaml</code> assigns a default model per agent. Data-gathering agents (Market and Technical Analyst) get Haiku; the reasoning-heavy agents (Investor Strategic, Critic) get Sonnet:</p>
+
+      <span class="pattern-code-attribution">ProspectAI / config/agents.yaml</span>
+      <pre class="pattern-code"><code># Model strategy:
+#   Agents 1-3 (data gathering): claude-haiku-4-5-20251001  -- fast, cost-efficient
+#   Agents 4-6 (strategy/critic): claude-sonnet-4-6         -- highest reasoning quality
+
+  market_analyst:
+    llm:
+      provider: "anthropic"
+      model: "claude-haiku-4-5-20251001"
+      api_key: null
+      base_url: null
+
+  investor_strategic:
+    llm:
+      provider: "anthropic"
+      model: "claude-sonnet-4-6"
+      api_key: null
+      base_url: null
+
+  critic:
+    llm:
+      provider: "anthropic"
+      model: "claude-sonnet-4-6"
+      api_key: null
+      base_url: null</code></pre>
+
+      <p><strong>Worth being precise about</strong>: the header comment states agents 1–3 (Market, Technical, <em>and Fundamental</em> Analyst) all use Haiku, but the live config currently pins <code>fundamental_analyst</code> to <code>claude-sonnet-4-6</code> — a real discrepancy between the doc comment and the actual configuration at time of writing, not a simplification for this page. It illustrates a genuine risk of this pattern: per-agent model assignment is easy to drift from its own documentation if nothing enforces the mapping.</p>
+
+      <p>The per-agent default isn't hardcoded into the assignment logic, though — it's resolved through a layered override chain. <code>config/config.py</code> lets any individual agent's model be overridden via environment variable in production, without touching code or YAML, falling back to a global default if no override is set:</p>
+
+      <span class="pattern-code-attribution">ProspectAI / config/config.py, lines 65-76</span>
+      <pre class="pattern-code"><code>AGENT_MODEL_ENV_KEYS: Dict[str, str] = {
+    "market_analyst":      "AGENT_MARKET_ANALYST_MODEL",
+    "technical_analyst":   "AGENT_TECHNICAL_ANALYST_MODEL",
+    "fundamental_analyst": "AGENT_FUNDAMENTAL_ANALYST_MODEL",
+    "investor_strategic":  "AGENT_INVESTOR_STRATEGIC_MODEL",
+    "critic":              "AGENT_CRITIC_MODEL",
+}
+
+def model_id_for_agent(self, agent_key: str) -&gt; Optional[str]:
+    """Resolve model for one agent. AGENT_*_MODEL overrides global MODEL."""
+    env_key = AGENT_MODEL_ENV_KEYS.get(agent_key)
+    if env_key:
+        per = os.getenv(env_key)
+        if per and per.strip():
+            return _strip_optional_provider_prefix(per)
+
+    return self.default_model_id()</code></pre>
+
+      <p><code>agents/base_agent.py</code> is the single place this resolution actually gets wired into a live CrewAI <code>LLM</code> instance — every agent calls the same <code>_get_llm()</code>, so the tiering logic lives in exactly one place, not duplicated per agent:</p>
+
+      <span class="pattern-code-attribution">ProspectAI / agents/base_agent.py, lines 41-61</span>
+      <pre class="pattern-code"><code>def _get_llm(self):
+    """Resolve LLM from MODEL_PROVIDER + AGENT_*_MODEL/MODEL (yaml llm.model is fallback)."""
+    provider = os.getenv("MODEL_PROVIDER", "anthropic")
+
+    resolved = self.config.model_id_for_agent(self.agent_key)
+    model = resolved or self.llm_model
+    if provider == "ollama":
+        return LLM(
+            model=f"ollama/{model}",
+            base_url=self.llm_base_url or self.config.OLLAMA_BASE_URL,
+            temperature=self.temperature,
+            max_tokens=self.max_tokens,
+        )
+
+    api_key = self.llm_api_key if self.llm_api_key else self.config.ANTHROPIC_API_KEY
+    return make_caching_llm(
+        model=f"anthropic/{model}",
+        api_key=api_key,
+        temperature=self.temperature,
+        max_tokens=self.max_tokens or 10000,
+    )</code></pre>
+
+      <h2>Why it matters</h2>
+      <p>Model tiering is a cost/quality optimization that only works if the mapping from agent to model is centralized and operationally tunable — otherwise it either drifts (as the <code>fundamental_analyst</code> discrepancy above shows) or becomes a hardcoded assumption nobody can safely change in production. The env-var override layer means someone running this pipeline can shift an individual agent to a different model tier — say, testing whether the Critic (see <a href="/patterns/adversarial-critic">adversarial critic</a>) needs its current reasoning tier or could run cheaper — without a code change or redeploy.</p>
+    </div>
+
+    <h2 class="stats-section-title" style="margin-top:56px">Related Patterns</h2>
+    <div class="pattern-related">
+      <a href="/patterns/adversarial-critic">Adversarial Critic →</a>
+      <a href="/patterns/parallel-execution">Parallel Agent Execution →</a>
+      <a href="/patterns/output-validation">LLM Output Validation →</a>
+      <a href="/architecture.html">Full Architecture →</a>
+    </div>
+
+  </div><!-- /wrap -->
+
+  <script type="module">
+    import { initNav } from '/ui/nav.js';
+    initNav();
+  </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Architecture Patterns: Multi-Agent System Design in ProspectAI</title>
+  <meta name="description" content="Four real architecture patterns from ProspectAI's multi-agent pipeline: adversarial critic review, parallel execution, output validation, model tiering.">
+  <link rel="canonical" href="https://prospect-ai.moisesprat.dev/patterns/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/style.css">
+  <link rel="stylesheet" href="/styles/architecture.css">
+  <link rel="stylesheet" href="/styles/patterns.css">
+  <script data-collect-dnt="true" async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</head>
+<body>
+
+  <div class="disclaimer-bar">
+    <strong>WARNING: NOT AN INVESTMENT TOOL.</strong> This is a technical demonstration of
+    multi-agent AI systems. All output is AI-generated and must not be used as financial advice.
+  </div>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="site-nav-inner wrap">
+      <a href="/" class="site-nav-brand">Prospect<em>AI</em></a>
+      <div class="site-nav-links">
+        <a href="/" class="site-nav-link" data-navpage="home">Home</a>
+        <a href="/stats.html" class="site-nav-link" data-navpage="stats">Stats</a>
+        <a href="/reports.html" class="site-nav-link" data-navpage="reports">Reports</a>
+        <a href="/architecture.html" class="site-nav-link" data-navpage="architecture">Architecture</a>
+        <a href="/patterns/" class="site-nav-link" data-navpage="patterns">Patterns</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+
+    <header class="arch-header">
+      <div class="header-tag">Architecture Patterns</div>
+      <h1>AI Architecture Patterns</h1>
+      <p>Four real engineering patterns from ProspectAI's 6-agent CrewAI pipeline, each with the actual code, not a paraphrase. See the <a href="/architecture.html">full pipeline architecture</a> for how they fit together.</p>
+    </header>
+
+    <div class="pattern-hub-grid">
+      <a class="pattern-hub-card" href="/patterns/adversarial-critic">
+        <div class="pattern-hub-card-title">Adversarial Critic Pattern</div>
+        <div class="pattern-hub-card-desc">How a separate Critic agent challenges a draft investment strategy before any recommendation is finalized.</div>
+      </a>
+      <a class="pattern-hub-card" href="/patterns/parallel-execution">
+        <div class="pattern-hub-card-title">Parallel Agent Execution</div>
+        <div class="pattern-hub-card-desc">How Technical and Fundamental analysis agents run concurrently in a CrewAI Flow via fan-out/fan-in.</div>
+      </a>
+      <a class="pattern-hub-card" href="/patterns/output-validation">
+        <div class="pattern-hub-card-title">LLM Output Validation</div>
+        <div class="pattern-hub-card-desc">Strict Pydantic schemas plus deterministic business-rule checks that guard every phase's output.</div>
+      </a>
+      <a class="pattern-hub-card" href="/patterns/model-tiering">
+        <div class="pattern-hub-card-title">Model Tiering</div>
+        <div class="pattern-hub-card-desc">Assigning cheaper models to data-gathering agents and higher-reasoning models to strategy agents.</div>
+      </a>
+    </div>
+
+  </div><!-- /wrap -->
+
+  <script type="module">
+    import { initNav } from '/ui/nav.js';
+    initNav();
+  </script>
+</body>
+</html>

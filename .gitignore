@@ -2,5 +2,6 @@
 /CLAUDE.md
 /node_modules
 /dist
+/.wrangler
 .env.local
 .env

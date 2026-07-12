@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parallel Agent Execution: Running AI Agents Concurrently in a CrewAI Flow</title>
+  <meta name="description" content="How ProspectAI runs Technical and Fundamental analysis agents concurrently in a CrewAI Flow, cutting pipeline latency without sacrificing correctness.">
+  <link rel="canonical" href="https://prospect-ai.moisesprat.dev/patterns/parallel-execution">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/style.css">
+  <link rel="stylesheet" href="/styles/architecture.css">
+  <link rel="stylesheet" href="/styles/patterns.css">
+  <script data-collect-dnt="true" async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+
+  <!-- ── JSON-LD STRUCTURED DATA (Google rich results) ───────── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Parallel Agent Execution: Running AI Agents Concurrently in a CrewAI Flow",
+    "description": "How ProspectAI runs Technical and Fundamental analysis agents concurrently in a CrewAI Flow, cutting pipeline latency without sacrificing correctness.",
+    "author": {
+      "@type": "Person",
+      "name": "Moises Prat",
+      "url": "https://moisesprat.dev"
+    },
+    "mainEntityOfPage": "https://prospect-ai.moisesprat.dev/patterns/parallel-execution"
+  }
+  </script>
+</head>
+<body>
+
+  <div class="disclaimer-bar">
+    <strong>WARNING: NOT AN INVESTMENT TOOL.</strong> This is a technical demonstration of
+    multi-agent AI systems. All output is AI-generated and must not be used as financial advice.
+  </div>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="site-nav-inner wrap">
+      <a href="/" class="site-nav-brand">Prospect<em>AI</em></a>
+      <div class="site-nav-links">
+        <a href="/" class="site-nav-link" data-navpage="home">Home</a>
+        <a href="/stats.html" class="site-nav-link" data-navpage="stats">Stats</a>
+        <a href="/reports.html" class="site-nav-link" data-navpage="reports">Reports</a>
+        <a href="/architecture.html" class="site-nav-link" data-navpage="architecture">Architecture</a>
+        <a href="/patterns/" class="site-nav-link" data-navpage="patterns">Patterns</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+
+    <header class="arch-header">
+      <div class="header-tag">Architecture Pattern</div>
+      <h1>Parallel Agent Execution: Running AI Agents Concurrently in a CrewAI Flow</h1>
+      <p>A fan-out/fan-in DAG for multi-agent pipelines: two independent agents run concurrently once their shared upstream dependency completes, and a downstream step gates on both finishing before proceeding.</p>
+    </header>
+
+    <div class="report-body">
+      <h2>What it is</h2>
+      <p>A linear multi-agent pipeline — agent 1, then agent 2, then agent 3 — is simple but wastes wall-clock time whenever two steps don't actually depend on each other's output. Parallel agent execution turns that line into a partial-order graph: independent branches run concurrently, and a join step waits for all of them before continuing. This is standard workflow-engine practice (Airflow, Temporal, Step Functions all support it), applied here to LLM agent calls specifically.</p>
+
+      <h2>How ProspectAI implements it</h2>
+      <p>ProspectAI's <code>ProspectAIFlow</code> (a CrewAI <code>Flow</code>) runs Technical Analysis and Fundamental Analysis as two branches that both depend only on Market Analysis, not on each other. Both are declared with <code>@listen(market_analysis)</code>, and because each method is <code>async def</code> and awaited via <code>akickoff()</code>, CrewAI's Flow engine fires both as soon as <code>market_analysis</code> resolves — they execute concurrently on the event loop rather than sequentially:</p>
+
+      <span class="pattern-code-attribution">ProspectAI / prospect_ai_flow.py, lines 411-455</span>
+      <pre class="pattern-code"><code>class ProspectAIFlow(Flow[ProspectAIFlowState]):
+    """Runs Technical and Fundamental analysis in parallel after Market
+    Analysis completes, then gates Draft Strategy on both via and_()."""
+
+    @start()
+    async def market_analysis(self):
+        ...
+        result = cast(CrewOutput, await self._make_crew(task, 0).akickoff())
+        self.state.market_output = self._extract_pydantic(
+            result, MarketAnalysisOutput, "market_analysis"
+        )
+        return result.raw or ""
+
+    @listen(market_analysis)
+    async def technical_analysis(self):
+        ...
+        result = cast(CrewOutput, await self._make_crew(task, 1).akickoff())
+        self.state.technical_output = self._extract_pydantic(
+            result, TechnicalAnalysisOutput, "technical_analysis"
+        )
+        return result.raw or ""
+
+    @listen(market_analysis)
+    async def fundamental_analysis(self):
+        ...
+        result = cast(CrewOutput, await self._make_crew(task, 2).akickoff())
+        self.state.fundamental_output = self._extract_pydantic(
+            result, FundamentalAnalysisOutput, "fundamental_analysis"
+        )
+        return result.raw or ""
+
+    @listen(and_(technical_analysis, fundamental_analysis))
+    async def draft_strategy(self):
+        ...</code></pre>
+
+      <p>The join is CrewAI's <code>and_()</code> combinator: <code>draft_strategy</code> is decorated with <code>@listen(and_(technical_analysis, fundamental_analysis))</code>, so it only fires once <em>both</em> branches have completed — guaranteeing correctness (draft strategy always has both technical and fundamental data available) without giving up the latency win from running them concurrently.</p>
+
+      <h2>Why it matters</h2>
+      <p>Each of the six phases in ProspectAI's pipeline is an LLM call with real network latency. Overlapping two independent, non-interfering calls (technical indicators vs. fundamental financials) instead of running them back-to-back removes one full phase's worth of latency from every analysis run, for free — no additional infrastructure, just structuring the dependency graph correctly. The trade-off is that reasoning about pipeline state gets slightly harder: both branches read the same upstream <code>market_output</code> but must not read each other's state before the join, which is why each branch validates its own output independently (see <a href="/patterns/output-validation">output validation</a>) rather than assuming a particular execution order.</p>
+    </div>
+
+    <h2 class="stats-section-title" style="margin-top:56px">Related Patterns</h2>
+    <div class="pattern-related">
+      <a href="/patterns/adversarial-critic">Adversarial Critic →</a>
+      <a href="/patterns/output-validation">LLM Output Validation →</a>
+      <a href="/patterns/model-tiering">Model Tiering →</a>
+      <a href="/architecture.html">Full Architecture →</a>
+    </div>
+
+  </div><!-- /wrap -->
+
+  <script type="module">
+    import { initNav } from '/ui/nav.js';
+    initNav();
+  </script>
+</body>
+</html>

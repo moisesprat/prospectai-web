@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Output Validation: Enforcing Structured Output with Pydantic Schemas</title>
+  <meta name="description" content="How ProspectAI enforces strict Pydantic schemas on every LLM output, plus deterministic business-rule checks, to guard against unreliable model output.">
+  <link rel="canonical" href="https://prospect-ai.moisesprat.dev/patterns/output-validation">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/style.css">
+  <link rel="stylesheet" href="/styles/architecture.css">
+  <link rel="stylesheet" href="/styles/patterns.css">
+  <script data-collect-dnt="true" async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+
+  <!-- ── JSON-LD STRUCTURED DATA (Google rich results) ───────── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "LLM Output Validation: Enforcing Structured Output with Pydantic Schemas",
+    "description": "How ProspectAI enforces strict Pydantic schemas on every LLM output, plus deterministic business-rule checks, to guard against unreliable model output.",
+    "author": {
+      "@type": "Person",
+      "name": "Moises Prat",
+      "url": "https://moisesprat.dev"
+    },
+    "mainEntityOfPage": "https://prospect-ai.moisesprat.dev/patterns/output-validation"
+  }
+  </script>
+</head>
+<body>
+
+  <div class="disclaimer-bar">
+    <strong>WARNING: NOT AN INVESTMENT TOOL.</strong> This is a technical demonstration of
+    multi-agent AI systems. All output is AI-generated and must not be used as financial advice.
+  </div>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="site-nav-inner wrap">
+      <a href="/" class="site-nav-brand">Prospect<em>AI</em></a>
+      <div class="site-nav-links">
+        <a href="/" class="site-nav-link" data-navpage="home">Home</a>
+        <a href="/stats.html" class="site-nav-link" data-navpage="stats">Stats</a>
+        <a href="/reports.html" class="site-nav-link" data-navpage="reports">Reports</a>
+        <a href="/architecture.html" class="site-nav-link" data-navpage="architecture">Architecture</a>
+        <a href="/patterns/" class="site-nav-link" data-navpage="patterns">Patterns</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+
+    <header class="arch-header">
+      <div class="header-tag">Architecture Pattern</div>
+      <h1>LLM Output Validation: Enforcing Structured Output with Pydantic Schemas</h1>
+      <p>Two independent validation layers for LLM output: strict Pydantic schemas that guard structural shape immediately after every model call, and deterministic business-rule checks that catch semantically-wrong-but-structurally-valid output at the end of the pipeline.</p>
+    </header>
+
+    <div class="report-body">
+      <h2>What it is</h2>
+      <p>LLMs are unreliable narrators of structured data — a model can return syntactically valid JSON that's still logically wrong (a stop-loss above the entry price, allocations that don't sum to 100%). Output validation as an architecture pattern means never trusting raw LLM output directly: every phase's result is parsed into a strict schema immediately, and separately, business-rule logic re-checks the final assembled output against domain invariants a schema alone can't express.</p>
+
+      <h2>How ProspectAI implements it: Layer 1, schema validation</h2>
+      <p>Every one of ProspectAI's six pipeline phases validates its LLM output against a Pydantic model the moment the call returns, via <code>_extract_pydantic()</code>. If parsing fails, the pipeline halts immediately rather than propagating malformed data downstream:</p>
+
+      <span class="pattern-code-attribution">ProspectAI / prospect_ai_flow.py, lines 190-212</span>
+      <pre class="pattern-code"><code>@staticmethod
+def _extract_pydantic(result: CrewOutput, model_cls: Type[_M], phase: str) -&gt; _M:
+    """Return validated Pydantic model from mini-Crew result.
+
+    Tries result.tasks_output[0].pydantic first (set by CrewAI when
+    output_pydantic validation succeeds), then falls back to parsing
+    result.raw directly via model_validate_json.
+    """
+    pydantic_model = (
+        result.tasks_output[0].pydantic
+        if result.tasks_output
+        else None
+    )
+    if pydantic_model is not None:
+        return cast(_M, pydantic_model)
+    raw = result.raw or ""
+    try:
+        return cast(_M, model_cls.model_validate_json(raw))
+    except Exception as exc:
+        raise RuntimeError(
+            f"Pydantic validation failed for {phase}. "
+            f"raw[:200]={raw[:200]!r}"
+        ) from exc</code></pre>
+
+      <p>The schemas themselves encode cross-field invariants, not just types. <code>TradeSetup</code> requires that a LONG-BUY's stop-loss sits below its entry zone, which in turn sits below its take-profit — expressed as a Pydantic <code>model_validator</code> that raises if the ordering is violated:</p>
+
+      <span class="pattern-code-attribution">ProspectAI / schemas/agent_outputs.py, lines 147-178</span>
+      <pre class="pattern-code"><code>class TradeSetup(BaseModel):
+    direction: Literal["LONG-BUY"]
+    entry_zone_low: float = Field(..., gt=0)
+    entry_zone_high: float = Field(..., gt=0)
+    stop_loss: float = Field(..., gt=0)
+    take_profit: float = Field(..., gt=0)
+
+    @model_validator(mode="after")
+    def validate_long_trade_structure(self) -&gt; TradeSetup:
+        if not (self.stop_loss &lt; self.entry_zone_low):
+            raise ValueError(
+                f"LONG-BUY invariant violated: "
+                f"stop_loss ({self.stop_loss}) must be &lt; "
+                f"entry_zone_low ({self.entry_zone_low}). "
+                f"Required: stop_loss &lt; entry_zone_low "
+                f"&lt;= entry_zone_high &lt; take_profit."
+            )
+        ...
+        return self</code></pre>
+
+      <h2>Layer 2: deterministic business-rule checks</h2>
+      <p>Schema validation alone isn't enough — a trade setup can satisfy every Pydantic constraint and still be a bad recommendation (e.g. a stop-loss that's technically below entry but by a trivially small margin). <code>recommendation_validator.py</code> runs once at the very end of the pipeline, over the fully assembled output, checking plain Python business logic rather than schema shape:</p>
+
+      <span class="pattern-code-attribution">ProspectAI / utils/recommendation_validator.py, lines 22-47</span>
+      <pre class="pattern-code"><code>def validate_position(position: Dict[str, Any]) -&gt; List[ValidationIssue]:
+    """Validate a single position dict from InvestorStrategicOutput.positions."""
+    issues: List[ValidationIssue] = []
+    ticker  = position.get("ticker", "UNKNOWN")
+    action  = (position.get("action") or "").upper()
+    setup   = position.get("trade_setup") or {}
+    ...
+    # -- TradeSetup invariant (should be caught by Pydantic, but belt-and-suspenders) --
+    if stop_loss is not None and entry_low is not None:
+        if stop_loss &gt;= entry_low:
+            issues.append(ValidationIssue(
+                severity="critical",
+                ticker=ticker,
+                field="trade_setup.stop_loss",
+                message=(
+                    f"stop_loss ({stop_loss}) &gt;= entry_zone_low ({entry_low}) -- "
+                    "stop will trigger immediately on entry."
+                ),
+            ))</code></pre>
+
+      <p>The code's own comment — "should be caught by Pydantic, but belt-and-suspenders" — makes the intent explicit: this isn't redundant, it's defense-in-depth against LLM unreliability at two different levels of the pipeline.</p>
+
+      <h2>Why it matters</h2>
+      <p>Separating "does this parse into the right shape" (schema) from "does this make business sense" (deterministic rules) keeps each concern simple and testable independently. A schema change doesn't need business-rule changes and vice versa, and — critically for a system whose output feeds directly into the same portfolio strategy that gets adversarially reviewed (see <a href="/patterns/adversarial-critic">adversarial critic</a>) — a validation failure at either layer halts the pipeline rather than shipping a recommendation nobody checked.</p>
+    </div>
+
+    <h2 class="stats-section-title" style="margin-top:56px">Related Patterns</h2>
+    <div class="pattern-related">
+      <a href="/patterns/adversarial-critic">Adversarial Critic →</a>
+      <a href="/patterns/parallel-execution">Parallel Agent Execution →</a>
+      <a href="/patterns/model-tiering">Model Tiering →</a>
+      <a href="/architecture.html">Full Architecture →</a>
+    </div>
+
+  </div><!-- /wrap -->
+
+  <script type="module">
+    import { initNav } from '/ui/nav.js';
+    initNav();
+  </script>
+</body>
+</html>

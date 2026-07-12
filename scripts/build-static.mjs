@@ -62,6 +62,11 @@ async function generateSitemap(reports) {
     { loc: `${SITE_ORIGIN}/stats.html`, lastmod: today },
     { loc: `${SITE_ORIGIN}/reports.html`, lastmod: today },
     { loc: `${SITE_ORIGIN}/architecture.html`, lastmod: today },
+    { loc: `${SITE_ORIGIN}/patterns/`, lastmod: today },
+    { loc: `${SITE_ORIGIN}/patterns/adversarial-critic`, lastmod: today },
+    { loc: `${SITE_ORIGIN}/patterns/parallel-execution`, lastmod: today },
+    { loc: `${SITE_ORIGIN}/patterns/output-validation`, lastmod: today },
+    { loc: `${SITE_ORIGIN}/patterns/model-tiering`, lastmod: today },
   ];
 
   const reportUrls = (reports ?? [])
