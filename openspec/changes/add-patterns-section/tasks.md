@@ -58,5 +58,5 @@
 - [x] 9.2 View-source each new page locally and confirm title=H1, meta description length (150-160), and JSON-LD validity (well-formed JSON, correct `@type`)
 - [x] 9.3 Confirm code excerpts render correctly (no broken markup from unescaped `<`/`>`/`&`) by viewing each page in a browser
 - [x] 9.4 Click through all cross-links (hub→patterns, pattern→pattern, pattern→architecture, architecture→patterns, nav "Patterns" entry from each existing page) and confirm they resolve
-- [ ] 9.5 Commit, push, and confirm Cloudflare Pages deploys the change
-- [ ] 9.6 Spot-check the deployed pages via `curl` for title/H1/canonical/JSON-LD and confirm `/patterns/*` URLs resolve without unexpected redirects
+- [x] 9.5 Commit, push, and confirm Cloudflare Pages deploys the change
+- [x] 9.6 Spot-check the deployed pages via `curl` for title/H1/canonical/JSON-LD and confirm `/patterns/*` URLs resolve without unexpected redirects
