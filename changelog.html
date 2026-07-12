@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProspectAI Changelog — Multi-Agent Pipeline Release History</title>
+  <meta name="description" content="Release history for ProspectAI, the multi-agent investment research system — updates to the agent pipeline (the brain) and the web frontend.">
+  <link rel="canonical" href="https://prospect-ai.moisesprat.dev/changelog.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/changelog.css">
+  <script data-collect-dnt="true" async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</head>
+<body>
+
+  <div class="disclaimer-bar">
+    <strong>WARNING: NOT AN INVESTMENT TOOL.</strong> This is a technical demonstration of
+    multi-agent AI systems. All output is AI-generated and must not be used as financial advice.
+  </div>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="site-nav-inner wrap">
+      <a href="/" class="site-nav-brand">Prospect<em>AI</em></a>
+      <div class="site-nav-links">
+        <a href="/" class="site-nav-link" data-navpage="home">Home</a>
+        <a href="stats.html" class="site-nav-link" data-navpage="stats">Stats</a>
+        <a href="reports.html" class="site-nav-link" data-navpage="reports">Reports</a>
+        <a href="architecture.html" class="site-nav-link" data-navpage="architecture">Architecture</a>
+        <a href="/patterns/" class="site-nav-link" data-navpage="patterns">Patterns</a>
+        <a href="changelog.html" class="site-nav-link" data-navpage="changelog">Changelog</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+
+    <header class="changelog-header">
+      <div class="header-tag">Release History</div>
+      <h1>Changelog</h1>
+      <p>What's shipped in <strong>ProspectAI</strong> — the multi-agent brain behind this system (Market Analyst → Technical Analyst → Fundamental Analyst → Draft Strategist → Critic → Final Strategist) and the web frontend that drives it. Newest first.</p>
+    </header>
+
+    <div class="changelog-list">
+
+      <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-07-12">2026-07-12</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
+          <h2 class="changelog-title">Architecture patterns for multi-agent systems</h2>
+          <p class="changelog-text">Added a Patterns section documenting the reusable design patterns behind ProspectAI's agent pipeline — adversarial critic, parallel agent execution, LLM output validation, and model tiering — for anyone studying how the brain is built.</p>
+        </div>
+      </article>
+
+      <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-07-12">2026-07-12</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--frontend">Frontend</span>
+          <h2 class="changelog-title">SEO improvements for homepage and Architecture page</h2>
+          <p class="changelog-text">Corrected homepage SEO metadata and synced titles/descriptions across surfaces; enhanced the Architecture page with updated meta description and structured data for better discoverability.</p>
+        </div>
+      </article>
+
+      <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-06-07">2026-06-07</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--frontend">Frontend</span>
+          <h2 class="changelog-title">Persistent nav bar and Architecture page</h2>
+          <p class="changelog-text">Added a site-wide persistent nav bar and a new Architecture page with a live, auto-cycling animation of the 6-agent pipeline — Market Analyst through Final Strategist — so visitors can see how ProspectAI's brain is wired without running a live analysis.</p>
+        </div>
+      </article>
+
+      <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-06-07">2026-06-07</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--frontend">Frontend</span>
+          <h2 class="changelog-title">Report persistence — viewer, history, and My Reports</h2>
+          <p class="changelog-text">Every ProspectAI run is now saved and shareable: a dedicated report viewer page, a report history page, an "Open Report" button, and a My Reports panel for revisiting past analyses.</p>
+        </div>
+      </article>
+
+      <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-05-30">2026-05-30</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--frontend">Frontend</span>
+          <h2 class="changelog-title">ProspectAI Stats page</h2>
+          <p class="changelog-text">Added a Stats page showing run analytics, sector distribution, risk-profile breakdown, and a sortable track record of past LONG-BUY decisions from the ProspectAI pipeline.</p>
+        </div>
+      </article>
+
+      <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-05-09">2026-05-09</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
+          <span class="changelog-version">v1.7.0</span>
+          <h2 class="changelog-title">Conservative / Aggressive risk profile selector</h2>
+          <p class="changelog-text">ProspectAI's Draft Strategist and Final Strategist now accept a risk profile — Conservative (15% max position, 3% stop-loss, 2.5× R/R) or Aggressive (30% max position, 5% stop-loss, 1.5× R/R) — that shapes portfolio allocation and entry/exit rules for every run.</p>
+        </div>
+      </article>
+
+      <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-04-14">2026-04-14</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--frontend">Frontend</span>
+          <h2 class="changelog-title">SEO and social sharing metadata</h2>
+          <p class="changelog-text">Added JSON-LD structured data, Open Graph tags, and Twitter card support so ProspectAI reports and pages preview correctly when shared.</p>
+        </div>
+      </article>
+
+      <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-04-10">2026-04-10</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
+          <span class="changelog-version">v1.5.0</span>
+          <h2 class="changelog-title">6-agent pipeline</h2>
+          <p class="changelog-text">ProspectAI's brain expanded from a single-pass analysis to a full 6-agent CrewAI flow — Market Analyst, Technical Analyst and Fundamental Analyst running in parallel, a Draft Strategist, an adversarial Critic, and a Final Strategist that revises the report before it's delivered.</p>
+        </div>
+      </article>
+
+      <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-04-06">2026-04-06</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--frontend">Frontend</span>
+          <h2 class="changelog-title">SEO foundation</h2>
+          <p class="changelog-text">Added meta tags, robots.txt, and sitemap.xml so the ProspectAI site could start being indexed.</p>
+        </div>
+      </article>
+
+    </div><!-- /changelog-list -->
+
+  </div><!-- /wrap -->
+
+  <footer>
+    <div class="wrap">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          ProspectAI -- Built by
+          <a href="https://moisesprat.dev" target="_blank">Moises Prat</a>
+          &nbsp;|&nbsp;
+          <span style="color:#3A2800">NOT AN INVESTMENT TOOL</span>
+        </div>
+        <div class="footer-links">
+          <a href="https://github.com/moisesprat/ProspectAI" target="_blank">GitHub</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="ui/changelogPage.js"></script>
+</body>
+</html>

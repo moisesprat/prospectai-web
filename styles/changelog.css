@@ -1,0 +1,94 @@
+/* ============================================================
+   CHANGELOG PAGE
+   ============================================================ */
+
+.changelog-header {
+  padding: 56px 0 40px;
+}
+
+.changelog-header p {
+  max-width: 640px;
+  color: var(--text-dim);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.changelog-header strong {
+  color: var(--amber);
+}
+
+.changelog-list {
+  padding: 8px 0 56px;
+}
+
+.changelog-entry {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 24px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.changelog-entry:last-child {
+  border-bottom: none;
+}
+
+.changelog-date {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.changelog-tag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+  margin-bottom: 10px;
+}
+
+.changelog-tag--module {
+  color: var(--amber);
+  border: 1px solid var(--amber-dim);
+  background: rgba(240, 165, 0, .08);
+}
+
+.changelog-tag--frontend {
+  color: var(--text-dim);
+  border: 1px solid var(--border2);
+  background: transparent;
+}
+
+.changelog-version {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--green);
+  margin-left: 8px;
+}
+
+.changelog-title {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 400;
+  color: #E8F0F8;
+  margin: 0 0 8px;
+}
+
+.changelog-text {
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .changelog-entry {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
