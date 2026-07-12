@@ -8,7 +8,7 @@ The build SHALL generate `sitemap.xml` as part of every production build (`npm r
 
 #### Scenario: Sitemap reflects current pages after a build
 - **WHEN** `npm run build` runs
-- **THEN** the generated `sitemap.xml` in the build output contains `<url>` entries for `/`, `/stats.html`, `/reports.html`, and `/architecture.html`
+- **THEN** the generated `sitemap.xml` in the build output contains `<url>` entries for `/`, `/stats.html`, `/reports.html`, `/architecture.html`, `/patterns/`, `/patterns/adversarial-critic`, `/patterns/parallel-execution`, `/patterns/output-validation`, and `/patterns/model-tiering`
 
 #### Scenario: Sitemap includes recent reports
 - **WHEN** `npm run build` runs and the Modal backend's `/api/reports` endpoint returns report entries
