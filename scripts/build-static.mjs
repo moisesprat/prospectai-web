@@ -25,6 +25,8 @@ import {
   sortHistory,
   computeKpis,
   renderHistoryRowsHTML,
+  computeSpyDelta,
+  renderBenchmarkSectionHTML,
 } from '../ui/statsRender.js';
 import { renderReportsGridHTML } from '../ui/reportsRender.js';
 
@@ -150,6 +152,22 @@ async function generateStats(analytics, historyData) {
 
     html = replaceBetween(html, 'history-tbody', renderHistoryRowsHTML(sorted));
     html = html.replace('<tbody id="history-tbody">', '<tbody id="history-tbody" data-ssr="1">');
+
+    const spyDelta = computeSpyDelta(cleaned);
+    if (spyDelta != null) {
+      html = replaceBetween(html, 'kpi-avg-return-delta-val', spyDelta.text);
+      html = html.replace(
+        /<span class="stats-kpi-delta-val[^"]*" id="kpi-avg-return-delta-val"/,
+        `<span class="stats-kpi-delta-val ${spyDelta.cls}" id="kpi-avg-return-delta-val" data-ssr="1"`
+      );
+      html = replaceBetween(html, 'kpi-avg-return-delta-label', 'vs SPY');
+      html = html.replace(
+        /<div class="stats-kpi-delta" id="kpi-avg-return-delta"([^>]*)>/,
+        '<div class="stats-kpi-delta" id="kpi-avg-return-delta" data-ssr="1">'
+      );
+    }
+
+    html = replaceBetween(html, 'benchmark-groups', renderBenchmarkSectionHTML(cleaned));
 
     html = replaceBetween(
       html,

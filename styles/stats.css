@@ -340,6 +340,26 @@
   .stats-kpi-grid { grid-template-columns: 1fr; }
 }
 
+/* ── Benchmark tab — overall + per-sector 3-box groups ────────── */
+.benchmark-group {
+  margin-bottom: 28px;
+}
+.benchmark-group-title {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.benchmark-kpi-grid {
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 0;
+}
+@media (max-width: 700px) {
+  .benchmark-kpi-grid { grid-template-columns: 1fr; }
+}
+
 .stats-kpi-card {
   padding: 18px 20px;
   background: rgba(255,255,255,.02);
@@ -369,6 +389,17 @@
   font-size: 10px;
   color: var(--muted);
 }
+.stats-kpi-delta {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.stats-kpi-delta-val {
+  font-weight: 600;
+}
+.stats-kpi-delta-val.stats-kpi-value--pos { color: var(--roi-positive); }
+.stats-kpi-delta-val.stats-kpi-value--neg { color: var(--roi-negative); }
 
 /* ── Sections ────────────────────────────────────────────────── */
 .stats-section {

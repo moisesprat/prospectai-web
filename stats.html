@@ -51,6 +51,7 @@
       <button class="stats-tab" role="tab" data-panel="panel-activity"    data-hash="activity"    aria-selected="true">Activity</button>
       <button class="stats-tab" role="tab" data-panel="panel-decisions"   data-hash="decisions"   aria-selected="false">Decisions</button>
       <button class="stats-tab" role="tab" data-panel="panel-performance" data-hash="performance" aria-selected="false">Performance</button>
+      <button class="stats-tab" role="tab" data-panel="panel-benchmark"   data-hash="benchmark"   aria-selected="false">Benchmark</button>
     </nav>
 
     <!-- ── PANEL: ACTIVITY ────────────────────────────────────────────── -->
@@ -216,13 +217,17 @@
         <div class="stats-kpi-grid">
           <div class="stats-kpi-card">
             <div class="stats-kpi-label">Win Rate</div>
-            <div class="stats-kpi-value" id="kpi-win-rate-val" data-ssr="1"><!--SSR:kpi-win-rate-val-->63.9%<!--/SSR--></div>
+            <div class="stats-kpi-value" id="kpi-win-rate-val" data-ssr="1"><!--SSR:kpi-win-rate-val-->64.2%<!--/SSR--></div>
             <div class="stats-kpi-sub">picks with positive return</div>
           </div>
           <div class="stats-kpi-card">
             <div class="stats-kpi-label">Avg Return</div>
             <div class="stats-kpi-value stats-kpi-value--pos" id="kpi-avg-return-val" data-ssr="1"><!--SSR:kpi-avg-return-val-->+4.3%<!--/SSR--></div>
             <div class="stats-kpi-sub">mean ROI across all signals</div>
+            <div class="stats-kpi-delta" id="kpi-avg-return-delta" data-ssr="1">
+              <span class="stats-kpi-delta-val stats-kpi-value--pos" id="kpi-avg-return-delta-val" data-ssr="1" data-ssr="1"><!--SSR:kpi-avg-return-delta-val-->+2.6%<!--/SSR--></span>
+              <span id="kpi-avg-return-delta-label"><!--SSR:kpi-avg-return-delta-label-->vs SPY<!--/SSR--></span>
+            </div>
           </div>
           <div class="stats-kpi-card">
             <div class="stats-kpi-label">Best Signal</div>
@@ -267,9 +272,9 @@
       <td class="col-sector">Consumer Discretionary</td>
       <td class="col-date">24-May-26</td>
       <td class="col-entry">$112.03</td>
-      <td class="col-current">$150.02</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+33.9%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:67.82%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$150.05</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+33.9%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:67.88%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">2</td>
@@ -279,7 +284,7 @@
       <td class="col-entry">$420.99</td>
       <td class="col-current">$529.14</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+25.7%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:51.38%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">3</td>
@@ -289,7 +294,7 @@
       <td class="col-entry">$724.66</td>
       <td class="col-current">$904.28</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+24.8%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:49.58%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">4</td>
@@ -299,7 +304,7 @@
       <td class="col-entry">$724.66</td>
       <td class="col-current">$904.28</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+24.8%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:49.58%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">5</td>
@@ -309,7 +314,7 @@
       <td class="col-entry">$424.10</td>
       <td class="col-current">$529.14</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+24.8%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:49.54%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">6</td>
@@ -317,9 +322,9 @@
       <td class="col-sector">Energy</td>
       <td class="col-date">07-May-26</td>
       <td class="col-entry">$236.35</td>
-      <td class="col-current">$292.67</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+23.8%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:47.66%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$292.66</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+23.8%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:47.64%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">7</td>
@@ -327,9 +332,9 @@
       <td class="col-sector">Energy</td>
       <td class="col-date">14-May-26</td>
       <td class="col-entry">$248.82</td>
-      <td class="col-current">$299.20</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+20.3%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:40.5%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$299.18</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+20.2%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:40.48%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">8</td>
@@ -337,9 +342,9 @@
       <td class="col-sector">Healthcare</td>
       <td class="col-date">01-May-26</td>
       <td class="col-entry">$963.33</td>
-      <td class="col-current">$1,156.46</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+20.1%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:40.1%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$1,156.63</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+20.1%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:40.14%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">9</td>
@@ -347,9 +352,9 @@
       <td class="col-sector">Energy</td>
       <td class="col-date">29-May-26</td>
       <td class="col-entry">$244.82</td>
-      <td class="col-current">$292.67</td>
+      <td class="col-current">$292.66</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+19.5%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:39.08%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">10</td>
@@ -357,8 +362,8 @@
       <td class="col-sector">Financials</td>
       <td class="col-date">31-May-26</td>
       <td class="col-entry">$51.60</td>
-      <td class="col-current">$61.62</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+19.4%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:38.84%"></div></div></div></td>
+      <td class="col-current">$61.59</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+19.4%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:38.72%"></div></div></div></td>
       <td class="col-version">1.9.0</td>
       <td class="col-report">—</td>
     </tr><tr>
@@ -367,9 +372,9 @@
       <td class="col-sector">Energy</td>
       <td class="col-date">20-May-26</td>
       <td class="col-entry">$61.63</td>
-      <td class="col-current">$73.19</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+18.8%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:37.52%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$73.21</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+18.8%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:37.58%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">12</td>
@@ -377,9 +382,9 @@
       <td class="col-sector">Energy</td>
       <td class="col-date">24-May-26</td>
       <td class="col-entry">$246.96</td>
-      <td class="col-current">$292.67</td>
+      <td class="col-current">$292.66</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+18.5%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:37.02%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">13</td>
@@ -387,9 +392,9 @@
       <td class="col-sector">Financials</td>
       <td class="col-date">17-May-26</td>
       <td class="col-entry">$297.81</td>
-      <td class="col-current">$347.02</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+16.5%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:33.04%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$346.91</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+16.5%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:32.98%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">14</td>
@@ -397,9 +402,9 @@
       <td class="col-sector">Financials</td>
       <td class="col-date">16-May-26</td>
       <td class="col-entry">$297.81</td>
-      <td class="col-current">$347.02</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+16.5%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:33.04%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$346.91</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+16.5%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:32.98%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">15</td>
@@ -407,9 +412,9 @@
       <td class="col-sector">Financials</td>
       <td class="col-date">14-May-26</td>
       <td class="col-entry">$299.91</td>
-      <td class="col-current">$347.02</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+15.7%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:31.42%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$346.91</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+15.7%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:31.34%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">16</td>
@@ -417,9 +422,9 @@
       <td class="col-sector">Healthcare</td>
       <td class="col-date">18-May-26</td>
       <td class="col-entry">$1,004.92</td>
-      <td class="col-current">$1,156.46</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+15.1%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:30.159999999999997%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$1,156.63</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+15.1%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:30.2%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">17</td>
@@ -427,9 +432,9 @@
       <td class="col-sector">Utilities</td>
       <td class="col-date">17-May-26</td>
       <td class="col-entry">$61.73</td>
-      <td class="col-current">$70.96</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+14.9%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:29.880000000000003%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$70.97</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+15.0%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:29.94%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">18</td>
@@ -438,8 +443,8 @@
       <td class="col-date">24-May-26</td>
       <td class="col-entry">$76.40</td>
       <td class="col-current">$87.51</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+14.6%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:29.100000000000005%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+14.5%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:29.080000000000002%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">19</td>
@@ -447,7 +452,7 @@
       <td class="col-sector">Energy</td>
       <td class="col-date">07-Jun-26</td>
       <td class="col-entry">$262.01</td>
-      <td class="col-current">$299.20</td>
+      <td class="col-current">$299.18</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+14.2%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:28.38%"></div></div></div></td>
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=ce7e355e-e9eb-4cdc-8264-334f5eb78b7c" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
@@ -457,7 +462,7 @@
       <td class="col-sector">Energy</td>
       <td class="col-date">06-Jun-26</td>
       <td class="col-entry">$262.01</td>
-      <td class="col-current">$299.20</td>
+      <td class="col-current">$299.18</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+14.2%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:28.38%"></div></div></div></td>
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=cdf592dd-2130-4e67-9a59-42014c870ae3" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
@@ -467,9 +472,9 @@
       <td class="col-sector">Financials</td>
       <td class="col-date">24-May-26</td>
       <td class="col-entry">$90.15</td>
-      <td class="col-current">$102.80</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+14.0%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:28.059999999999995%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$102.79</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+14.0%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:28.04%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">22</td>
@@ -477,9 +482,9 @@
       <td class="col-sector">Healthcare</td>
       <td class="col-date">20-May-26</td>
       <td class="col-entry">$1,021.56</td>
-      <td class="col-current">$1,156.46</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+13.2%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:26.419999999999998%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$1,156.63</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+13.2%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:26.44%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">23</td>
@@ -489,7 +494,7 @@
       <td class="col-entry">$173.52</td>
       <td class="col-current">$195.89</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+12.9%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:25.78%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">24</td>
@@ -497,8 +502,8 @@
       <td class="col-sector">Energy</td>
       <td class="col-date">08-Jun-26</td>
       <td class="col-entry">$266.17</td>
-      <td class="col-current">$299.20</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+12.4%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:24.82%"></div></div></div></td>
+      <td class="col-current">$299.18</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+12.4%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:24.8%"></div></div></div></td>
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=f7eb9719-5aab-4159-b872-047ac123b5f8" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
     </tr><tr>
@@ -509,7 +514,7 @@
       <td class="col-entry">$607.38</td>
       <td class="col-current">$681.31</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+12.2%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:24.34%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">26</td>
@@ -519,7 +524,7 @@
       <td class="col-entry">$154.03</td>
       <td class="col-current">$171.92</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+11.6%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:23.22%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">27</td>
@@ -529,7 +534,7 @@
       <td class="col-entry">$175.68</td>
       <td class="col-current">$195.89</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+11.5%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:23%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">28</td>
@@ -539,7 +544,7 @@
       <td class="col-entry">$614.23</td>
       <td class="col-current">$681.31</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+10.9%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:21.84%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">29</td>
@@ -547,8 +552,8 @@
       <td class="col-sector">Healthcare</td>
       <td class="col-date">02-Jun-26</td>
       <td class="col-entry">$379.30</td>
-      <td class="col-current">$418.58</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+10.4%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:20.72%"></div></div></div></td>
+      <td class="col-current">$418.52</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+10.3%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:20.68%"></div></div></div></td>
       <td class="col-version">1.9.0</td>
       <td class="col-report">—</td>
     </tr><tr>
@@ -559,7 +564,7 @@
       <td class="col-entry">$159.18</td>
       <td class="col-current">$175.40</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+10.2%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:20.38%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">31</td>
@@ -569,7 +574,7 @@
       <td class="col-entry">$159.18</td>
       <td class="col-current">$175.40</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+10.2%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:20.38%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">32</td>
@@ -577,9 +582,9 @@
       <td class="col-sector">Real Estate</td>
       <td class="col-date">11-May-26</td>
       <td class="col-entry">$202.12</td>
-      <td class="col-current">$221.93</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+9.8%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:19.6%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$222.01</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+9.8%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:19.68%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">33</td>
@@ -587,8 +592,8 @@
       <td class="col-sector">Utilities</td>
       <td class="col-date">30-May-26</td>
       <td class="col-entry">$77.27</td>
-      <td class="col-current">$84.59</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+9.5%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:18.94%"></div></div></div></td>
+      <td class="col-current">$84.63</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+9.5%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:19.06%"></div></div></div></td>
       <td class="col-version">1.8.1</td>
       <td class="col-report">—</td>
     </tr><tr>
@@ -597,9 +602,9 @@
       <td class="col-sector">Financials</td>
       <td class="col-date">14-May-26</td>
       <td class="col-entry">$489.94</td>
-      <td class="col-current">$535.36</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+9.3%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:18.54%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$535.21</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+9.2%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:18.48%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">35</td>
@@ -613,136 +618,146 @@
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=cef193a3-fc9a-43bd-b5bd-efb456637860" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
     </tr><tr>
       <td class="col-rank">36</td>
-      <td class="col-ticker">JNJ</td>
-      <td class="col-sector">Healthcare</td>
-      <td class="col-date">17-May-26</td>
-      <td class="col-entry">$226.71</td>
-      <td class="col-current">$247.03</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+9.0%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:17.92%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-ticker">GRC</td>
+      <td class="col-sector">Industrials</td>
+      <td class="col-date">24-May-26</td>
+      <td class="col-entry">$72.66</td>
+      <td class="col-current">$79.19</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+9.0%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:17.98%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">37</td>
       <td class="col-ticker">JNJ</td>
       <td class="col-sector">Healthcare</td>
-      <td class="col-date">16-May-26</td>
+      <td class="col-date">17-May-26</td>
       <td class="col-entry">$226.71</td>
-      <td class="col-current">$247.03</td>
+      <td class="col-current">$247.02</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+9.0%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:17.92%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">38</td>
+      <td class="col-ticker">JNJ</td>
+      <td class="col-sector">Healthcare</td>
+      <td class="col-date">16-May-26</td>
+      <td class="col-entry">$226.71</td>
+      <td class="col-current">$247.02</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+9.0%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:17.92%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
+      <td class="col-report">—</td>
+    </tr><tr>
+      <td class="col-rank">39</td>
       <td class="col-ticker">ES</td>
       <td class="col-sector">Utilities</td>
       <td class="col-date">27-Apr-26</td>
       <td class="col-entry">$68.38</td>
-      <td class="col-current">$73.81</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+7.9%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:15.879999999999999%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$73.79</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+7.9%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:15.82%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">39</td>
+      <td class="col-rank">40</td>
       <td class="col-ticker">JNJ</td>
       <td class="col-sector">Healthcare</td>
       <td class="col-date">20-May-26</td>
       <td class="col-entry">$230.31</td>
-      <td class="col-current">$247.03</td>
+      <td class="col-current">$247.02</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+7.3%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:14.52%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">40</td>
+      <td class="col-rank">41</td>
       <td class="col-ticker">WDC</td>
       <td class="col-sector">Semiconductors</td>
       <td class="col-date">08-May-26</td>
       <td class="col-entry">$480.00</td>
       <td class="col-current">$513.84</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+7.0%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:14.099999999999998%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">41</td>
+      <td class="col-rank">42</td>
       <td class="col-ticker">TSM</td>
       <td class="col-sector">Semiconductors</td>
       <td class="col-date">18-May-26</td>
       <td class="col-entry">$392.87</td>
-      <td class="col-current">$419.67</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+6.8%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:13.639999999999999%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$419.48</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+6.8%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:13.54%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">42</td>
+      <td class="col-rank">43</td>
       <td class="col-ticker">WDC</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">16-May-26</td>
       <td class="col-entry">$482.02</td>
       <td class="col-current">$513.84</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+6.6%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:13.200000000000001%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">43</td>
+      <td class="col-rank">44</td>
       <td class="col-ticker">APPF</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">24-May-26</td>
       <td class="col-entry">$164.92</td>
       <td class="col-current">$175.40</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+6.3%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:12.7%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">44</td>
+      <td class="col-rank">45</td>
       <td class="col-ticker">UNH</td>
       <td class="col-sector">Healthcare</td>
       <td class="col-date">18-May-26</td>
       <td class="col-entry">$393.85</td>
-      <td class="col-current">$418.58</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+6.3%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:12.560000000000002%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$418.52</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+6.3%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:12.520000000000001%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">45</td>
+      <td class="col-rank">46</td>
       <td class="col-ticker">ZS</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">30-May-26</td>
       <td class="col-entry">$139.73</td>
       <td class="col-current">$148.19</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+6.0%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:12.1%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">46</td>
+      <td class="col-rank">47</td>
       <td class="col-ticker">TSM</td>
       <td class="col-sector">Semiconductors</td>
       <td class="col-date">19-May-26</td>
       <td class="col-entry">$395.95</td>
-      <td class="col-current">$419.67</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+6.0%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:11.98%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$419.48</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+5.9%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:11.88%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">47</td>
+      <td class="col-rank">48</td>
       <td class="col-ticker">DHI</td>
       <td class="col-sector">Real Estate</td>
       <td class="col-date">24-May-26</td>
       <td class="col-entry">$143.73</td>
-      <td class="col-current">$151.62</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+5.5%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:10.98%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$151.55</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+5.4%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:10.88%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">48</td>
+      <td class="col-rank">49</td>
       <td class="col-ticker">MAR</td>
       <td class="col-sector">Consumer Discretionary</td>
       <td class="col-date">13-May-26</td>
       <td class="col-entry">$350.23</td>
       <td class="col-current">$369.05</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+5.4%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:10.74%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">49</td>
+      <td class="col-rank">50</td>
       <td class="col-ticker">AMZN</td>
       <td class="col-sector">Consumer Discretionary</td>
       <td class="col-date">03-Jul-26</td>
@@ -752,7 +767,7 @@
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=a0df69b8-c409-4e2f-aa0a-fc1dc01047db" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
     </tr><tr>
-      <td class="col-rank">50</td>
+      <td class="col-rank">51</td>
       <td class="col-ticker">NVDA</td>
       <td class="col-sector">Semiconductors</td>
       <td class="col-date">09-Jul-26</td>
@@ -762,7 +777,7 @@
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=cc9f8647-3935-4d1c-afe5-ee454072476e" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
     </tr><tr>
-      <td class="col-rank">51</td>
+      <td class="col-rank">52</td>
       <td class="col-ticker">AAPL</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">06-Jul-26</td>
@@ -772,7 +787,7 @@
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=ce4e046b-10a0-401b-a952-2b9f10dcd508" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
     </tr><tr>
-      <td class="col-rank">52</td>
+      <td class="col-rank">53</td>
       <td class="col-ticker">AMD</td>
       <td class="col-sector">Semiconductors</td>
       <td class="col-date">16-Jun-26</td>
@@ -782,7 +797,7 @@
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=5281781d-e58c-4deb-9ea1-50a1416a7c8f" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
     </tr><tr>
-      <td class="col-rank">53</td>
+      <td class="col-rank">54</td>
       <td class="col-ticker">AAPL</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">09-Jul-26</td>
@@ -792,117 +807,117 @@
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=cf0303cb-2998-4edb-a525-667cb5548150" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
     </tr><tr>
-      <td class="col-rank">54</td>
+      <td class="col-rank">55</td>
       <td class="col-ticker">BAC</td>
       <td class="col-sector">Financials</td>
       <td class="col-date">09-Jul-26</td>
       <td class="col-entry">$59.24</td>
-      <td class="col-current">$61.62</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+4.0%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:8.04%"></div></div></div></td>
+      <td class="col-current">$61.59</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+4.0%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:7.9399999999999995%"></div></div></div></td>
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=b7683eeb-435f-4c6f-86ee-13f23518c11d" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
     </tr><tr>
-      <td class="col-rank">55</td>
+      <td class="col-rank">56</td>
       <td class="col-ticker">TSM</td>
       <td class="col-sector">Semiconductors</td>
       <td class="col-date">25-May-26</td>
       <td class="col-entry">$404.52</td>
-      <td class="col-current">$419.67</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+3.8%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:7.5%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$419.48</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+3.7%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:7.400000000000001%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">56</td>
+      <td class="col-rank">57</td>
       <td class="col-ticker">AWK</td>
       <td class="col-sector">Utilities</td>
       <td class="col-date">24-May-26</td>
       <td class="col-entry">$125.20</td>
-      <td class="col-current">$129.17</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+3.2%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:6.34%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$129.21</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+3.2%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:6.4%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">57</td>
+      <td class="col-rank">58</td>
       <td class="col-ticker">ED</td>
       <td class="col-sector">Utilities</td>
       <td class="col-date">14-May-26</td>
       <td class="col-entry">$107.13</td>
-      <td class="col-current">$110.30</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+3.0%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:5.92%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$110.31</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+3.0%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:5.94%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">58</td>
+      <td class="col-rank">59</td>
       <td class="col-ticker">OHI</td>
       <td class="col-sector">Healthcare</td>
       <td class="col-date">30-Apr-26</td>
       <td class="col-entry">$46.73</td>
       <td class="col-current">$47.95</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+2.6%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:5.22%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">59</td>
+      <td class="col-rank">60</td>
       <td class="col-ticker">AWK</td>
       <td class="col-sector">Utilities</td>
       <td class="col-date">14-May-26</td>
       <td class="col-entry">$125.98</td>
-      <td class="col-current">$129.17</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+2.5%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:5.06%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$129.21</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+2.6%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:5.12%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">60</td>
+      <td class="col-rank">61</td>
       <td class="col-ticker">VST</td>
       <td class="col-sector">Utilities</td>
       <td class="col-date">24-May-26</td>
       <td class="col-entry">$156.27</td>
-      <td class="col-current">$160.20</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+2.5%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:5.02%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$160.23</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+2.5%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:5.06%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">61</td>
+      <td class="col-rank">62</td>
       <td class="col-ticker">JNJ</td>
       <td class="col-sector">Healthcare</td>
       <td class="col-date">25-Jun-26</td>
       <td class="col-entry">$241.00</td>
-      <td class="col-current">$247.03</td>
+      <td class="col-current">$247.02</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+2.5%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:5%"></div></div></div></td>
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=96de5703-2cc9-4fba-b274-953997338951" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
     </tr><tr>
-      <td class="col-rank">62</td>
+      <td class="col-rank">63</td>
       <td class="col-ticker">BIIB</td>
       <td class="col-sector">Healthcare</td>
       <td class="col-date">17-May-26</td>
       <td class="col-entry">$192.95</td>
       <td class="col-current">$197.24</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+2.2%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:4.44%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">63</td>
+      <td class="col-rank">64</td>
       <td class="col-ticker">FTI</td>
       <td class="col-sector">Energy</td>
       <td class="col-date">15-May-26</td>
       <td class="col-entry">$71.28</td>
-      <td class="col-current">$72.26</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+1.4%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:2.74%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$72.27</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+1.4%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:2.78%"></div></div></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">64</td>
+      <td class="col-rank">65</td>
       <td class="col-ticker">DOV</td>
       <td class="col-sector">Industrials</td>
       <td class="col-date">24-May-26</td>
       <td class="col-entry">$209.90</td>
       <td class="col-current">$212.26</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+1.1%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:2.24%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">65</td>
+      <td class="col-rank">66</td>
       <td class="col-ticker">PPL</td>
       <td class="col-sector">Utilities</td>
       <td class="col-date">30-May-26</td>
@@ -912,27 +927,27 @@
       <td class="col-version">1.9.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">66</td>
+      <td class="col-rank">67</td>
       <td class="col-ticker">WFC</td>
       <td class="col-sector">Financials</td>
       <td class="col-date">09-Jul-26</td>
       <td class="col-entry">$86.91</td>
       <td class="col-current">$87.51</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+0.7%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:1.4%"></div></div></div></td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+0.7%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:1.38%"></div></div></div></td>
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=b7683eeb-435f-4c6f-86ee-13f23518c11d" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
     </tr><tr>
-      <td class="col-rank">67</td>
+      <td class="col-rank">68</td>
       <td class="col-ticker">NVDA</td>
       <td class="col-sector">Semiconductors</td>
       <td class="col-date">29-May-26</td>
       <td class="col-entry">$211.14</td>
       <td class="col-current">$212.50</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--pos">+0.6%</span><div class="roi-bar-track"><div class="roi-bar-fill" style="width:1.28%"></div></div></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">68</td>
+      <td class="col-rank">69</td>
       <td class="col-ticker">ASML</td>
       <td class="col-sector">Semiconductors</td>
       <td class="col-date">16-Jun-26</td>
@@ -942,7 +957,7 @@
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=5281781d-e58c-4deb-9ea1-50a1416a7c8f" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
     </tr><tr>
-      <td class="col-rank">69</td>
+      <td class="col-rank">70</td>
       <td class="col-ticker">EXC</td>
       <td class="col-sector">Utilities</td>
       <td class="col-date">03-Jun-26</td>
@@ -952,137 +967,137 @@
       <td class="col-version">1.9.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">70</td>
+      <td class="col-rank">71</td>
       <td class="col-ticker">NVDA</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">29-May-26</td>
       <td class="col-entry">$214.25</td>
       <td class="col-current">$212.50</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−0.8%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">71</td>
+      <td class="col-rank">72</td>
       <td class="col-ticker">NVDA</td>
       <td class="col-sector">Semiconductors</td>
       <td class="col-date">28-May-26</td>
       <td class="col-entry">$214.25</td>
       <td class="col-current">$212.50</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−0.8%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">72</td>
+      <td class="col-rank">73</td>
       <td class="col-ticker">NVDA</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">28-May-26</td>
       <td class="col-entry">$214.50</td>
       <td class="col-current">$212.50</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−0.9%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">73</td>
+      <td class="col-rank">74</td>
       <td class="col-ticker">NVDA</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">27-May-26</td>
       <td class="col-entry">$214.86</td>
       <td class="col-current">$212.50</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−1.1%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">74</td>
+      <td class="col-rank">75</td>
       <td class="col-ticker">LMT</td>
       <td class="col-sector">Industrials</td>
       <td class="col-date">15-May-26</td>
       <td class="col-entry">$520.41</td>
-      <td class="col-current">$514.30</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−1.2%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$514.46</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−1.1%</span></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">75</td>
+      <td class="col-rank">76</td>
       <td class="col-ticker">NVDA</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">24-May-26</td>
       <td class="col-entry">$215.33</td>
       <td class="col-current">$212.50</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−1.3%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">76</td>
+      <td class="col-rank">77</td>
       <td class="col-ticker">GEV</td>
       <td class="col-sector">Energy</td>
       <td class="col-date">27-May-26</td>
       <td class="col-entry">$1,070.47</td>
-      <td class="col-current">$1,055.67</td>
+      <td class="col-current">$1,055.28</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−1.4%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">77</td>
+      <td class="col-rank">78</td>
       <td class="col-ticker">ENB</td>
       <td class="col-sector">Energy</td>
       <td class="col-date">27-May-26</td>
       <td class="col-entry">$57.01</td>
-      <td class="col-current">$56.17</td>
+      <td class="col-current">$56.15</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−1.5%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">78</td>
+      <td class="col-rank">79</td>
       <td class="col-ticker">EPD</td>
       <td class="col-sector">Energy</td>
       <td class="col-date">27-May-26</td>
       <td class="col-entry">$38.40</td>
-      <td class="col-current">$37.50</td>
+      <td class="col-current">$37.52</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−2.3%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">79</td>
+      <td class="col-rank">80</td>
       <td class="col-ticker">NI</td>
       <td class="col-sector">Utilities</td>
       <td class="col-date">23-Apr-26</td>
       <td class="col-entry">$46.85</td>
       <td class="col-current">$45.71</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−2.4%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">80</td>
+      <td class="col-rank">81</td>
       <td class="col-ticker">PLTR</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">22-May-26</td>
       <td class="col-entry">$137.41</td>
       <td class="col-current">$133.76</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−2.7%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">81</td>
+      <td class="col-rank">82</td>
       <td class="col-ticker">CVX</td>
       <td class="col-sector">Energy</td>
       <td class="col-date">14-May-26</td>
       <td class="col-entry">$186.64</td>
-      <td class="col-current">$181.66</td>
+      <td class="col-current">$181.60</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−2.7%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">82</td>
+      <td class="col-rank">83</td>
       <td class="col-ticker">GOOGL</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">24-May-26</td>
       <td class="col-entry">$382.97</td>
       <td class="col-current">$370.92</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−3.1%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">83</td>
+      <td class="col-rank">84</td>
       <td class="col-ticker">AMD</td>
       <td class="col-sector">Semiconductors</td>
       <td class="col-date">09-Jul-26</td>
@@ -1092,137 +1107,137 @@
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=cc9f8647-3935-4d1c-afe5-ee454072476e" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
     </tr><tr>
-      <td class="col-rank">84</td>
+      <td class="col-rank">85</td>
       <td class="col-ticker">CEG</td>
       <td class="col-sector">Utilities</td>
       <td class="col-date">17-May-26</td>
       <td class="col-entry">$267.20</td>
       <td class="col-current">$258.11</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−3.4%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">85</td>
+      <td class="col-rank">86</td>
       <td class="col-ticker">CVX</td>
       <td class="col-sector">Energy</td>
       <td class="col-date">08-Jun-26</td>
       <td class="col-entry">$189.24</td>
-      <td class="col-current">$181.66</td>
+      <td class="col-current">$181.60</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−4.0%</span></div></td>
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=f7eb9719-5aab-4159-b872-047ac123b5f8" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
     </tr><tr>
-      <td class="col-rank">86</td>
+      <td class="col-rank">87</td>
       <td class="col-ticker">AMZN</td>
       <td class="col-sector">Consumer Discretionary</td>
       <td class="col-date">24-May-26</td>
       <td class="col-entry">$266.32</td>
       <td class="col-current">$254.96</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−4.3%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">87</td>
+      <td class="col-rank">88</td>
       <td class="col-ticker">EPD</td>
       <td class="col-sector">Energy</td>
       <td class="col-date">15-May-26</td>
       <td class="col-entry">$39.23</td>
-      <td class="col-current">$37.50</td>
+      <td class="col-current">$37.52</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−4.4%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">88</td>
+      <td class="col-rank">89</td>
       <td class="col-ticker">NVDA</td>
       <td class="col-sector">Semiconductors</td>
       <td class="col-date">19-May-26</td>
       <td class="col-entry">$222.32</td>
       <td class="col-current">$212.50</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−4.4%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">89</td>
+      <td class="col-rank">90</td>
       <td class="col-ticker">NEE</td>
       <td class="col-sector">Utilities</td>
       <td class="col-date">17-May-26</td>
       <td class="col-entry">$93.36</td>
-      <td class="col-current">$89.12</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−4.5%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-current">$89.10</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−4.6%</span></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">90</td>
+      <td class="col-rank">91</td>
       <td class="col-ticker">GOOGL</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">27-May-26</td>
       <td class="col-entry">$388.88</td>
       <td class="col-current">$370.92</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−4.6%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">91</td>
+      <td class="col-rank">92</td>
       <td class="col-ticker">AVGO</td>
       <td class="col-sector">Semiconductors</td>
       <td class="col-date">24-May-26</td>
       <td class="col-entry">$414.14</td>
       <td class="col-current">$394.28</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−4.8%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">92</td>
+      <td class="col-rank">93</td>
       <td class="col-ticker">AVGO</td>
       <td class="col-sector">Semiconductors</td>
       <td class="col-date">22-May-26</td>
       <td class="col-entry">$414.57</td>
       <td class="col-current">$394.28</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−4.9%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">93</td>
+      <td class="col-rank">94</td>
       <td class="col-ticker">MSFT</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">08-May-26</td>
       <td class="col-entry">$416.43</td>
       <td class="col-current">$395.63</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−5.0%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">94</td>
+      <td class="col-rank">95</td>
       <td class="col-ticker">MSFT</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">24-May-26</td>
       <td class="col-entry">$418.57</td>
       <td class="col-current">$395.63</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−5.5%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">95</td>
+      <td class="col-rank">96</td>
       <td class="col-ticker">NVDA</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">18-May-26</td>
       <td class="col-entry">$225.32</td>
       <td class="col-current">$212.50</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−5.7%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">96</td>
+      <td class="col-rank">97</td>
       <td class="col-ticker">NVDA</td>
       <td class="col-sector">Semiconductors</td>
       <td class="col-date">16-May-26</td>
       <td class="col-entry">$225.32</td>
       <td class="col-current">$212.50</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−5.7%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">97</td>
+      <td class="col-rank">98</td>
       <td class="col-ticker">RUN</td>
       <td class="col-sector">Energy</td>
       <td class="col-date">23-Jun-26</td>
@@ -1232,57 +1247,57 @@
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=69e7db04-253c-4690-a043-4af5b3d7b51f" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
     </tr><tr>
-      <td class="col-rank">98</td>
+      <td class="col-rank">99</td>
       <td class="col-ticker">AVGO</td>
       <td class="col-sector">Semiconductors</td>
       <td class="col-date">19-May-26</td>
       <td class="col-entry">$420.71</td>
       <td class="col-current">$394.28</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−6.3%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
-      <td class="col-report">—</td>
-    </tr><tr>
-      <td class="col-rank">99</td>
-      <td class="col-ticker">COP</td>
-      <td class="col-sector">Energy</td>
-      <td class="col-date">14-May-26</td>
-      <td class="col-entry">$118.97</td>
-      <td class="col-current">$111.47</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−6.3%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">100</td>
       <td class="col-ticker">COP</td>
       <td class="col-sector">Energy</td>
-      <td class="col-date">24-May-26</td>
-      <td class="col-entry">$120.46</td>
-      <td class="col-current">$111.47</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−7.5%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-date">14-May-26</td>
+      <td class="col-entry">$118.97</td>
+      <td class="col-current">$111.46</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−6.3%</span></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
       <td class="col-rank">101</td>
+      <td class="col-ticker">COP</td>
+      <td class="col-sector">Energy</td>
+      <td class="col-date">24-May-26</td>
+      <td class="col-entry">$120.46</td>
+      <td class="col-current">$111.46</td>
+      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−7.5%</span></div></td>
+      <td class="col-version">&lt;=1.8.0</td>
+      <td class="col-report">—</td>
+    </tr><tr>
+      <td class="col-rank">102</td>
       <td class="col-ticker">TTE</td>
       <td class="col-sector">Energy</td>
       <td class="col-date">29-May-26</td>
       <td class="col-entry">$87.32</td>
-      <td class="col-current">$80.37</td>
+      <td class="col-current">$80.34</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−8.0%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">102</td>
+      <td class="col-rank">103</td>
       <td class="col-ticker">REGN</td>
       <td class="col-sector">Healthcare</td>
       <td class="col-date">13-May-26</td>
       <td class="col-entry">$723.41</td>
       <td class="col-current">$664.45</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−8.2%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">103</td>
+      <td class="col-rank">104</td>
       <td class="col-ticker">CEG</td>
       <td class="col-sector">Utilities</td>
       <td class="col-date">30-May-26</td>
@@ -1292,47 +1307,47 @@
       <td class="col-version">1.9.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">104</td>
+      <td class="col-rank">105</td>
       <td class="col-ticker">ISRG</td>
       <td class="col-sector">Healthcare</td>
       <td class="col-date">27-May-26</td>
       <td class="col-entry">$436.64</td>
       <td class="col-current">$388.97</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−10.9%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">105</td>
+      <td class="col-rank">106</td>
       <td class="col-ticker">SLB</td>
       <td class="col-sector">Energy</td>
       <td class="col-date">08-Jun-26</td>
       <td class="col-entry">$56.55</td>
-      <td class="col-current">$47.56</td>
+      <td class="col-current">$47.55</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−15.9%</span></div></td>
       <td class="col-version">1.9.0</td>
       <td class="col-report"><a href="https://reports.prospect-ai.moisesprat.dev/report.html?id=f7eb9719-5aab-4159-b872-047ac123b5f8" target="_blank" rel="noopener noreferrer" class="report-link">View</a></td>
     </tr><tr>
-      <td class="col-rank">106</td>
+      <td class="col-rank">107</td>
       <td class="col-ticker">FDX</td>
       <td class="col-sector">Industrials</td>
       <td class="col-date">17-May-26</td>
       <td class="col-entry">$375.78</td>
       <td class="col-current">$313.42</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−16.6%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">107</td>
+      <td class="col-rank">108</td>
       <td class="col-ticker">INOD</td>
       <td class="col-sector">Technology</td>
       <td class="col-date">26-May-26</td>
       <td class="col-entry">$95.68</td>
       <td class="col-current">$65.31</td>
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−31.7%</span></div></td>
-      <td class="col-version"><=1.8.0</td>
+      <td class="col-version">&lt;=1.8.0</td>
       <td class="col-report">—</td>
     </tr><tr>
-      <td class="col-rank">108</td>
+      <td class="col-rank">109</td>
       <td class="col-ticker">CENX</td>
       <td class="col-sector">Industrials</td>
       <td class="col-date">30-May-26</td>
@@ -1341,21 +1356,225 @@
       <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--neg">−33.4%</span></div></td>
       <td class="col-version">1.9.0</td>
       <td class="col-report">—</td>
-    </tr><tr>
-      <td class="col-rank">109</td>
-      <td class="col-ticker">GRC</td>
-      <td class="col-sector">Industrials</td>
-      <td class="col-date">24-May-26</td>
-      <td class="col-entry">$72.66</td>
-      <td class="col-current">—</td>
-      <td class="col-roi"><div class="roi-cell"><span class="roi-badge roi-badge--null">—</span></div></td>
-      <td class="col-version"><=1.8.0</td>
-      <td class="col-report">—</td>
     </tr><!--/SSR--></tbody>
           </table>
           <div class="stats-empty" id="history-empty" hidden>No signals yet for this sector.</div>
           <div class="stats-error" id="history-error" hidden>Could not load signal performance data.</div>
         </div>
+      </section>
+    </div>
+
+    <!-- ── PANEL: BENCHMARK ───────────────────────────────────────────── -->
+    <div id="panel-benchmark" role="tabpanel" class="stats-panel">
+      <section class="stats-section">
+        <h2 class="stats-section-title">Benchmark Comparison</h2>
+        <p class="stats-section-sub">
+          Average realized return of LONG-BUY signals vs SPY overall, and vs each sector's own ETF —
+          each comparison uses the same trigger-to-current window as the signals it covers.
+        </p>
+
+        <div id="benchmark-groups" data-ssr="1"><!--SSR:benchmark-groups-->
+    <div class="benchmark-group">
+      <h3 class="benchmark-group-title">Overall — vs SPY</h3>
+      <div class="stats-kpi-grid benchmark-kpi-grid">
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg Buy ROI</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+4.3%</div>
+          <div class="stats-kpi-sub">109 signals</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg SPY Return</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+1.7%</div>
+          <div class="stats-kpi-sub">same trigger-to-current window</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Delta</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+2.6%</div>
+          <div class="stats-kpi-sub">buy ROI minus benchmark</div>
+        </div>
+      </div>
+    </div>
+    <div class="benchmark-group">
+      <h3 class="benchmark-group-title">Consumer Discretionary — vs XLY</h3>
+      <div class="stats-kpi-grid benchmark-kpi-grid">
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg Buy ROI</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+10.0%</div>
+          <div class="stats-kpi-sub">4 signals</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg XLY Return</div>
+          <div class="stats-kpi-value stats-kpi-value--neg">−1.2%</div>
+          <div class="stats-kpi-sub">same trigger-to-current window</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Delta</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+11.2%</div>
+          <div class="stats-kpi-sub">buy ROI minus benchmark</div>
+        </div>
+      </div>
+    </div>
+    <div class="benchmark-group">
+      <h3 class="benchmark-group-title">Energy — vs XLE</h3>
+      <div class="stats-kpi-grid benchmark-kpi-grid">
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg Buy ROI</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+4.1%</div>
+          <div class="stats-kpi-sub">20 signals</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg XLE Return</div>
+          <div class="stats-kpi-value stats-kpi-value--neg">−1.5%</div>
+          <div class="stats-kpi-sub">same trigger-to-current window</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Delta</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+5.7%</div>
+          <div class="stats-kpi-sub">buy ROI minus benchmark</div>
+        </div>
+      </div>
+    </div>
+    <div class="benchmark-group">
+      <h3 class="benchmark-group-title">Financials — vs XLF</h3>
+      <div class="stats-kpi-grid benchmark-kpi-grid">
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg Buy ROI</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+12.3%</div>
+          <div class="stats-kpi-sub">9 signals</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg XLF Return</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+8.4%</div>
+          <div class="stats-kpi-sub">same trigger-to-current window</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Delta</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+3.9%</div>
+          <div class="stats-kpi-sub">buy ROI minus benchmark</div>
+        </div>
+      </div>
+    </div>
+    <div class="benchmark-group">
+      <h3 class="benchmark-group-title">Healthcare — vs XLV</h3>
+      <div class="stats-kpi-grid benchmark-kpi-grid">
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg Buy ROI</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+6.0%</div>
+          <div class="stats-kpi-sub">13 signals</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg XLV Return</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+8.2%</div>
+          <div class="stats-kpi-sub">same trigger-to-current window</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Delta</div>
+          <div class="stats-kpi-value stats-kpi-value--neg">−2.2%</div>
+          <div class="stats-kpi-sub">buy ROI minus benchmark</div>
+        </div>
+      </div>
+    </div>
+    <div class="benchmark-group">
+      <h3 class="benchmark-group-title">Industrials — vs XLI</h3>
+      <div class="stats-kpi-grid benchmark-kpi-grid">
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg Buy ROI</div>
+          <div class="stats-kpi-value stats-kpi-value--neg">−2.4%</div>
+          <div class="stats-kpi-sub">7 signals</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg XLI Return</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+5.2%</div>
+          <div class="stats-kpi-sub">same trigger-to-current window</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Delta</div>
+          <div class="stats-kpi-value stats-kpi-value--neg">−7.5%</div>
+          <div class="stats-kpi-sub">buy ROI minus benchmark</div>
+        </div>
+      </div>
+    </div>
+    <div class="benchmark-group">
+      <h3 class="benchmark-group-title">Real Estate — vs XLRE</h3>
+      <div class="stats-kpi-grid benchmark-kpi-grid">
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg Buy ROI</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+7.6%</div>
+          <div class="stats-kpi-sub">2 signals</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg XLRE Return</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+0.9%</div>
+          <div class="stats-kpi-sub">same trigger-to-current window</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Delta</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+6.8%</div>
+          <div class="stats-kpi-sub">buy ROI minus benchmark</div>
+        </div>
+      </div>
+    </div>
+    <div class="benchmark-group">
+      <h3 class="benchmark-group-title">Semiconductors — vs SOXX</h3>
+      <div class="stats-kpi-grid benchmark-kpi-grid">
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg Buy ROI</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+5.6%</div>
+          <div class="stats-kpi-sub">20 signals</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg SOXX Return</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+4.4%</div>
+          <div class="stats-kpi-sub">same trigger-to-current window</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Delta</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+1.2%</div>
+          <div class="stats-kpi-sub">buy ROI minus benchmark</div>
+        </div>
+      </div>
+    </div>
+    <div class="benchmark-group">
+      <h3 class="benchmark-group-title">Technology — vs XLK</h3>
+      <div class="stats-kpi-grid benchmark-kpi-grid">
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg Buy ROI</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+1.0%</div>
+          <div class="stats-kpi-sub">21 signals</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg XLK Return</div>
+          <div class="stats-kpi-value stats-kpi-value--neg">−0.5%</div>
+          <div class="stats-kpi-sub">same trigger-to-current window</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Delta</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+1.4%</div>
+          <div class="stats-kpi-sub">buy ROI minus benchmark</div>
+        </div>
+      </div>
+    </div>
+    <div class="benchmark-group">
+      <h3 class="benchmark-group-title">Utilities — vs XLU</h3>
+      <div class="stats-kpi-grid benchmark-kpi-grid">
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg Buy ROI</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+1.9%</div>
+          <div class="stats-kpi-sub">13 signals</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg XLU Return</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+1.8%</div>
+          <div class="stats-kpi-sub">same trigger-to-current window</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Delta</div>
+          <div class="stats-kpi-value stats-kpi-value--pos">+0.1%</div>
+          <div class="stats-kpi-sub">buy ROI minus benchmark</div>
+        </div>
+      </div>
+    </div><!--/SSR--></div>
+        <div class="stats-empty" id="benchmark-empty" hidden>No benchmark data available yet.</div>
       </section>
     </div>
 

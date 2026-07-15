@@ -5,7 +5,8 @@
    identical markup from identical data.
    ============================================================ */
 
-import { fmtDate, utcDateStr, fmtPrice, fmtRoi } from './formatters.js';
+import { fmtDate, utcDateStr, fmtPrice, fmtRoi, escapeHtml } from './formatters.js';
+import { getSectorEtf } from './data.js';
 
 export const ACTION_COLOURS = {
   'LONG-BUY':       '#4a7c59',
@@ -203,6 +204,92 @@ export function computeKpis(history) {
   return { winRate, avg, best, worst };
 }
 
+/* ── Performance tab — benchmark comparison (vs SPY / vs sector ETF) ─ */
+
+export function computeRoiPct(triggerPrice, currentPrice) {
+  if (triggerPrice == null || currentPrice == null || triggerPrice === 0) return null;
+  return (currentPrice - triggerPrice) / triggerPrice * 100;
+}
+
+// Average buy ROI, average benchmark ROI, and their delta — all computed
+// over the same trigger-to-current window as each individual signal
+// (a rolling per-row window, not one shared calendar range).
+function computeBenchmarkGroup(history, triggerField, currentField) {
+  const rows = (history ?? []).filter(r =>
+    r.roi_pct != null && computeRoiPct(r[triggerField], r[currentField]) != null
+  );
+  if (rows.length === 0) return null;
+  const avgPick      = rows.reduce((s, r) => s + r.roi_pct, 0) / rows.length;
+  const avgBenchmark = rows.reduce((s, r) => s + computeRoiPct(r[triggerField], r[currentField]), 0) / rows.length;
+  return {
+    sampleSize:   rows.length,
+    avgRoi:       fmtRoi(avgPick),
+    avgBenchmark: fmtRoi(avgBenchmark),
+    delta:        fmtRoi(avgPick - avgBenchmark),
+  };
+}
+
+export function computeSpyBenchmarkGroup(history) {
+  return computeBenchmarkGroup(history, 'spy_trigger_price', 'spy_current_price');
+}
+
+export function computeSectorBenchmarkGroup(history) {
+  return computeBenchmarkGroup(history, 'sector_etf_trigger_price', 'sector_etf_current_price');
+}
+
+export function computeSpyDelta(history) {
+  return computeSpyBenchmarkGroup(history)?.delta ?? null;
+}
+
+export function computeSectorDelta(history) {
+  return computeSectorBenchmarkGroup(history)?.delta ?? null;
+}
+
+/* ── Benchmark tab — overall + per-sector three-box groups ───────── */
+
+function renderBenchmarkGroupHTML(title, benchmarkLabel, group) {
+  if (!group) return '';
+  return `
+    <div class="benchmark-group">
+      <h3 class="benchmark-group-title">${escapeHtml(title)}</h3>
+      <div class="stats-kpi-grid benchmark-kpi-grid">
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Avg Buy ROI</div>
+          <div class="stats-kpi-value ${group.avgRoi.cls}">${group.avgRoi.text}</div>
+          <div class="stats-kpi-sub">${group.sampleSize} signal${group.sampleSize === 1 ? '' : 's'}</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">${escapeHtml(benchmarkLabel)}</div>
+          <div class="stats-kpi-value ${group.avgBenchmark.cls}">${group.avgBenchmark.text}</div>
+          <div class="stats-kpi-sub">same trigger-to-current window</div>
+        </div>
+        <div class="stats-kpi-card">
+          <div class="stats-kpi-label">Delta</div>
+          <div class="stats-kpi-value ${group.delta.cls}">${group.delta.text}</div>
+          <div class="stats-kpi-sub">buy ROI minus benchmark</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+export function renderBenchmarkSectionHTML(history) {
+  const rows = history ?? [];
+  let html = renderBenchmarkGroupHTML('Overall — vs SPY', 'Avg SPY Return', computeSpyBenchmarkGroup(rows));
+
+  const sectors = [...new Set(rows.map(r => r.sector).filter(Boolean))].sort();
+  for (const sector of sectors) {
+    const etf = getSectorEtf(sector);
+    const sectorRows = rows.filter(r => r.sector === sector);
+    html += renderBenchmarkGroupHTML(
+      `${sector} — vs ${etf ?? 'Sector ETF'}`,
+      `Avg ${etf ?? 'Sector'} Return`,
+      computeSectorBenchmarkGroup(sectorRows)
+    );
+  }
+
+  return html;
+}
+
 export function renderHistoryRowsHTML(history) {
   return history.map((row, i) => {
     const roi    = row.roi_pct;
@@ -221,18 +308,18 @@ export function renderHistoryRowsHTML(history) {
     }
 
     const reportCell = row.report_url
-      ? `<a href="${row.report_url}" target="_blank" rel="noopener noreferrer" class="report-link">View</a>`
+      ? `<a href="${escapeHtml(row.report_url)}" target="_blank" rel="noopener noreferrer" class="report-link">View</a>`
       : '—';
 
     return `<tr>
       <td class="col-rank">${i + 1}</td>
-      <td class="col-ticker">${row.ticker}</td>
-      <td class="col-sector">${row.sector || '—'}</td>
+      <td class="col-ticker">${escapeHtml(row.ticker)}</td>
+      <td class="col-sector">${escapeHtml(row.sector) || '—'}</td>
       <td class="col-date">${fmtDate(row.recommended_at)}</td>
       <td class="col-entry">${fmtPrice(row.trigger_price)}</td>
       <td class="col-current">${fmtPrice(row.current_price)}</td>
       <td class="col-roi"><div class="roi-cell">${roiBadge}${barHtml}</div></td>
-      <td class="col-version">${row.prospectai_version ?? '—'}</td>
+      <td class="col-version">${escapeHtml(row.prospectai_version) || '—'}</td>
       <td class="col-report">${reportCell}</td>
     </tr>`;
   }).join('');

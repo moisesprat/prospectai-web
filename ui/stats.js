@@ -10,12 +10,16 @@ import {
   applyDataRules,
   computeKpis,
   renderHistoryRowsHTML,
+  computeSpyDelta,
+  computeSectorDelta,
+  renderBenchmarkSectionHTML,
 } from './statsRender.js';
+import { getSectorEtf } from './data.js';
 
 const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL
   ?? 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
 
-const TABS = ['activity', 'decisions', 'performance'];
+const TABS = ['activity', 'decisions', 'performance', 'benchmark'];
 
 /* ── Tab navigation ──────────────────────────────────────────── */
 
@@ -180,14 +184,37 @@ function populateSectorDropdown(raw) {
     select.addEventListener('change', () => {
       const ruled = applyDataRules(getFilteredHistory(select.value));
       renderHistory(ruled);
-      renderPerformanceKpis(ruled);
+      renderPerformanceKpis(ruled, select.value);
     });
   }
 }
 
 /* ── Performance tab — KPI cards ─────────────────────────────── */
 
-function renderPerformanceKpis(history) {
+function renderReturnDelta(history, sectorFilter) {
+  const wrap = document.getElementById('kpi-avg-return-delta');
+
+  const delta = sectorFilter === '__all__'
+    ? computeSpyDelta(history)
+    : computeSectorDelta(history);
+
+  if (delta == null) {
+    wrap.hidden = true;
+    return;
+  }
+
+  const label = sectorFilter === '__all__'
+    ? 'vs SPY'
+    : `vs ${getSectorEtf(sectorFilter) ?? 'Sector'}`;
+
+  const valEl = document.getElementById('kpi-avg-return-delta-val');
+  valEl.textContent = delta.text;
+  valEl.className   = `stats-kpi-delta-val ${delta.cls}`;
+  document.getElementById('kpi-avg-return-delta-label').textContent = label;
+  wrap.hidden = false;
+}
+
+function renderPerformanceKpis(history, sectorFilter = '__all__') {
   const { winRate, avg, best, worst } = computeKpis(history);
 
   const winRateEl = document.getElementById('kpi-win-rate-val');
@@ -212,6 +239,8 @@ function renderPerformanceKpis(history) {
   worstEl.className      = `stats-kpi-value ${worst.cls}`;
   worstSubEl.textContent = worst.text;
   worstEl.dataset.ssr     = '1';
+
+  renderReturnDelta(history, sectorFilter);
 }
 
 /* ── Performance tab — track record table ────────────────────── */
@@ -255,6 +284,24 @@ function renderHistory(history, storeAndInit = true) {
     ` · ${history.length} signals · entries within 5 days and duplicates excluded`;
 }
 
+/* ── Benchmark tab — overall + per-sector comparison ─────────── */
+
+function renderBenchmarkSection(history) {
+  const container = document.getElementById('benchmark-groups');
+  const emptyEl    = document.getElementById('benchmark-empty');
+
+  const html = renderBenchmarkSectionHTML(history);
+  if (!html) {
+    container.innerHTML = '';
+    emptyEl.hidden = false;
+    return;
+  }
+
+  emptyEl.hidden = true;
+  container.innerHTML = html;
+  container.dataset.ssr = '1';
+}
+
 /* ── Init ────────────────────────────────────────────────────── */
 
 async function init() {
@@ -295,11 +342,15 @@ async function init() {
       const cleaned = applyDataRules(_allHistory);
       renderHistory(cleaned);
       renderPerformanceKpis(cleaned);
+      renderBenchmarkSection(cleaned);
     } catch {
       loadingEl.hidden = true;
       if (document.getElementById('history-tbody').dataset.ssr !== '1') {
         document.getElementById('history-error').hidden = false;
         renderPerformanceKpis([]);
+      }
+      if (document.getElementById('benchmark-groups').dataset.ssr !== '1') {
+        renderBenchmarkSection([]);
       }
     }
   } else {
@@ -307,6 +358,9 @@ async function init() {
     if (document.getElementById('history-tbody').dataset.ssr !== '1') {
       document.getElementById('history-error').hidden = false;
       renderPerformanceKpis([]);
+    }
+    if (document.getElementById('benchmark-groups').dataset.ssr !== '1') {
+      renderBenchmarkSection([]);
     }
   }
 }

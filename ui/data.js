@@ -17,6 +17,12 @@ export const SECTORS = [
   { ticker: 'XLU',  name: 'Utilities' },
 ];
 
+/* Sector name -> ETF ticker, for resolving benchmark comparisons without
+   requiring the backend to send an explicit ETF ticker per row. */
+export function getSectorEtf(sectorName) {
+  return SECTORS.find(s => s.name === sectorName)?.ticker ?? null;
+}
+
 /* ---- Agent scripts (dummy) ---- */
 export const AGENT_SCRIPTS = {
   Technology: [
