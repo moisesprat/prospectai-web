@@ -157,8 +157,8 @@ async function generateStats(analytics, historyData) {
     if (spyDelta != null) {
       html = replaceBetween(html, 'kpi-avg-return-delta-val', spyDelta.text);
       html = html.replace(
-        /<span class="stats-kpi-delta-val[^"]*" id="kpi-avg-return-delta-val"/,
-        `<span class="stats-kpi-delta-val ${spyDelta.cls}" id="kpi-avg-return-delta-val" data-ssr="1"`
+        /<span class="stats-kpi-delta-val[^"]*" id="kpi-avg-return-delta-val"[^>]*>/,
+        `<span class="stats-kpi-delta-val ${spyDelta.cls}" id="kpi-avg-return-delta-val" data-ssr="1">`
       );
       html = replaceBetween(html, 'kpi-avg-return-delta-label', 'vs SPY');
       html = html.replace(
