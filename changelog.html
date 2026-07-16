@@ -48,295 +48,52 @@
         <time class="changelog-date" datetime="2026-05-30">2026-05-30</time>
         <div class="changelog-entry-body">
           <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.9.0/" target="_blank" rel="noopener">v1.9.0</a></h2>
+          <h2 class="changelog-title">v1.9.0</h2>
+          <ul class="changelog-bullets">
+            <li>enhance LONG-BUY trade setup logic to ensure stop_loss and entry zones are anchored to current_price</li><li>harden PositionRecommendation schema: auto-correct above-zone trade_setup invariant violations before Pydantic validation</li><li>remove scaled_entry_setups from draft output in ProspectAIFlow</li><li>remove SCALED-ENTRY action and related logic from PositionRecommendation schema</li><li>implement reasoning-based action selection in Draft Strategist, removing SCALED-ENTRY and enhancing Critic validation</li>
+          </ul>
         </div>
       </article>
       <article class="changelog-entry">
         <time class="changelog-date" datetime="2026-05-30">2026-05-30</time>
         <div class="changelog-entry-body">
           <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.8.1/" target="_blank" rel="noopener">v1.8.1</a></h2>
+          <h2 class="changelog-title">v1.8.1</h2>
+          <ul class="changelog-bullets">
+            <li>catch LONG-BUY outside entry zone, degenerate zones, and bucket accounting errors</li><li>add risk aversion profile selector to portfolio allocation</li><li>implement continuous scrolling marquee for recent-wins strip with hover pause and seamless looping</li><li>enhance token tracking in ExecutionTracker and AnthropicCachingCompletion for improved cache metrics</li>
+          </ul>
         </div>
       </article>
       <article class="changelog-entry">
         <time class="changelog-date" datetime="2026-05-17">2026-05-17</time>
         <div class="changelog-entry-body">
           <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.8.0/" target="_blank" rel="noopener">v1.8.0</a></h2>
+          <h2 class="changelog-title">v1.8.0</h2>
+          <ul class="changelog-bullets">
+            <li>update tests to use AnthropicCachingCompletion and improve structure</li><li>replace CachingLLM with make_caching_llm factory for improved prompt caching</li><li>implement CachingLLM for prompt caching and enhance execution tracking metrics</li><li>implement long-buy wins enrichment with trigger price and recommendation label</li>
+          </ul>
         </div>
       </article>
       <article class="changelog-entry">
         <time class="changelog-date" datetime="2026-05-14">2026-05-14</time>
         <div class="changelog-entry-body">
           <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.7.1/" target="_blank" rel="noopener">v1.7.1</a></h2>
+          <h2 class="changelog-title">v1.7.1</h2>
+          <ul class="changelog-bullets">
+            <li>Maintenance and stability improvements</li>
+          </ul>
         </div>
       </article>
       <article class="changelog-entry">
         <time class="changelog-date" datetime="2026-05-09">2026-05-09</time>
         <div class="changelog-entry-body">
           <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.7.0/" target="_blank" rel="noopener">v1.7.0</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-05-08">2026-05-08</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.17/" target="_blank" rel="noopener">v1.6.17</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-29">2026-04-29</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.16/" target="_blank" rel="noopener">v1.6.16</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-29">2026-04-29</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.15/" target="_blank" rel="noopener">v1.6.15</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-28">2026-04-28</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.14/" target="_blank" rel="noopener">v1.6.14</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-27">2026-04-27</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.13/" target="_blank" rel="noopener">v1.6.13</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-27">2026-04-27</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.12/" target="_blank" rel="noopener">v1.6.12</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-26">2026-04-26</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.11/" target="_blank" rel="noopener">v1.6.11</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-24">2026-04-24</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.10/" target="_blank" rel="noopener">v1.6.10</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-24">2026-04-24</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.9/" target="_blank" rel="noopener">v1.6.9</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-24">2026-04-24</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.8/" target="_blank" rel="noopener">v1.6.8</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-24">2026-04-24</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.7/" target="_blank" rel="noopener">v1.6.7</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-23">2026-04-23</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.6/" target="_blank" rel="noopener">v1.6.6</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-23">2026-04-23</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.5/" target="_blank" rel="noopener">v1.6.5</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-23">2026-04-23</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.4/" target="_blank" rel="noopener">v1.6.4</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-23">2026-04-23</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.3/" target="_blank" rel="noopener">v1.6.3</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-23">2026-04-23</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.2/" target="_blank" rel="noopener">v1.6.2</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-23">2026-04-23</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.1/" target="_blank" rel="noopener">v1.6.1</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-23">2026-04-23</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.6.0/" target="_blank" rel="noopener">v1.6.0</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-22">2026-04-22</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.5.20/" target="_blank" rel="noopener">v1.5.20</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-22">2026-04-22</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.5.19/" target="_blank" rel="noopener">v1.5.19</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-20">2026-04-20</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.5.18/" target="_blank" rel="noopener">v1.5.18</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-20">2026-04-20</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.5.17/" target="_blank" rel="noopener">v1.5.17</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-20">2026-04-20</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.5.16/" target="_blank" rel="noopener">v1.5.16</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-20">2026-04-20</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.5.15/" target="_blank" rel="noopener">v1.5.15</a></h2>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-20">2026-04-20</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Release <a href="https://pypi.org/project/prospectai/1.5.14/" target="_blank" rel="noopener">v1.5.14</a></h2>
+          <h2 class="changelog-title">v1.7.0</h2>
+          <ul class="changelog-bullets">
+            <li>add risk_profile parameter (conservative / aggressive) flowing through the entire pipeline with per-profile allocation caps, stop-loss multipliers, and R/R ratios</li><li>PortfolioAllocatorTool applies hardcoded bounds per profile; Draft Strategist, Critic, and Final Strategist receive qualitative profile guidance</li><li>InvestorStrategicOutput and CriticOutput schemas carry risk_profile field</li><li>Backend /api/analyze exposes risk_profile query param; analytics tracks usage by profile</li><li>Web UI adds Conservative / Aggressive toggle before pipeline trigger</li>
+          </ul>
         </div>
       </article><!--/SSR-->
-
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-07-12">2026-07-12</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">Architecture patterns for multi-agent systems</h2>
-          <p class="changelog-text">Added a Patterns section documenting the reusable design patterns behind ProspectAI's agent pipeline — adversarial critic, parallel agent execution, LLM output validation, and model tiering — for anyone studying how the brain is built.</p>
-        </div>
-      </article>
-
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-07-12">2026-07-12</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--frontend">Frontend</span>
-          <h2 class="changelog-title">SEO improvements for homepage and Architecture page</h2>
-          <p class="changelog-text">Corrected homepage SEO metadata and synced titles/descriptions across surfaces; enhanced the Architecture page with updated meta description and structured data for better discoverability.</p>
-        </div>
-      </article>
-
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-06-07">2026-06-07</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--frontend">Frontend</span>
-          <h2 class="changelog-title">Persistent nav bar and Architecture page</h2>
-          <p class="changelog-text">Added a site-wide persistent nav bar and a new Architecture page with a live, auto-cycling animation of the 6-agent pipeline — Market Analyst through Final Strategist — so visitors can see how ProspectAI's brain is wired without running a live analysis.</p>
-        </div>
-      </article>
-
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-06-07">2026-06-07</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--frontend">Frontend</span>
-          <h2 class="changelog-title">Report persistence — viewer, history, and My Reports</h2>
-          <p class="changelog-text">Every ProspectAI run is now saved and shareable: a dedicated report viewer page, a report history page, an "Open Report" button, and a My Reports panel for revisiting past analyses.</p>
-        </div>
-      </article>
-
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-05-30">2026-05-30</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--frontend">Frontend</span>
-          <h2 class="changelog-title">ProspectAI Stats page</h2>
-          <p class="changelog-text">Added a Stats page showing run analytics, sector distribution, risk-profile breakdown, and a sortable track record of past LONG-BUY decisions from the ProspectAI pipeline.</p>
-        </div>
-      </article>
-
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-05-09">2026-05-09</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <span class="changelog-version">v1.7.0</span>
-          <h2 class="changelog-title">Conservative / Aggressive risk profile selector</h2>
-          <p class="changelog-text">ProspectAI's Draft Strategist and Final Strategist now accept a risk profile — Conservative (15% max position, 3% stop-loss, 2.5× R/R) or Aggressive (30% max position, 5% stop-loss, 1.5× R/R) — that shapes portfolio allocation and entry/exit rules for every run.</p>
-        </div>
-      </article>
-
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-14">2026-04-14</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--frontend">Frontend</span>
-          <h2 class="changelog-title">SEO and social sharing metadata</h2>
-          <p class="changelog-text">Added JSON-LD structured data, Open Graph tags, and Twitter card support so ProspectAI reports and pages preview correctly when shared.</p>
-        </div>
-      </article>
-
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-10">2026-04-10</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <span class="changelog-version">v1.5.0</span>
-          <h2 class="changelog-title">6-agent pipeline</h2>
-          <p class="changelog-text">ProspectAI's brain expanded from a single-pass analysis to a full 6-agent CrewAI flow — Market Analyst, Technical Analyst and Fundamental Analyst running in parallel, a Draft Strategist, an adversarial Critic, and a Final Strategist that revises the report before it's delivered.</p>
-        </div>
-      </article>
-
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-04-06">2026-04-06</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--frontend">Frontend</span>
-          <h2 class="changelog-title">SEO foundation</h2>
-          <p class="changelog-text">Added meta tags, robots.txt, and sitemap.xml so the ProspectAI site could start being indexed.</p>
-        </div>
-      </article>
 
     </div><!-- /changelog-list -->
 

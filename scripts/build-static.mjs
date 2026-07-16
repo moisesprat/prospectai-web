@@ -29,7 +29,7 @@ import {
   renderBenchmarkSectionHTML,
 } from '../ui/statsRender.js';
 import { renderReportsGridHTML } from '../ui/reportsRender.js';
-import { parsePypiReleasesRSS, renderPypiReleasesHTML } from '../ui/changelogRender.js';
+import { parsePypiReleaseNotes, renderReleaseNotesHTML } from '../ui/changelogRender.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT      = join(__dirname, '..');
@@ -37,7 +37,7 @@ const ROOT      = join(__dirname, '..');
 const MODAL_URL  = 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
 const SITE_ORIGIN = 'https://prospect-ai.moisesprat.dev';
 const MAX_SITEMAP_REPORTS = 200;
-const PYPI_RELEASES_RSS_URL = 'https://pypi.org/rss/project/prospectai/releases.xml';
+const PYPI_PROJECT_JSON_URL = 'https://pypi.org/pypi/prospectai/json';
 
 async function fetchJSON(path) {
   try {
@@ -49,11 +49,11 @@ async function fetchJSON(path) {
   }
 }
 
-async function fetchPypiReleasesRSS() {
+async function fetchPypiProjectJSON() {
   try {
-    const res = await fetch(PYPI_RELEASES_RSS_URL);
+    const res = await fetch(PYPI_PROJECT_JSON_URL);
     if (!res.ok) return null;
-    return await res.text();
+    return await res.json();
   } catch {
     return null;
   }
@@ -239,40 +239,40 @@ async function generateReports(reports) {
 
 /* ── changelog.html ──────────────────────────────────────────── */
 
-async function generateChangelog(rssText) {
+async function generateChangelog(pypiData) {
   const path = join(ROOT, 'changelog.html');
   let html = await readFile(path, 'utf8');
 
-  const items = parsePypiReleasesRSS(rssText);
+  const items = parsePypiReleaseNotes(pypiData?.info?.description, pypiData?.releases);
   if (items.length === 0) {
     await writeFile(path, html, 'utf8');
     return;
   }
 
-  html = replaceBetween(html, 'pypi-releases', renderPypiReleasesHTML(items));
+  html = replaceBetween(html, 'pypi-releases', renderReleaseNotesHTML(items));
   await writeFile(path, html, 'utf8');
 }
 
 /* ── main ────────────────────────────────────────────────────── */
 
 async function main() {
-  const [analytics, historyData, reports, pypiReleasesRSS] = await Promise.all([
+  const [analytics, historyData, reports, pypiData] = await Promise.all([
     fetchJSON('/api/analytics'),
     fetchJSON('/api/long-buy-history'),
     fetchJSON('/api/reports'),
-    fetchPypiReleasesRSS(),
+    fetchPypiProjectJSON(),
   ]);
 
   await generateSitemap(reports);
   await generateStats(analytics, historyData);
   await generateReports(reports);
-  await generateChangelog(pypiReleasesRSS);
+  await generateChangelog(pypiData);
 
   console.log('build-static: done', {
     analytics: !!analytics,
     history: !!historyData,
     reports: reports ? reports.length : 'unreachable',
-    pypiReleases: !!pypiReleasesRSS,
+    pypiReleases: !!pypiData,
   });
 }
 

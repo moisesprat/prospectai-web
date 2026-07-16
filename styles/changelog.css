@@ -86,6 +86,23 @@
   margin: 0;
 }
 
+.changelog-bullets {
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  margin: 0;
+  padding-left: 18px;
+}
+
+.changelog-bullets li {
+  margin-bottom: 4px;
+}
+
+.changelog-bullets li:last-child {
+  margin-bottom: 0;
+}
+
 @media (max-width: 640px) {
   .changelog-entry {
     grid-template-columns: 1fr;
