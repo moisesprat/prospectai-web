@@ -29,6 +29,7 @@ import {
   renderBenchmarkSectionHTML,
 } from '../ui/statsRender.js';
 import { renderReportsGridHTML } from '../ui/reportsRender.js';
+import { parsePypiReleasesRSS, renderPypiReleasesHTML } from '../ui/changelogRender.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT      = join(__dirname, '..');
@@ -36,12 +37,23 @@ const ROOT      = join(__dirname, '..');
 const MODAL_URL  = 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
 const SITE_ORIGIN = 'https://prospect-ai.moisesprat.dev';
 const MAX_SITEMAP_REPORTS = 200;
+const PYPI_RELEASES_RSS_URL = 'https://pypi.org/rss/project/prospectai/releases.xml';
 
 async function fetchJSON(path) {
   try {
     const res = await fetch(`${MODAL_URL}${path}`);
     if (!res.ok) return null;
     return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+async function fetchPypiReleasesRSS() {
+  try {
+    const res = await fetch(PYPI_RELEASES_RSS_URL);
+    if (!res.ok) return null;
+    return await res.text();
   } catch {
     return null;
   }
@@ -225,23 +237,42 @@ async function generateReports(reports) {
   await writeFile(path, html, 'utf8');
 }
 
+/* ── changelog.html ──────────────────────────────────────────── */
+
+async function generateChangelog(rssText) {
+  const path = join(ROOT, 'changelog.html');
+  let html = await readFile(path, 'utf8');
+
+  const items = parsePypiReleasesRSS(rssText);
+  if (items.length === 0) {
+    await writeFile(path, html, 'utf8');
+    return;
+  }
+
+  html = replaceBetween(html, 'pypi-releases', renderPypiReleasesHTML(items));
+  await writeFile(path, html, 'utf8');
+}
+
 /* ── main ────────────────────────────────────────────────────── */
 
 async function main() {
-  const [analytics, historyData, reports] = await Promise.all([
+  const [analytics, historyData, reports, pypiReleasesRSS] = await Promise.all([
     fetchJSON('/api/analytics'),
     fetchJSON('/api/long-buy-history'),
     fetchJSON('/api/reports'),
+    fetchPypiReleasesRSS(),
   ]);
 
   await generateSitemap(reports);
   await generateStats(analytics, historyData);
   await generateReports(reports);
+  await generateChangelog(pypiReleasesRSS);
 
   console.log('build-static: done', {
     analytics: !!analytics,
     history: !!historyData,
     reports: reports ? reports.length : 'unreachable',
+    pypiReleases: !!pypiReleasesRSS,
   });
 }
 
