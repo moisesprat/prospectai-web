@@ -11,12 +11,6 @@ initNav();
 const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL
   ?? 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
 
-function fmtDate(iso) {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  return d.toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
-}
-
 function showError(msg) {
   document.getElementById('viewer-loading').hidden = true;
   const el = document.getElementById('viewer-error');

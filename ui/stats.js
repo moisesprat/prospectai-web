@@ -1,10 +1,8 @@
 import { trackStatsPageOpen } from './saEvents.js';
 import { initNav } from './nav.js';
 import {
-  buildSlices,
   renderSectorBarListHTML,
   renderRiskDonutWrapHTML,
-  computeDecisionsForSector,
   renderDecisionsDonutPieces,
   sortHistory,
   applyDataRules,

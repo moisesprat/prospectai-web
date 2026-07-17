@@ -15,7 +15,6 @@ const TEXT    = [17,   24,  39];
 const DIM     = [107, 114, 128];
 const BORDER  = [209, 213, 219];
 const CARDBG  = [249, 250, 251];
-const METABG  = [241, 245, 249];
 
 const ACTION_COLOR = {
   'LONG-BUY':       GREEN,
@@ -97,10 +96,6 @@ export async function exportToPdf(data, sector) {
   function setC(rgb) { doc.setTextColor(rgb[0], rgb[1], rgb[2]); }
   function setF(rgb) { doc.setFillColor(rgb[0], rgb[1], rgb[2]); }
   function setD(rgb) { doc.setDrawColor(rgb[0], rgb[1], rgb[2]); }
-
-  function txt(text, x, opts) {
-    doc.text(String(text ?? ''), x, y, opts);
-  }
 
   /**
    * Print wrapped text starting at current y.

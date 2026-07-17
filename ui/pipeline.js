@@ -81,7 +81,7 @@ const AGENT_IDLE_MESSAGES = [
     `Drafting initial portfolio allocation — pending critic review…`,
   ],
   // 4 — Critic
-  (sector) => [
+  (_sector) => [
     `Cross-referencing draft positions against raw technical indicators…`,
     `Checking RSI and Stochastic for overbought signals ignored in draft…`,
     `Verifying allocation percentages match composite score ranking…`,
