@@ -23,8 +23,7 @@ function observeDisclaimer() {
 export function initNav() {
   // Active link
   const path = window.location.pathname;
-  const page = path.includes('patterns')     ? 'patterns'
-    : path.includes('changelog')             ? 'changelog'
+  const page = path.includes('changelog')     ? 'changelog'
     : path.includes('architecture')          ? 'architecture'
     : path.includes('stats')                 ? 'stats'
     : path.includes('report')                ? 'reports'

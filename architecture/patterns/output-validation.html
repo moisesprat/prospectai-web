@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LLM Output Validation: Enforcing Structured Output with Pydantic Schemas</title>
   <meta name="description" content="How ProspectAI enforces strict Pydantic schemas on every LLM output, plus deterministic business-rule checks, to guard against unreliable model output.">
-  <link rel="canonical" href="https://prospect-ai.moisesprat.dev/patterns/output-validation">
+  <link rel="canonical" href="https://prospect-ai.moisesprat.dev/architecture/patterns/output-validation">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles/style.css">
@@ -25,7 +25,7 @@
       "name": "Moises Prat",
       "url": "https://moisesprat.dev"
     },
-    "mainEntityOfPage": "https://prospect-ai.moisesprat.dev/patterns/output-validation"
+    "mainEntityOfPage": "https://prospect-ai.moisesprat.dev/architecture/patterns/output-validation"
   }
   </script>
 </head>
@@ -44,7 +44,6 @@
         <a href="/stats.html" class="site-nav-link" data-navpage="stats">Stats</a>
         <a href="/reports.html" class="site-nav-link" data-navpage="reports">Reports</a>
         <a href="/architecture.html" class="site-nav-link" data-navpage="architecture">Architecture</a>
-        <a href="/patterns/" class="site-nav-link" data-navpage="patterns">Patterns</a>
         <a href="/changelog.html" class="site-nav-link" data-navpage="changelog">Changelog</a>
       </div>
     </div>
@@ -140,14 +139,14 @@ def _extract_pydantic(result: CrewOutput, model_cls: Type[_M], phase: str) -&gt;
       <p>The code's own comment — "should be caught by Pydantic, but belt-and-suspenders" — makes the intent explicit: this isn't redundant, it's defense-in-depth against LLM unreliability at two different levels of the pipeline.</p>
 
       <h2>Why it matters</h2>
-      <p>Separating "does this parse into the right shape" (schema) from "does this make business sense" (deterministic rules) keeps each concern simple and testable independently. A schema change doesn't need business-rule changes and vice versa, and — critically for a system whose output feeds directly into the same portfolio strategy that gets adversarially reviewed (see <a href="/patterns/adversarial-critic">adversarial critic</a>) — a validation failure at either layer halts the pipeline rather than shipping a recommendation nobody checked.</p>
+      <p>Separating "does this parse into the right shape" (schema) from "does this make business sense" (deterministic rules) keeps each concern simple and testable independently. A schema change doesn't need business-rule changes and vice versa, and — critically for a system whose output feeds directly into the same portfolio strategy that gets adversarially reviewed (see <a href="/architecture/patterns/adversarial-critic">adversarial critic</a>) — a validation failure at either layer halts the pipeline rather than shipping a recommendation nobody checked.</p>
     </div>
 
     <h2 class="stats-section-title" style="margin-top:56px">Related Patterns</h2>
     <div class="pattern-related">
-      <a href="/patterns/adversarial-critic">Adversarial Critic →</a>
-      <a href="/patterns/parallel-execution">Parallel Agent Execution →</a>
-      <a href="/patterns/model-tiering">Model Tiering →</a>
+      <a href="/architecture/patterns/adversarial-critic">Adversarial Critic →</a>
+      <a href="/architecture/patterns/parallel-execution">Parallel Agent Execution →</a>
+      <a href="/architecture/patterns/model-tiering">Model Tiering →</a>
       <a href="/architecture.html">Full Architecture →</a>
     </div>
 
