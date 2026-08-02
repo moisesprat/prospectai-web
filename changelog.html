@@ -44,6 +44,16 @@
 
       <!--SSR:pypi-releases-->
       <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-08-01">2026-08-01</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
+          <h2 class="changelog-title">v1.9.1</h2>
+          <ul class="changelog-bullets">
+            <li>Archive deterministic-enforcement-v1-9-1 and critic-evidence-grounded-review</li><li>Enforce deterministic bounds/policy on portfolio output and fix Critic's inverted CURRENT_ENTRY rule</li><li>Add sector filter dropdown to Performance tab for enhanced data analysis</li><li>Add loading skeletons and update donut chart legends for improved UX</li><li>single filtered donut chart with a sector dropdown. - Improve Performance table by excluding recent entries, deduplicating rows, adding a version column, and including a stop-loss disclaimer. - Update specs and tasks to reflect new requirements and ensure proper implementation.</li><li>Implement sortable headers for Return and Signal Date in Performance table</li><li>Add sortable headers for Return and Signal Date in Performance table</li><li>Implement Stats Page with Enhanced UX and Backend Integration</li><li>Add Stats page with LONG-BUY track record and usage metrics</li><li>Add section for custom slash commands in CLAUDE.md</li><li>Add action totals summary section to analytics output</li><li>Add action breakdown by sector to analytics API and update command output</li><li>Implement reasoning-based action selection in Draft Strategist</li>
+          </ul>
+        </div>
+      </article>
+      <article class="changelog-entry">
         <time class="changelog-date" datetime="2026-05-30">2026-05-30</time>
         <div class="changelog-entry-body">
           <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
@@ -80,16 +90,6 @@
           <h2 class="changelog-title">v1.7.1</h2>
           <ul class="changelog-bullets">
             <li>Maintenance and stability improvements</li>
-          </ul>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-05-09">2026-05-09</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">v1.7.0</h2>
-          <ul class="changelog-bullets">
-            <li>add risk_profile parameter (conservative / aggressive) flowing through the entire pipeline with per-profile allocation caps, stop-loss multipliers, and R/R ratios</li><li>PortfolioAllocatorTool applies hardcoded bounds per profile; Draft Strategist, Critic, and Final Strategist receive qualitative profile guidance</li><li>InvestorStrategicOutput and CriticOutput schemas carry risk_profile field</li><li>Backend /api/analyze exposes risk_profile query param; analytics tracks usage by profile</li><li>Web UI adds Conservative / Aggressive toggle before pipeline trigger</li>
           </ul>
         </div>
       </article><!--/SSR-->
