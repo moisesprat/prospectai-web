@@ -1680,13 +1680,19 @@ footer {
 
 .footer-links {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 20px;
 }
 
+.footer-badge {
+  flex-shrink: 0;
+}
+
 .footer-badge img {
   display: block;
-  height: 24px;
+  height: 20px;
+  max-width: 140px;
   width: auto;
   opacity: .7;
   transition: opacity .2s;
