@@ -1,0 +1,40 @@
+# Lint gate for prospectai-web pull requests (D-18).
+#
+# - The single job id `lint` is the branch-protection required-check context
+#   (plan 01-08 configures it). Do not rename it or add a path filter, since a
+#   skipped workflow leaves a required check pending.
+# - There is no web test runner until Phase 3 (TEST-02), so the metrics render
+#   check is a plain Node assert script.
+# - generate-sitemap.yml is unrelated and untouched. It pushes to main every
+#   15 minutes, which is why this workflow has no push trigger.
+name: Lint
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - name: Metrics render check
+        run: node scripts/check-metrics-render.mjs
