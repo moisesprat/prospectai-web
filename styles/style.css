@@ -1680,7 +1680,20 @@ footer {
 
 .footer-links {
   display: flex;
+  align-items: center;
   gap: 20px;
+}
+
+.footer-badge img {
+  display: block;
+  height: 24px;
+  width: auto;
+  opacity: .7;
+  transition: opacity .2s;
+}
+
+.footer-badge:hover img {
+  opacity: 1;
 }
 
 .footer-links a {
