@@ -39,6 +39,125 @@ function fmtTok(n) {
   return n ? Number(n).toLocaleString() : '—';
 }
 
+function phaseLabel(name) {
+  return esc(PHASE_LABELS[name] ?? name);
+}
+
+function fmtCount(n) {
+  return n == null ? '—' : esc(n);
+}
+
+/**
+ * Renders the collapsed "Slowest calls & per-tool timing" block (D-03).
+ * Returns '' for old reports that lack execution_metrics v2 (no tool_calls),
+ * so they render exactly as before. Every backend string goes through esc().
+ * @param {object} metrics — the `execution_metrics` dict from the backend
+ * @returns {string} HTML
+ */
+function renderToolTimings(metrics) {
+  if (!Array.isArray(metrics.tool_calls)) return '';
+
+  const phases  = Array.isArray(metrics.phases) ? metrics.phases : [];
+  const backend = metrics.backend ?? null;
+  const slowP   = metrics.slowest_phase ?? null;
+  const slowT   = metrics.slowest_tool_call ?? null;
+
+  const summaryItems = [
+    `<span>Slowest phase: ${slowP ? `${phaseLabel(slowP.name)} (${fmtElapsed(slowP.elapsed_sec)})` : '—'}</span>`,
+    `<span>Slowest tool call: ${slowT ? `${esc(slowT.tool)} in ${phaseLabel(slowT.phase)} (${fmtElapsed(slowT.elapsed_sec)})` : '—'}</span>`,
+    `<span>Unattributed: ${fmtElapsed(metrics.unattributed_sec)}</span>`,
+  ];
+  if (backend && backend.wall_total_sec != null) {
+    summaryItems.push(
+      `<span>Wall total: ${fmtElapsed(backend.wall_total_sec)} (backend overhead ${fmtElapsed(backend.unattributed_sec)})</span>`
+    );
+  }
+
+  const phaseRows = phases.map(p => `
+        <tr>
+          <td class="mt-name">${phaseLabel(p.name)}</td>
+          <td class="mt-num">${esc(p.status ?? '—')}</td>
+          <td class="mt-num">${fmtElapsed(p.elapsed_sec)}</td>
+          <td class="mt-num">${fmtElapsed(p.tool_wall_sec)}</td>
+          <td class="mt-num">${fmtElapsed(p.llm_overhead_sec)}</td>
+          <td class="mt-num">${fmtCount(p.tool_call_count)}</td>
+        </tr>`).join('');
+
+  const toolRows = phases.flatMap(p =>
+    (Array.isArray(p.tools) ? p.tools : []).map(t => `
+        <tr>
+          <td class="mt-name">${phaseLabel(p.name)}</td>
+          <td class="mt-name">${esc(t.tool)}</td>
+          <td class="mt-num">${fmtCount(t.count)}</td>
+          <td class="mt-num">${fmtElapsed(t.total_sec)}</td>
+          <td class="mt-num">${fmtElapsed(t.max_sec)}</td>
+          <td class="mt-num">${fmtCount(t.error_count)}</td>
+        </tr>`)).join('');
+
+  const slowest = [...metrics.tool_calls]
+    .sort((a, b) => (b.elapsed_sec ?? -1) - (a.elapsed_sec ?? -1))
+    .slice(0, 10);
+  const callRows = slowest.map(c => `
+        <tr>
+          <td class="mt-name">${phaseLabel(c.phase)}</td>
+          <td class="mt-name">${esc(c.tool)}</td>
+          <td class="mt-num">${fmtElapsed(c.elapsed_sec)}</td>
+          <td class="mt-num">${c.ok ? 'ok' : esc(c.error ?? 'error')}</td>
+        </tr>`).join('');
+
+  return `
+    <details class="tool-timings">
+      <summary>Slowest calls &amp; per-tool timing</summary>
+      <p class="tool-timings-summary">${summaryItems.join(' · ')}</p>
+      <strong class="subsection-label">Phase timing</strong>
+      <div class="metrics-table-wrap">
+        <table class="metrics-table">
+          <thead>
+            <tr>
+              <th class="mt-name">Phase</th>
+              <th class="mt-num">Status</th>
+              <th class="mt-num">Elapsed</th>
+              <th class="mt-num">Tool time</th>
+              <th class="mt-num">LLM + overhead</th>
+              <th class="mt-num">Calls</th>
+            </tr>
+          </thead>
+          <tbody>${phaseRows}</tbody>
+        </table>
+      </div>
+      <strong class="subsection-label">Per tool</strong>
+      <div class="metrics-table-wrap">
+        <table class="metrics-table">
+          <thead>
+            <tr>
+              <th class="mt-name">Phase</th>
+              <th class="mt-name">Tool</th>
+              <th class="mt-num">Calls</th>
+              <th class="mt-num">Total</th>
+              <th class="mt-num">Max</th>
+              <th class="mt-num">Errors</th>
+            </tr>
+          </thead>
+          <tbody>${toolRows}</tbody>
+        </table>
+      </div>
+      <strong class="subsection-label">Slowest calls</strong>
+      <div class="metrics-table-wrap">
+        <table class="metrics-table">
+          <thead>
+            <tr>
+              <th class="mt-name">Phase</th>
+              <th class="mt-name">Tool</th>
+              <th class="mt-num">Elapsed</th>
+              <th class="mt-num">Result</th>
+            </tr>
+          </thead>
+          <tbody>${callRows}</tbody>
+        </table>
+      </div>
+    </details>`;
+}
+
 /**
  * Renders an execution metrics block as an HTML string.
  * @param {object} metrics — the `execution_metrics` dict from the backend
@@ -123,7 +242,8 @@ export function renderMetrics(metrics) {
         </thead>
         <tbody>${modelRows}</tbody>
       </table>
-    </div>` : ''}`;
+    </div>` : ''}
+    ${renderToolTimings(metrics)}`;
 }
 
 const DISCLAIMER = `

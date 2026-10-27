@@ -1495,6 +1495,25 @@ h1 em {
   background: rgba(255, 255, 255, .02);
 }
 
+/* Collapsed per-tool timing block (execution_metrics v2, D-03) */
+.tool-timings {
+  margin-top: 16px;
+}
+
+.tool-timings > summary {
+  cursor: pointer;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.tool-timings-summary {
+  margin: 8px 0 12px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
 /* ============================================================
    PRINT / PDF EXPORT
    Activated by body.is-printing (set by report.js triggerPDF).
