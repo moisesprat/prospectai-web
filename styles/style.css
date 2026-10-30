@@ -1430,6 +1430,12 @@ h1 em {
   margin-left: auto;
 }
 
+.stock-flag {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
 .subsection-label {
   display: block;
   font-family: var(--mono);
@@ -1638,7 +1644,8 @@ h1 em {
     font-size: 16px !important;
   }
 
-  body.is-printing .stock-score {
+  body.is-printing .stock-score,
+  body.is-printing .stock-flag {
     color: #666 !important;
   }
 

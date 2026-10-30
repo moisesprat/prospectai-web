@@ -225,6 +225,7 @@ export async function exportToPdf(data, sector) {
       ? `${Number(pos.allocation_pct).toFixed(1)}%` : '—';
     const curPrice   = pos.current_price != null ? fmtPrice(pos.current_price) : '—';
     const reviewFreq = safeStr(pos.review_frequency ?? '—').replace(/_/g, ' ');
+    const fundamentalsUnknown = pos.fundamentals_status === 'UNKNOWN';
 
     // Pre-compute wrapped text heights for ensureSpace
     const rationaleLines   = pos.rationale ? wrap(doc, pos.rationale, CW - 4) : [];
@@ -232,6 +233,7 @@ export async function exportToPdf(data, sector) {
     const riskLines        = (pos.key_risks ?? []);
 
     const cardH = 10           // ticker row
+      + (fundamentalsUnknown ? 5 : 0)  // fundamentals-unavailable line
       + 14                     // trade params row
       + (rationaleLines.length > 0 ? textHeight(rationaleLines, 9, 1.5) + 4 : 0)
       + (triggerLines.length > 0 ? 5 + triggerLines.length * 4.5 + 4 : 0)
@@ -273,6 +275,14 @@ export async function exportToPdf(data, sector) {
     doc.text(reviewFreq, ML + CW - 3, y + 4.5, { align: 'right' });
 
     y += 8;
+
+    // ── Fundamentals unavailable (fixed text, D-08) ──────
+    if (fundamentalsUnknown) {
+      setC(DIM);
+      doc.setFont('helvetica', 'italic'); doc.setFontSize(7.5);
+      doc.text('Fundamentals unavailable', ML + 3, y - 1);
+      y += 4;
+    }
 
     // ── Trade parameters: 5 columns ──────────────────────
     const params = [
