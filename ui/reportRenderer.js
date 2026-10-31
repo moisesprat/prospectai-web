@@ -12,7 +12,8 @@
        current_price?,
        trade_setup?: { direction, entry_zone_low, entry_zone_high, stop_loss, take_profit },
        scaled_entry_setups?: [immediate_tranche, pullback_tranche],
-       rationale, monitoring_triggers: string[], review_frequency
+       rationale, monitoring_triggers: string[], review_frequency,
+       fundamentals_status?: 'AVAILABLE' | 'UNKNOWN'   (absent on older reports)
      }],
      deployed_pct, reserved_pct, total_allocated_pct, cash_reserve_pct,
      overall_strategy, risk_level
@@ -337,7 +338,7 @@ function positionCard(pos) {
     <div class="stock-card">
       <div class="stock-card-header">
         <span class="stock-ticker">${esc(pos.ticker)}</span>
-        <span class="stock-rec" style="color:${actionColor}">${esc(action)}</span>
+        <span class="stock-rec" style="color:${actionColor}">${esc(action)}</span>${pos.fundamentals_status === 'UNKNOWN' ? '<span class="stock-flag">Fundamentals unavailable</span>' : ''}
         ${reviewFreq ? `<span class="stock-score">${reviewFreq}</span>` : ''}
       </div>
       <div class="metric-row metric-row-5">
