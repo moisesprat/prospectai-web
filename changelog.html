@@ -44,6 +44,16 @@
 
       <!--SSR:pypi-releases-->
       <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-10-31">2026-10-31</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
+          <h2 class="changelog-title">v1.11.0</h2>
+          <ul class="changelog-bullets">
+            <li>Every number and grade in a report is now computed from live data. The AI model only writes the commentary and chooses each stock's action.</li><li>Stocks whose fundamentals can't be graded are marked unavailable and can only be Monitor or Avoid.</li><li>A slow Reddit lookup no longer stalls a run.</li><li>The technical score and overall fundamental grade fields were removed from reports.</li>
+          </ul>
+        </div>
+      </article>
+      <article class="changelog-entry">
         <time class="changelog-date" datetime="2026-10-30">2026-10-30</time>
         <div class="changelog-entry-body">
           <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
@@ -80,16 +90,6 @@
           <h2 class="changelog-title">v1.9.3</h2>
           <ul class="changelog-bullets">
             <li>Every analysis now records how long each step and each data source takes, so slow runs can be diagnosed and sped up. The timings appear in a collapsible section of the report's execution metrics.</li><li>If an analysis fails partway through, the timings gathered up to that point are kept with the error instead of being lost.</li><li>The AI model for each run is now passed to that run directly, so one run can no longer change another's model settings.</li><li>Dependencies are locked to exact versions, and every change must pass the full test suite before it can be merged.</li><li>Releases now go through a single verified process, and the live service reports exactly which version it is running.</li>
-          </ul>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-08-02">2026-08-02</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">v1.9.2</h2>
-          <ul class="changelog-bullets">
-            <li>Refactor reasoning and validation logic in action selection and portfolio management</li>
           </ul>
         </div>
       </article><!--/SSR-->
