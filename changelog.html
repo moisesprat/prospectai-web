@@ -44,6 +44,16 @@
 
       <!--SSR:pypi-releases-->
       <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-11-01">2026-11-01</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
+          <h2 class="changelog-title">v1.11.1</h2>
+          <ul class="changelog-bullets">
+            <li>The market research step now runs three web searches instead of one, and a stock is kept only if its ticker symbol actually appears in the search results, so a report can no longer feature a stock the research never mentioned.</li><li>Each analysis now keeps a short record of the search results its stock picks came from, so a recommendation can be traced back to its sources.</li><li>Ordinary words and one-letter tickers are no longer counted as stock mentions, and tickers with a dot, such as BRK.B, are now recognised.</li>
+          </ul>
+        </div>
+      </article>
+      <article class="changelog-entry">
         <time class="changelog-date" datetime="2026-10-31">2026-10-31</time>
         <div class="changelog-entry-body">
           <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
@@ -80,16 +90,6 @@
           <h2 class="changelog-title">v1.9.4</h2>
           <ul class="changelog-bullets">
             <li>Fixed an issue in 1.9.3 where every analysis failed right after starting, caused by an incompatible version of the AI provider's library.</li><li>Added an automatic check that stops an incompatible AI library version from ever being released again.</li>
-          </ul>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-10-27">2026-10-27</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">v1.9.3</h2>
-          <ul class="changelog-bullets">
-            <li>Every analysis now records how long each step and each data source takes, so slow runs can be diagnosed and sped up. The timings appear in a collapsible section of the report's execution metrics.</li><li>If an analysis fails partway through, the timings gathered up to that point are kept with the error instead of being lost.</li><li>The AI model for each run is now passed to that run directly, so one run can no longer change another's model settings.</li><li>Dependencies are locked to exact versions, and every change must pass the full test suite before it can be merged.</li><li>Releases now go through a single verified process, and the live service reports exactly which version it is running.</li>
           </ul>
         </div>
       </article><!--/SSR-->
