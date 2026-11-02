@@ -2,38 +2,42 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://prospect-ai.moisesprat.dev/</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/stats.html</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/reports.html</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/architecture.html</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/architecture/patterns/</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/architecture/patterns/adversarial-critic</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/architecture/patterns/parallel-execution</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/architecture/patterns/output-validation</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/architecture/patterns/model-tiering</loc>
+    <lastmod>2026-11-02</lastmod>
+  </url>
+  <url>
+    <loc>https://prospect-ai.moisesprat.dev/report.html?id=4fa9a6f2-d229-4827-b0ed-55d48b119e95</loc>
     <lastmod>2026-11-01</lastmod>
   </url>
   <url>
@@ -830,10 +834,6 @@
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/report.html?id=0d2ce97d-e2ae-4933-b4a3-e8877c9dcf24</loc>
-    <lastmod>2026-07-02</lastmod>
-  </url>
-  <url>
-    <loc>https://prospect-ai.moisesprat.dev/report.html?id=b0dfc57e-fb00-40c1-a2c5-3c909278db7c</loc>
     <lastmod>2026-07-02</lastmod>
   </url>
 </urlset>
