@@ -44,6 +44,16 @@
 
       <!--SSR:pypi-releases-->
       <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-11-03">2026-11-03</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
+          <h2 class="changelog-title">v1.12.1</h2>
+          <ul class="changelog-bullets">
+            <li>Analyses no longer use prompt caching. Every step of a run sends a different prompt, so a cached prompt was never reused and only added cost; each run now costs a little less, and reports are unchanged.</li>
+          </ul>
+        </div>
+      </article>
+      <article class="changelog-entry">
         <time class="changelog-date" datetime="2026-11-01">2026-11-01</time>
         <div class="changelog-entry-body">
           <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
@@ -80,16 +90,6 @@
           <h2 class="changelog-title">v1.10.1</h2>
           <ul class="changelog-bullets">
             <li>Fixed an issue where the market, technical and fundamental analysis steps could skip fetching live data and answer from the model alone. They now always fetch their data first.</li>
-          </ul>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-10-30">2026-10-30</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">v1.10.0</h2>
-          <ul class="changelog-bullets">
-            <li>Analyses now run on Claude Haiku 5.5, Anthropic's latest model.</li><li>If a data-gathering step finishes without actually fetching its data, the analysis now stops with a clear error instead of reporting figures the model made up.</li>
           </ul>
         </div>
       </article><!--/SSR-->
