@@ -44,6 +44,16 @@
 
       <!--SSR:pypi-releases-->
       <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-11-05">2026-11-05</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
+          <h2 class="changelog-title">v1.12.2</h2>
+          <ul class="changelog-bullets">
+            <li>The token and cost figures shown for a run no longer count the draft step a second time under the final step, so the per-step, per-model and total figures now match what each step really used.</li><li>A sector fund or a market-wide fund picked as a stock is now set aside before the picks are checked, so it can no longer leave a run without stocks or lower the other picks' relevance.</li><li>Common capitalised words and abbreviations such as AI, CEO and EV in web search results no longer count as stock mentions unless they are written as a ticker, for example $AI or NYSE: AI.</li><li>An analysis for a sector the app does not support is now refused straight away instead of starting paid web searches, and the stored record of a run's web searches never keeps a web address.</li>
+          </ul>
+        </div>
+      </article>
+      <article class="changelog-entry">
         <time class="changelog-date" datetime="2026-11-03">2026-11-03</time>
         <div class="changelog-entry-body">
           <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
@@ -80,16 +90,6 @@
           <h2 class="changelog-title">v1.11.0</h2>
           <ul class="changelog-bullets">
             <li>Every number and grade in a report is now computed from live data. The AI model only writes the commentary and chooses each stock's action.</li><li>Stocks whose fundamentals can't be graded are marked unavailable and can only be Monitor or Avoid.</li><li>A slow Reddit lookup no longer stalls a run.</li><li>The technical score and overall fundamental grade fields were removed from reports.</li>
-          </ul>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-10-30">2026-10-30</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">v1.10.1</h2>
-          <ul class="changelog-bullets">
-            <li>Fixed an issue where the market, technical and fundamental analysis steps could skip fetching live data and answer from the model alone. They now always fetch their data first.</li>
           </ul>
         </div>
       </article><!--/SSR-->
