@@ -15,6 +15,7 @@ import {
 } from '../ui/statsRender.js';
 import { renderReleaseNotesHTML } from '../ui/changelogRender.js';
 import { renderReport } from '../ui/reportRenderer.js';
+import { typeOutput, textWithCursorHTML, CURSOR_HTML } from '../ui/utils.js';
 
 const XSS = '<img src=x onerror=alert(1)>';
 
@@ -145,4 +146,35 @@ test('renderReport escapes every position field and quotes', () => {
   assertInert(html);
   assert.ok(!html.includes('" onclick='), 'quote escaped so attribute injection cannot survive');
   assert.ok(html.includes('color:var(--text-dim)'), '__proto__ action keeps the fallback colour');
+});
+
+// ─── utils (live-run agent cards, SEC-06 / T-03-22) ───
+
+test('utils textWithCursorHTML escapes the text and appends only the cursor span', () => {
+  const html = textWithCursorHTML(XSS);
+  assert.equal(html, escapeHtml(XSS) + CURSOR_HTML);
+  assert.ok(!html.includes('<img'), html);
+  assert.equal(textWithCursorHTML(null), CURSOR_HTML);
+});
+
+test('utils typeOutput never assigns live markup in any frame and ends with the escaped text', async () => {
+  const frames = [];
+  const el = { set innerHTML(v) { frames.push(v); } };
+  const text = '<script>alert(1)</script>\n"x" & \'y\'';
+  await typeOutput(el, text, 0);
+  assert.ok(frames.length > text.length);
+  for (const f of frames) {
+    assert.ok(!f.includes('<script'), `frame must not contain <script: ${f}`);
+  }
+  assert.equal(frames[frames.length - 1], escapeHtml(text));
+});
+
+test('utils typeOutput frames contain only complete entities when a slice ends mid-character', async () => {
+  const frames = [];
+  const el = { set innerHTML(v) { frames.push(v); } };
+  await typeOutput(el, 'a&b<c', 0);
+  for (const f of frames) {
+    const stripped = f.replace(CURSOR_HTML, '');
+    assert.ok(!/&(?!amp;|lt;|gt;|quot;|#39;)/.test(stripped), `partial entity in frame: ${f}`);
+  }
 });
