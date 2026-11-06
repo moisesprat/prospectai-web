@@ -20,6 +20,8 @@
    }
    ============================================================ */
 
+import { escapeHtml } from './formatters.js';
+
 const PHASE_LABELS = {
   market_analysis:      'Market Analysis',
   technical_analysis:   'Technical Analysis',
@@ -41,17 +43,17 @@ function fmtTok(n) {
 }
 
 function phaseLabel(name) {
-  return esc(PHASE_LABELS[name] ?? name);
+  return escapeHtml(PHASE_LABELS[name] ?? name);
 }
 
 function fmtCount(n) {
-  return n == null ? '—' : esc(n);
+  return n == null ? '—' : escapeHtml(n);
 }
 
 /**
  * Renders the collapsed "Slowest calls & per-tool timing" block (D-03).
  * Returns '' for old reports that lack execution_metrics v2 (no tool_calls),
- * so they render exactly as before. Every backend string goes through esc().
+ * so they render exactly as before. Every backend string goes through escapeHtml() from formatters.js.
  * @param {object} metrics — the `execution_metrics` dict from the backend
  * @returns {string} HTML
  */
@@ -65,7 +67,7 @@ function renderToolTimings(metrics) {
 
   const summaryItems = [
     `<span>Slowest phase: ${slowP ? `${phaseLabel(slowP.name)} (${fmtElapsed(slowP.elapsed_sec)})` : '—'}</span>`,
-    `<span>Slowest tool call: ${slowT ? `${esc(slowT.tool)} in ${phaseLabel(slowT.phase)} (${fmtElapsed(slowT.elapsed_sec)})` : '—'}</span>`,
+    `<span>Slowest tool call: ${slowT ? `${escapeHtml(slowT.tool)} in ${phaseLabel(slowT.phase)} (${fmtElapsed(slowT.elapsed_sec)})` : '—'}</span>`,
     `<span>Unattributed: ${fmtElapsed(metrics.unattributed_sec)}</span>`,
   ];
   if (backend && backend.wall_total_sec != null) {
@@ -77,7 +79,7 @@ function renderToolTimings(metrics) {
   const phaseRows = phases.map(p => `
         <tr>
           <td class="mt-name">${phaseLabel(p.name)}</td>
-          <td class="mt-num">${esc(p.status ?? '—')}</td>
+          <td class="mt-num">${escapeHtml(p.status ?? '—')}</td>
           <td class="mt-num">${fmtElapsed(p.elapsed_sec)}</td>
           <td class="mt-num">${fmtElapsed(p.tool_wall_sec)}</td>
           <td class="mt-num">${fmtElapsed(p.llm_overhead_sec)}</td>
@@ -88,7 +90,7 @@ function renderToolTimings(metrics) {
     (Array.isArray(p.tools) ? p.tools : []).map(t => `
         <tr>
           <td class="mt-name">${phaseLabel(p.name)}</td>
-          <td class="mt-name">${esc(t.tool)}</td>
+          <td class="mt-name">${escapeHtml(t.tool)}</td>
           <td class="mt-num">${fmtCount(t.count)}</td>
           <td class="mt-num">${fmtElapsed(t.total_sec)}</td>
           <td class="mt-num">${fmtElapsed(t.max_sec)}</td>
@@ -101,9 +103,9 @@ function renderToolTimings(metrics) {
   const callRows = slowest.map(c => `
         <tr>
           <td class="mt-name">${phaseLabel(c.phase)}</td>
-          <td class="mt-name">${esc(c.tool)}</td>
+          <td class="mt-name">${escapeHtml(c.tool)}</td>
           <td class="mt-num">${fmtElapsed(c.elapsed_sec)}</td>
-          <td class="mt-num">${c.ok ? 'ok' : esc(c.error ?? 'error')}</td>
+          <td class="mt-num">${c.ok ? 'ok' : escapeHtml(c.error ?? 'error')}</td>
         </tr>`).join('');
 
   return `
@@ -174,7 +176,7 @@ export function renderMetrics(metrics) {
 
   const phaseRows = phases.map(p => `
     <tr>
-      <td class="mt-name">${esc(PHASE_LABELS[p.name] ?? p.name)}</td>
+      <td class="mt-name">${escapeHtml(PHASE_LABELS[p.name] ?? p.name)}</td>
       <td class="mt-num">${fmtElapsed(p.elapsed_sec)}</td>
       <td class="mt-num">${fmtTok(p.input_tokens)}</td>
       <td class="mt-num">${fmtTok(p.output_tokens)}</td>
@@ -185,7 +187,7 @@ export function renderMetrics(metrics) {
   const modelEntries = Object.entries(byModel);
   const modelRows = modelEntries.map(([model, t]) => `
     <tr>
-      <td class="mt-name">${esc(model)}</td>
+      <td class="mt-name">${escapeHtml(model)}</td>
       <td class="mt-num">${fmtTok(t.input_tokens)}</td>
       <td class="mt-num">${fmtTok(t.output_tokens)}</td>
       <td class="mt-num">${fmtTok(t.cached_tokens)}</td>
@@ -263,10 +265,6 @@ const ACTION_COLOR = {
   'AVOID':          'var(--red)',
 };
 
-function esc(val) {
-  return String(val ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
 function fmt(num) {
   return num != null ? Number(num).toFixed(2) : '—';
 }
@@ -314,7 +312,7 @@ function scaledEntrySetupHtml(setups) {
 
 function positionCard(pos) {
   const action      = pos.action ?? pos.recommendation ?? '—';
-  const actionColor = ACTION_COLOR[action] ?? 'var(--text-dim)';
+  const actionColor = Object.hasOwn(ACTION_COLOR, action) ? ACTION_COLOR[action] : 'var(--text-dim)';
 
   const allocHtml = (pos.allocation_pct ?? 0) > 0
     ? `<div class="m-value up">${Number(pos.allocation_pct).toFixed(1)}%</div>`
@@ -329,26 +327,26 @@ function positionCard(pos) {
   const stopLoss   = ts ? `$${fmt(ts.stop_loss)}`   : (pos.stop_loss   != null ? `$${fmt(pos.stop_loss)}` : '—');
   const takeProfit = ts ? `$${fmt(ts.take_profit)}` : '—';
 
-  const triggers = (pos.monitoring_triggers ?? []).map(t => `<li>${esc(t)}</li>`).join('');
-  const risks    = (pos.key_risks ?? []).map(r => `<li>${esc(r)}</li>`).join('');
+  const triggers = (pos.monitoring_triggers ?? []).map(t => `<li>${escapeHtml(t)}</li>`).join('');
+  const risks    = (pos.key_risks ?? []).map(r => `<li>${escapeHtml(r)}</li>`).join('');
 
-  const reviewFreq = esc((pos.review_frequency ?? '').replace(/_/g, ' '));
+  const reviewFreq = escapeHtml((pos.review_frequency ?? '').replace(/_/g, ' '));
 
   return `
     <div class="stock-card">
       <div class="stock-card-header">
-        <span class="stock-ticker">${esc(pos.ticker)}</span>
-        <span class="stock-rec" style="color:${actionColor}">${esc(action)}</span>${pos.fundamentals_status === 'UNKNOWN' ? '<span class="stock-flag">Fundamentals unavailable</span>' : ''}
+        <span class="stock-ticker">${escapeHtml(pos.ticker)}</span>
+        <span class="stock-rec" style="color:${actionColor}">${escapeHtml(action)}</span>${pos.fundamentals_status === 'UNKNOWN' ? '<span class="stock-flag">Fundamentals unavailable</span>' : ''}
         ${reviewFreq ? `<span class="stock-score">${reviewFreq}</span>` : ''}
       </div>
       <div class="metric-row metric-row-5">
         <div class="metric-box"><div class="m-label">Allocation</div>${allocHtml}</div>
         <div class="metric-box"><div class="m-label">Current Price</div>${currentPriceHtml}</div>
-        <div class="metric-box"><div class="m-label">Entry Zone</div><div class="m-value">${esc(entryZone)}</div></div>
-        <div class="metric-box"><div class="m-label">Stop Loss</div><div class="m-value">${esc(stopLoss)}</div></div>
-        <div class="metric-box"><div class="m-label">Take Profit</div><div class="m-value">${esc(takeProfit)}</div></div>
+        <div class="metric-box"><div class="m-label">Entry Zone</div><div class="m-value">${escapeHtml(entryZone)}</div></div>
+        <div class="metric-box"><div class="m-label">Stop Loss</div><div class="m-value">${escapeHtml(stopLoss)}</div></div>
+        <div class="metric-box"><div class="m-label">Take Profit</div><div class="m-value">${escapeHtml(takeProfit)}</div></div>
       </div>
-      ${pos.rationale ? `<p>${esc(pos.rationale)}</p>` : ''}
+      ${pos.rationale ? `<p>${escapeHtml(pos.rationale)}</p>` : ''}
       ${pos.scaled_entry_setups ? scaledEntrySetupHtml(pos.scaled_entry_setups) : ''}
       ${triggers ? `<strong class="subsection-label">Monitoring Triggers</strong><ul>${triggers}</ul>` : ''}
       ${risks    ? `<strong class="subsection-label">Key Risks</strong><ul>${risks}</ul>`             : ''}
@@ -366,7 +364,7 @@ export function renderReport(data) {
     const raw = data?.raw_output ?? data?.overall_strategy ?? data?.portfolio_summary?.portfolio_rationale ?? 'No output.';
     return `
       <h2>Analysis Output</h2>
-      <pre style="white-space:pre-wrap;font-size:12px;color:var(--text)">${esc(raw)}</pre>
+      <pre style="white-space:pre-wrap;font-size:12px;color:var(--text)">${escapeHtml(raw)}</pre>
       ${DISCLAIMER}`;
   }
 
@@ -423,7 +421,7 @@ export function renderReport(data) {
     <div class="metric-row">
       <div class="metric-box">
         <div class="m-label">Risk Level</div>
-        <div class="m-value" style="color:${riskClr}">${esc(riskLevel)}</div>
+        <div class="m-value" style="color:${riskClr}">${escapeHtml(riskLevel)}</div>
       </div>
       <div class="metric-box">
         <div class="m-label">Positions</div>
@@ -431,7 +429,7 @@ export function renderReport(data) {
       </div>
       ${capitalMetrics}
     </div>
-    ${strategy ? `<p>${esc(strategy)}</p>` : ''}
+    ${strategy ? `<p>${escapeHtml(strategy)}</p>` : ''}
 
     <h2>Position Recommendations</h2>
     ${posHtml || '<p>No positions available.</p>'}

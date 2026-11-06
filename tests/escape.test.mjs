@@ -9,6 +9,14 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { escapeHtml, safeUrl } from '../ui/formatters.js';
 import { renderReportCardHTML } from '../ui/reportsRender.js';
+import {
+  buildLegendHTML, renderRiskDonutWrapHTML, renderSectorBarListHTML,
+  renderDecisionsDonutPieces, renderHistoryRowsHTML,
+} from '../ui/statsRender.js';
+import { renderReleaseNotesHTML } from '../ui/changelogRender.js';
+import { renderReport } from '../ui/reportRenderer.js';
+
+const XSS = '<img src=x onerror=alert(1)>';
 
 // Fails when a hostile fragment survives as live markup or an injected attribute.
 function assertInert(html) {
@@ -72,4 +80,69 @@ test('renderReportCardHTML keeps normal data readable', () => {
   assert.ok(html.includes('v1.9.2'));
   assert.ok(html.includes('>8 stocks<'));
   assert.ok(html.includes('>3 LONG-BUY<'));
+});
+
+// ─── statsRender ───
+
+test('buildLegendHTML and the risk donut escape slice labels', () => {
+  assertInert(buildLegendHTML([{ label: XSS, value: 1, colour: '#fff' }], 1));
+  // The wrapper legitimately holds its own donut <svg>; only the hostile label must be inert.
+  const wrap = renderRiskDonutWrapHTML({ [XSS]: 2 });
+  assert.ok(!wrap.includes('<img'), 'hostile label must not become an element');
+  assert.ok(wrap.includes('&lt;img'), 'label rendered as literal text');
+});
+
+test('renderSectorBarListHTML escapes the sector in text and title, counts are numbers', () => {
+  const html = renderSectorBarListHTML({ '"><img src=x onerror=alert(1)>': 3, Tech: 'x<b>' });
+  assertInert(html);
+  assert.ok(!html.includes('title=""'), 'title attribute not broken out of');
+  assert.ok(html.includes('>0</span>'), 'non-number count renders as 0');
+});
+
+test('renderDecisionsDonutPieces escapes the centre label', () => {
+  const pieces = renderDecisionsDonutPieces({ '<script>x</script>': { counts: { 'LONG-BUY': 1 }, total: 1 } }, '<script>x</script>');
+  assertInert(pieces.centerHTML);
+});
+
+test('renderRiskDonutWrapHTML ignores prototype keys', () => {
+  const html = renderRiskDonutWrapHTML({ constructor: 1, __proto__: 1, toString: 1 });
+  assert.ok(!html.includes('function'), 'no Object.prototype values leak into the markup');
+});
+
+test('renderHistoryRowsHTML links script URLs to # and keeps https URLs', () => {
+  const rows = renderHistoryRowsHTML([
+    { ticker: 'A', roi_pct: 1, report_url: 'javascript:alert(1)' },
+    { ticker: 'B', roi_pct: 1, report_url: 'https://reports.example/report.html?id=1' },
+  ]);
+  assert.ok(rows.includes('href="#"'));
+  assert.ok(!rows.includes('javascript:'));
+  assert.ok(rows.includes('href="https://reports.example/report.html?id=1"'));
+});
+
+// ─── changelogRender ───
+
+test('renderReleaseNotesHTML escapes version, date and bullets including the apostrophe', () => {
+  const html = renderReleaseNotesHTML([{
+    version: '1.0.0<script>', date: '2026-01-01"><img src=x onerror=1>', bullets: ["it's <b>"],
+  }]);
+  assertInert(html);
+  assert.ok(html.includes('it&#39;s &lt;b&gt;'));
+});
+
+// ─── reportRenderer ───
+
+test('renderReport escapes every position field and quotes', () => {
+  const html = renderReport({
+    risk_level: '<svg onload=1>',
+    overall_strategy: '"><script>1</script>',
+    positions: [{
+      ticker: XSS, action: '__proto__', rationale: `"><script>2</script>`,
+      entry_zone: '<img src=y onerror=2>',
+      monitoring_triggers: ['<svg/onload=3>'], key_risks: ['" onclick="4'],
+      review_frequency: 'daily"><img src=z>',
+    }],
+  });
+  assertInert(html);
+  assert.ok(!html.includes('" onclick='), 'quote escaped so attribute injection cannot survive');
+  assert.ok(html.includes('color:var(--text-dim)'), '__proto__ action keeps the fallback colour');
 });
