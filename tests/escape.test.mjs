@@ -8,13 +8,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { escapeHtml, safeUrl } from '../ui/formatters.js';
-import { renderReportCardHTML } from '../ui/reportsRender.js';
+import { renderReportCardHTML, renderReportsGridHTML } from '../ui/reportsRender.js';
 import {
   buildLegendHTML, renderRiskDonutWrapHTML, renderSectorBarListHTML,
-  renderDecisionsDonutPieces, renderHistoryRowsHTML,
+  renderDecisionsDonutPieces, renderHistoryRowsHTML, renderBenchmarkSectionHTML,
 } from '../ui/statsRender.js';
 import { renderReleaseNotesHTML } from '../ui/changelogRender.js';
-import { renderReport } from '../ui/reportRenderer.js';
+import { renderReport, renderMetrics } from '../ui/reportRenderer.js';
 import { renderCards } from '../ui/recentWins.js';
 import { renderEntryHTML } from '../ui/myReports.js';
 import { typeOutput, textWithCursorHTML, CURSOR_HTML } from '../ui/utils.js';
@@ -222,4 +222,90 @@ test('myReports renderEntryHTML keeps an https report_url and escapes quotes in 
   assert.ok(ok.includes('Energy') && ok.includes('05-Mar-26'), ok);
   const quoted = renderEntryHTML({ report_url: 'https://x.example/a"onmouseover="1', sector: null, run_at: null });
   assert.ok(!quoted.includes('"onmouseover'), quoted);
+});
+
+// ─── Sink inventory hostile paths (SEC-06 / plan 03-09, named in innerhtml-inventory.test.mjs) ───
+
+test('stats renderDecisionsDonutPieces hostile key and counts', () => {
+  const key = '"><svg onload=alert(1)>';
+  const pieces = renderDecisionsDonutPieces({
+    [key]: { counts: { 'LONG-BUY': 2, '<img src=x onerror=1>': 3 }, total: 5 },
+  }, key);
+  assertInert(pieces.svgInner);
+  assertInert(pieces.centerHTML);
+  assertInert(pieces.legendHTML);
+  assert.ok(pieces.centerHTML.includes('&lt;svg'), 'sector key rendered as literal text');
+  assert.ok(!pieces.legendHTML.includes('onerror'), 'unknown action never becomes a legend label');
+  assert.ok(pieces.legendHTML.includes('LONG-BUY'), 'known action keeps its label');
+});
+
+test('stats renderBenchmarkSectionHTML hostile sector', () => {
+  const row = sector => ({
+    sector, roi_pct: 5,
+    spy_trigger_price: 100, spy_current_price: 104,
+    sector_etf_trigger_price: 50, sector_etf_current_price: 52,
+  });
+  const html = renderBenchmarkSectionHTML([
+    row('<img src=x onerror=alert(1)>'),
+    row('"><script>alert(2)</script>'),
+  ]);
+  assertInert(html);
+  assert.ok(html.includes('&lt;img src=x onerror=alert(1)&gt;'), 'sector title is literal text');
+  assert.ok(html.includes('benchmark-group-title'), 'groups still render');
+});
+
+test('stats renderHistoryRowsHTML hostile row', () => {
+  const html = renderHistoryRowsHTML([{
+    ticker: XSS, sector: '<script>alert(1)</script>', recommended_at: '2026-01-02T00:00:00Z',
+    trigger_price: 10, current_price: 11, roi_pct: 10, prospectai_version: '"><img src=y>',
+    report_url: 'javascript:alert(1)',
+  }]);
+  assertInert(html);
+  assert.ok(html.includes('href="#"'), 'script URL becomes #');
+  assert.ok(!html.includes('javascript:'), html);
+  assert.ok(html.includes('&lt;img src=x onerror=alert(1)&gt;'), 'ticker is literal text');
+});
+
+test('reports renderReportsGridHTML hostile entries', () => {
+  const html = renderReportsGridHTML([
+    { run_id: '"><img src=x onerror=1>', sector: 'A', prospectai_version: '1', run_at: null },
+    { run_id: 'ok', sector: '<script>alert(1)</script>', prospectai_version: '1', run_at: null },
+    { run_id: 'ok2', sector: 'B', prospectai_version: '<svg onload=1>', run_at: null },
+  ], 'https://reports.example');
+  assertInert(html);
+  assert.equal(html.split('class="report-card"').length - 1, 3, 'three cards rendered');
+});
+
+test('report renderReport hostile summary fields', () => {
+  const full = renderReport({
+    risk_level: '<img src=x onerror=1>',
+    overall_strategy: '"><script>alert(1)</script>',
+    positions: [{ ticker: 'A', action: 'MONITOR', review_frequency: '<svg/onload=1>_weekly' }],
+  });
+  assertInert(full);
+  const viaSummary = renderReport({
+    positions: [],
+    portfolio_summary: { portfolio_rationale: '<img src=x onerror=2>' },
+  });
+  assertInert(viaSummary);
+  assert.ok(viaSummary.includes('&lt;img src=x onerror=2&gt;'), 'portfolio_rationale is literal text');
+  const legacy = renderReport({
+    stock_recommendations: [{ ticker: XSS, recommendation: '"><script>3</script>', rationale: '<img src=q onerror=4>' }],
+  });
+  assertInert(legacy);
+  const parseError = renderReport({ parse_error: true, raw_output: '</pre><script>alert(5)</script><img src=x onerror=5>' });
+  assertInert(parseError);
+  assert.ok(parseError.includes('&lt;/pre&gt;'), 'raw_output cannot close the pre element');
+});
+
+test('report renderMetrics hostile names', () => {
+  const html = renderMetrics({
+    pipeline_elapsed_sec: 12,
+    totals: { total_tokens: 10, input_tokens: 5, cached_tokens: 1 },
+    phases: [{ name: XSS, status: '"><script>alert(1)</script>', elapsed_sec: 1, tools: [] }],
+    by_model: { [XSS]: { input_tokens: 1, output_tokens: 1, cached_tokens: 0, total_tokens: 2 } },
+    tool_calls: [],
+  });
+  assertInert(html);
+  assert.ok(html.includes('&lt;img src=x onerror=alert(1)&gt;'), 'phase and model names are literal text');
 });
