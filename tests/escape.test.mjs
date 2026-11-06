@@ -15,6 +15,8 @@ import {
 } from '../ui/statsRender.js';
 import { renderReleaseNotesHTML } from '../ui/changelogRender.js';
 import { renderReport } from '../ui/reportRenderer.js';
+import { renderCards } from '../ui/recentWins.js';
+import { renderEntryHTML } from '../ui/myReports.js';
 import { typeOutput, textWithCursorHTML, CURSOR_HTML } from '../ui/utils.js';
 
 const XSS = '<img src=x onerror=alert(1)>';
@@ -177,4 +179,47 @@ test('utils typeOutput frames contain only complete entities when a slice ends m
     const stripped = f.replace(CURSOR_HTML, '');
     assert.ok(!/&(?!amp;|lt;|gt;|quot;|#39;)/.test(stripped), `partial entity in frame: ${f}`);
   }
+});
+
+// ─── recentWins (landing strip, SEC-06 / T-03-23) ───
+
+test('recentWins renderCards is inert for hostile strings and non-numeric values and does not throw', () => {
+  const html = renderCards([{
+    ticker: XSS, recommended_action: '"><script>', sector: '<b>',
+    roi_pct: 'NaN', trigger_price: null, current_price: 'x', recommended_at: 'not-a-date',
+  }]);
+  assertInert(html);
+  assert.ok(!html.includes('<b>'), html);
+  assert.ok(!html.includes('NaN'), html);
+  assert.ok(html.includes('<div class="rw-roi">—</div>'), html);
+  assert.ok(html.includes('<div class="rw-price">—</div>'), html);
+  assert.ok(html.includes('<span class="rw-date">· —</span>'), html);
+});
+
+test('recentWins renderCards keeps a normal win readable', () => {
+  const html = renderCards([{
+    ticker: 'NVDA', recommended_action: 'LONG-BUY', sector: 'Technology',
+    roi_pct: 12.345, trigger_price: 100, current_price: 112.5, recommended_at: '2026-03-05T10:00:00Z',
+  }]);
+  assert.ok(html.includes('NVDA') && html.includes('LONG-BUY') && html.includes('Technology'));
+  assert.ok(html.includes('+12.3%'), html);
+  assert.ok(html.includes('$100.00') && html.includes('$112.50'), html);
+  assert.ok(html.includes('05-Mar-26'), html);
+});
+
+// ─── myReports (localStorage entries, SEC-06 / T-03-23) ───
+
+test('myReports renderEntryHTML links script URLs to # and is inert', () => {
+  const html = renderEntryHTML({ report_url: 'javascript:alert(1)', sector: XSS, run_at: null });
+  assertInert(html);
+  assert.ok(html.includes('href="#"'), html);
+  assert.ok(!html.includes('javascript:'), html);
+});
+
+test('myReports renderEntryHTML keeps an https report_url and escapes quotes in it', () => {
+  const ok = renderEntryHTML({ report_url: 'https://reports.prospect-ai.moisesprat.dev/report.html?id=1', sector: 'Energy', run_at: '2026-03-05T10:00:00Z' });
+  assert.ok(ok.includes('href="https://reports.prospect-ai.moisesprat.dev/report.html?id=1"'), ok);
+  assert.ok(ok.includes('Energy') && ok.includes('05-Mar-26'), ok);
+  const quoted = renderEntryHTML({ report_url: 'https://x.example/a"onmouseover="1', sector: null, run_at: null });
+  assert.ok(!quoted.includes('"onmouseover'), quoted);
 });

@@ -2,7 +2,10 @@
    RECENT WINS
    Fetches positive-ROI LONG-BUY picks from the backend and
    renders a scrolling marquee strip between the header and controls.
+   renderCards is pure (no DOM) and escapes every backend string (SEC-06).
    ============================================================ */
+
+import { escapeHtml } from './formatters.js';
 
 const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL
   ?? 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
@@ -14,27 +17,36 @@ const MONTH_ABBREVIATIONS = [
 
 function formatRecommendedDate(isoString) {
   const d = new Date(isoString);
+  if (Number.isNaN(d.getTime())) return '—';
   const day = String(d.getUTCDate()).padStart(2, '0');
   const month = MONTH_ABBREVIATIONS[d.getUTCMonth()];
   const year = String(d.getUTCFullYear() % 100).padStart(2, '0');
   return `${day}-${month}-${year}`;
 }
 
-function formatPrice(value) {
-  return `$${Number(value).toFixed(2)}`;
+function isFiniteNumber(value) {
+  return typeof value === 'number' && Number.isFinite(value);
 }
 
-function renderCards(wins) {
+function formatPrice(value) {
+  return isFiniteNumber(value) ? `$${value.toFixed(2)}` : '—';
+}
+
+function formatRoi(value) {
+  return isFiniteNumber(value) ? `+${value.toFixed(1)}%` : '—';
+}
+
+export function renderCards(wins) {
   return wins.map(w => `
     <div class="rw-card">
       <div class="rw-top">
-        <span class="rw-ticker">${w.ticker}</span>
-        <span class="rw-tag">${w.recommended_action}</span>
+        <span class="rw-ticker">${escapeHtml(w.ticker)}</span>
+        <span class="rw-tag">${escapeHtml(w.recommended_action)}</span>
         <span class="rw-date">· ${formatRecommendedDate(w.recommended_at)}</span>
       </div>
-      <div class="rw-sector">${w.sector}</div>
-      <div class="rw-roi">+${w.roi_pct.toFixed(1)}%</div>
-      <div class="rw-price">${w.trigger_price != null ? `${formatPrice(w.trigger_price)} <span class="rw-arrow">→</span> ` : ''}${formatPrice(w.current_price)}</div>
+      <div class="rw-sector">${escapeHtml(w.sector)}</div>
+      <div class="rw-roi">${formatRoi(w.roi_pct)}</div>
+      <div class="rw-price">${isFiniteNumber(w.trigger_price) ? `${formatPrice(w.trigger_price)} <span class="rw-arrow">→</span> ` : ''}${formatPrice(w.current_price)}</div>
     </div>
   `).join('');
 }
