@@ -27,10 +27,16 @@ export const RISK_LABELS = {
   moderate:     'Moderate',
 };
 
+// Backend numbers (counts, prices, ROI) are used only when they are finite
+// numbers; anything else is unavailable (null), never 0.0 and never a throw.
+function finiteOrNull(v) {
+  return Number.isFinite(v) ? v : null;
+}
+
 export function buildSlices(counts) {
   return ACTION_ORDER
-    .filter(a => (counts[a] ?? 0) > 0)
-    .map(a => ({ label: a, value: counts[a], colour: ACTION_COLOURS[a] }));
+    .map(a => ({ label: a, value: finiteOrNull(counts?.[a]) ?? 0, colour: ACTION_COLOURS[a] }))
+    .filter(sl => sl.value > 0);
 }
 
 /* ── SVG donut (string) ─────────────────────────────────────── */
@@ -86,7 +92,9 @@ export function renderSectorBarListHTML(bySector) {
 }
 
 export function renderRiskDonutWrapHTML(byRiskProfile) {
-  const risks     = Object.entries(byRiskProfile ?? {}).sort((a, b) => b[1] - a[1]);
+  const risks     = Object.entries(byRiskProfile ?? {})
+    .filter(([, v]) => Number.isFinite(v))
+    .sort((a, b) => b[1] - a[1]);
   const riskTotal = risks.reduce((s, [, v]) => s + v, 0);
   const slices    = risks.map(([key, value]) => ({
     // Object.hasOwn: a backend key like 'constructor' must not reach Object.prototype.
@@ -113,17 +121,17 @@ export function renderRiskDonutWrapHTML(byRiskProfile) {
 
 export function computeDecisionsForSector(actionBreakdown, sectorKey) {
   if (sectorKey === '__overall__') {
-    const counts = {};
+    const counts = Object.create(null);
     for (const sd of Object.values(actionBreakdown ?? {})) {
-      for (const [a, c] of Object.entries(sd.counts ?? {})) {
-        counts[a] = (counts[a] ?? 0) + c;
+      for (const [a, c] of Object.entries(sd?.counts ?? {})) {
+        counts[a] = (counts[a] ?? 0) + (finiteOrNull(c) ?? 0);
       }
     }
     const total = Object.values(counts).reduce((s, v) => s + v, 0);
     return { counts, total, label: 'Overall' };
   }
   const sd = (actionBreakdown ?? {})[sectorKey] ?? {};
-  return { counts: sd.counts ?? {}, total: sd.total ?? 0, label: sectorKey };
+  return { counts: sd.counts ?? {}, total: finiteOrNull(sd.total) ?? 0, label: sectorKey };
 }
 
 export function renderDecisionsDonutPieces(actionBreakdown, sectorKey = '__overall__') {
@@ -164,8 +172,8 @@ export function applyDataRules(history) {
 export function sortHistory(history, col, dir) {
   return [...history].sort((a, b) => {
     if (col === 'roi') {
-      const nullA = a.roi_pct == null;
-      const nullB = b.roi_pct == null;
+      const nullA = !Number.isFinite(a.roi_pct);
+      const nullB = !Number.isFinite(b.roi_pct);
       if (nullA && nullB) return 0;
       if (nullA) return 1;
       if (nullB) return -1;
@@ -178,7 +186,7 @@ export function sortHistory(history, col, dir) {
 }
 
 export function computeKpis(history) {
-  const valid    = history.filter(r => r.roi_pct != null);
+  const valid    = history.filter(r => Number.isFinite(r.roi_pct));
   const positive = valid.filter(r => r.roi_pct > 0);
 
   const winRate = valid.length > 0
@@ -211,7 +219,7 @@ export function computeKpis(history) {
 /* ── Performance tab — benchmark comparison (vs SPY / vs sector ETF) ─ */
 
 export function computeRoiPct(triggerPrice, currentPrice) {
-  if (triggerPrice == null || currentPrice == null || triggerPrice === 0) return null;
+  if (!Number.isFinite(triggerPrice) || !Number.isFinite(currentPrice) || triggerPrice === 0) return null;
   return (currentPrice - triggerPrice) / triggerPrice * 100;
 }
 
@@ -220,7 +228,7 @@ export function computeRoiPct(triggerPrice, currentPrice) {
 // (a rolling per-row window, not one shared calendar range).
 function computeBenchmarkGroup(history, triggerField, currentField) {
   const rows = (history ?? []).filter(r =>
-    r.roi_pct != null && computeRoiPct(r[triggerField], r[currentField]) != null
+    Number.isFinite(r.roi_pct) && computeRoiPct(r[triggerField], r[currentField]) != null
   );
   if (rows.length === 0) return null;
   const avgPick      = rows.reduce((s, r) => s + r.roi_pct, 0) / rows.length;
@@ -296,7 +304,7 @@ export function renderBenchmarkSectionHTML(history) {
 
 export function renderHistoryRowsHTML(history) {
   return history.map((row, i) => {
-    const roi    = row.roi_pct;
+    const roi    = finiteOrNull(row.roi_pct);
     const isPos  = roi != null && roi > 0;
     const isNull = roi == null;
 

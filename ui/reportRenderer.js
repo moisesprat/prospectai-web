@@ -46,6 +46,15 @@ function phaseLabel(name) {
   return escapeHtml(PHASE_LABELS[name] ?? name);
 }
 
+// Backend lists and percentages: a wrong type is unavailable, never a throw.
+function objects(list) {
+  return Array.isArray(list) ? list.filter(x => x && typeof x === 'object') : [];
+}
+
+function fmtPct(v) {
+  return Number.isFinite(v) ? `${v.toFixed(1)}%` : '—';
+}
+
 function fmtCount(n) {
   return n == null ? '—' : escapeHtml(n);
 }
@@ -60,7 +69,7 @@ function fmtCount(n) {
 function renderToolTimings(metrics) {
   if (!Array.isArray(metrics.tool_calls)) return '';
 
-  const phases  = Array.isArray(metrics.phases) ? metrics.phases : [];
+  const phases  = objects(metrics.phases);
   const backend = metrics.backend ?? null;
   const slowP   = metrics.slowest_phase ?? null;
   const slowT   = metrics.slowest_tool_call ?? null;
@@ -87,7 +96,7 @@ function renderToolTimings(metrics) {
         </tr>`).join('');
 
   const toolRows = phases.flatMap(p =>
-    (Array.isArray(p.tools) ? p.tools : []).map(t => `
+    objects(p.tools).map(t => `
         <tr>
           <td class="mt-name">${phaseLabel(p.name)}</td>
           <td class="mt-name">${escapeHtml(t.tool)}</td>
@@ -97,7 +106,7 @@ function renderToolTimings(metrics) {
           <td class="mt-num">${fmtCount(t.error_count)}</td>
         </tr>`)).join('');
 
-  const slowest = [...metrics.tool_calls]
+  const slowest = objects(metrics.tool_calls)
     .sort((a, b) => (b.elapsed_sec ?? -1) - (a.elapsed_sec ?? -1))
     .slice(0, 10);
   const callRows = slowest.map(c => `
@@ -171,8 +180,8 @@ export function renderMetrics(metrics) {
 
   const elapsed  = metrics.pipeline_elapsed_sec;
   const totals   = metrics.totals   ?? {};
-  const phases   = metrics.phases   ?? [];
-  const byModel  = metrics.by_model ?? {};
+  const phases   = objects(metrics.phases);
+  const byModel  = metrics.by_model && typeof metrics.by_model === 'object' ? metrics.by_model : {};
 
   const phaseRows = phases.map(p => `
     <tr>
@@ -185,14 +194,17 @@ export function renderMetrics(metrics) {
     </tr>`).join('');
 
   const modelEntries = Object.entries(byModel);
-  const modelRows = modelEntries.map(([model, t]) => `
+  const modelRows = modelEntries.map(([model, raw]) => {
+    const t = raw && typeof raw === 'object' ? raw : {};
+    return `
     <tr>
       <td class="mt-name">${escapeHtml(model)}</td>
       <td class="mt-num">${fmtTok(t.input_tokens)}</td>
       <td class="mt-num">${fmtTok(t.output_tokens)}</td>
       <td class="mt-num">${fmtTok(t.cached_tokens)}</td>
       <td class="mt-num mt-total">${fmtTok(t.total_tokens)}</td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 
   return `
     <h2>Execution Metrics</h2>
@@ -275,8 +287,9 @@ function fmt(num) {
  * Tranche 2 (PULLBACK · PENDING) is dimmed to signal it has not fired.
  */
 function scaledEntrySetupHtml(setups) {
-  if (!setups || setups.length < 2) return '';
+  if (!Array.isArray(setups) || setups.length < 2) return '';
   const [imm, plb] = setups;
+  if (!imm || !plb) return '';
   return `
     <strong class="subsection-label">Tranche 1 — IMMEDIATE · LIVE</strong>
     <div class="metric-row">
@@ -327,10 +340,10 @@ function positionCard(pos) {
   const stopLoss   = ts ? `$${fmt(ts.stop_loss)}`   : (pos.stop_loss   != null ? `$${fmt(pos.stop_loss)}` : '—');
   const takeProfit = ts ? `$${fmt(ts.take_profit)}` : '—';
 
-  const triggers = (pos.monitoring_triggers ?? []).map(t => `<li>${escapeHtml(t)}</li>`).join('');
-  const risks    = (pos.key_risks ?? []).map(r => `<li>${escapeHtml(r)}</li>`).join('');
+  const triggers = (Array.isArray(pos.monitoring_triggers) ? pos.monitoring_triggers : []).map(t => `<li>${escapeHtml(t)}</li>`).join('');
+  const risks    = (Array.isArray(pos.key_risks) ? pos.key_risks : []).map(r => `<li>${escapeHtml(r)}</li>`).join('');
 
-  const reviewFreq = escapeHtml((pos.review_frequency ?? '').replace(/_/g, ' '));
+  const reviewFreq = escapeHtml(String(pos.review_frequency ?? '').replace(/_/g, ' '));
 
   return `
     <div class="stock-card">
@@ -376,7 +389,7 @@ export function renderReport(data) {
                   : 'var(--text-dim)';
 
   // Support both new schema (positions) and legacy schema (stock_recommendations)
-  const positions = data.positions ?? data.stock_recommendations ?? [];
+  const positions = objects(data.positions ?? data.stock_recommendations);
   const posHtml   = positions.map(positionCard).join('');
 
   const deployedPct     = data.deployed_pct      ?? null;
@@ -396,24 +409,24 @@ export function renderReport(data) {
     ? `
       <div class="metric-box">
         <div class="m-label">Deployed</div>
-        <div class="m-value ${deployedPct > 0 ? 'up' : ''}">${deployedPct.toFixed(1)}%</div>
+        <div class="m-value ${Number.isFinite(deployedPct) && deployedPct > 0 ? 'up' : ''}">${fmtPct(deployedPct)}</div>
       </div>
       <div class="metric-box">
         <div class="m-label">Reserved</div>
-        <div class="m-value ${reservedPct > 0 ? 'up' : ''}">${reservedPct.toFixed(1)}%</div>
+        <div class="m-value ${Number.isFinite(reservedPct) && reservedPct > 0 ? 'up' : ''}">${fmtPct(reservedPct)}</div>
       </div>
       <div class="metric-box">
         <div class="m-label">Cash Buffer</div>
-        <div class="m-value">${cashReserve != null ? cashReserve.toFixed(1) + '%' : '—'}</div>
+        <div class="m-value">${fmtPct(cashReserve)}</div>
       </div>`
     : `
       <div class="metric-box">
         <div class="m-label">Allocated</div>
-        <div class="m-value ${totalAllocated > 0 ? 'up' : ''}">${totalAllocated != null ? totalAllocated.toFixed(1) + '%' : '—'}</div>
+        <div class="m-value ${Number.isFinite(totalAllocated) && totalAllocated > 0 ? 'up' : ''}">${fmtPct(totalAllocated)}</div>
       </div>
       <div class="metric-box">
         <div class="m-label">Cash Reserve</div>
-        <div class="m-value">${cashReserve != null ? cashReserve.toFixed(1) + '%' : '—'}</div>
+        <div class="m-value">${fmtPct(cashReserve)}</div>
       </div>`;
 
   return `

@@ -32,6 +32,8 @@ const T_BENCHMARK      = 'stats renderBenchmarkSectionHTML hostile sector';
 const T_HISTORY        = 'stats renderHistoryRowsHTML hostile row';
 const T_GRID           = 'reports renderReportsGridHTML hostile entries';
 const T_REPORT         = 'report renderReport hostile summary fields';
+const T_STATS_TYPES    = 'stats hostile types do not throw';
+const T_REPORT_TYPES   = 'report hostile types do not throw';
 const T_METRICS        = 'report renderMetrics hostile names';
 const T_SECTOR_BARS    = 'renderSectorBarListHTML escapes the sector in text and title, counts are numbers';
 const T_RISK_LEGEND    = 'buildLegendHTML and the risk donut escape slice labels';
@@ -107,7 +109,7 @@ const REVIEWED = {
         'backend: pipeline_done.report via pipeline.js renderReport(event.report) (escapeHtml throughout)',
         'constant: REPORT_TEMPLATES fallbacks from data.js keyed by the SPA sector constant',
       ],
-      hostileTests: [T_REPORT] },
+      hostileTests: [T_REPORT, T_REPORT_TYPES] },
     { sink: `reportBodyEl.insertAdjacentHTML('beforeend', renderMetrics(metrics));`,
       sources: ['backend: pipeline_done.metrics phase names, statuses, model keys, tool names via renderMetrics (escapeHtml)'],
       hostileTests: [T_METRICS] },
@@ -116,7 +118,7 @@ const REVIEWED = {
   'ui/reportViewer.js': [
     { sink: 'body.innerHTML = renderReport(report);',
       sources: ['backend: GET /api/report/{id} result (or top level) via renderReport (escapeHtml throughout)'],
-      hostileTests: [T_REPORT] },
+      hostileTests: [T_REPORT, T_REPORT_TYPES] },
     { sink: `body.insertAdjacentHTML('beforeend', renderMetrics(metrics));`,
       sources: ['backend: GET /api/report/{id} execution_metrics via renderMetrics (escapeHtml)'],
       hostileTests: [T_METRICS] },
@@ -150,16 +152,16 @@ const REVIEWED = {
       hostileTests: [T_SECTOR_BARS] },
     { sink: 'riskWrap.innerHTML = renderRiskDonutWrapHTML(data.by_risk_profile);',
       sources: ['backend: GET /api/analytics by_risk_profile keys and counts via renderRiskDonutWrapHTML (escapeHtml, hasOwn label and colour tables)'],
-      hostileTests: [T_RISK_LEGEND, T_RISK_PROTO] },
+      hostileTests: [T_RISK_LEGEND, T_RISK_PROTO, T_STATS_TYPES] },
     { sink: 'svgEl.innerHTML      = svgInner;',
       sources: ['backend: GET /api/analytics action_breakdown counts via renderDecisionsDonutPieces (numbers and ACTION_COLOURS constants only)'],
-      hostileTests: [T_DONUT_PIECES] },
+      hostileTests: [T_DONUT_PIECES, T_STATS_TYPES] },
     { sink: 'centerEl.innerHTML   = centerHTML;',
       sources: ['backend: action_breakdown sector key (the filter value) via renderDecisionsDonutPieces (escapeHtml)'],
-      hostileTests: [T_DONUT_PIECES] },
+      hostileTests: [T_DONUT_PIECES, T_STATS_TYPES] },
     { sink: 'legendEl.innerHTML   = legendHTML;',
       sources: ['backend: action_breakdown counts via buildLegendHTML (ACTION_ORDER labels, escapeHtml, numeric percentages)'],
-      hostileTests: [T_DONUT_PIECES] },
+      hostileTests: [T_DONUT_PIECES, T_STATS_TYPES] },
     { sink: `select.innerHTML = '<option value="__overall__">Overall</option>';`,
       sources: ['static: no interpolation (sector options are added through textContent)'],
       hostileTests: [] },
@@ -171,13 +173,13 @@ const REVIEWED = {
       hostileTests: [] },
     { sink: 'tbody.innerHTML = renderHistoryRowsHTML(history);',
       sources: ['backend: GET /api/long-buy-history ticker, sector, date, prices, roi, version, report_url via renderHistoryRowsHTML (escapeHtml, safeUrl, fmtDate, fmtPrice)'],
-      hostileTests: [T_HISTORY] },
+      hostileTests: [T_HISTORY, T_STATS_TYPES] },
     { sink: "container.innerHTML = '';",
       sources: ['static: clears the benchmark container'],
       hostileTests: [] },
     { sink: 'container.innerHTML = html;',
       sources: ['backend: GET /api/long-buy-history sector, roi and benchmark prices via renderBenchmarkSectionHTML (escapeHtml on titles); ETF name from data.js getSectorEtf (constant)'],
-      hostileTests: [T_BENCHMARK] },
+      hostileTests: [T_BENCHMARK, T_STATS_TYPES] },
     { sink: "if (sectorEl.dataset.ssr !== '1') sectorEl.innerHTML = '';",
       sources: ['static: clears the sector chart'],
       hostileTests: [] },

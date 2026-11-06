@@ -7,11 +7,12 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { escapeHtml, safeUrl } from '../ui/formatters.js';
+import { escapeHtml, safeUrl, fmtRoi, fmtDate, fmtPrice } from '../ui/formatters.js';
 import { renderReportCardHTML, renderReportsGridHTML } from '../ui/reportsRender.js';
 import {
   buildLegendHTML, renderRiskDonutWrapHTML, renderSectorBarListHTML,
   renderDecisionsDonutPieces, renderHistoryRowsHTML, renderBenchmarkSectionHTML,
+  computeKpis, computeSpyDelta,
 } from '../ui/statsRender.js';
 import { renderReleaseNotesHTML } from '../ui/changelogRender.js';
 import { renderReport, renderMetrics } from '../ui/reportRenderer.js';
@@ -308,4 +309,78 @@ test('report renderMetrics hostile names', () => {
   });
   assertInert(html);
   assert.ok(html.includes('&lt;img src=x onerror=alert(1)&gt;'), 'phase and model names are literal text');
+});
+
+// ─── Hostile value types (SEC-06 / T-03-47): a non-number is unavailable, never a throw ───
+
+test('stats hostile types do not throw', () => {
+  const spy = { spy_trigger_price: 100, spy_current_price: 110 };
+  const rows = [
+    { ticker: 'A', sector: 'S', recommended_at: 'not-a-date', trigger_price: 'x', current_price: {}, roi_pct: '5', ...spy },
+    { ticker: 'B', sector: 'S', recommended_at: '2026-01-02T00:00:00Z', trigger_price: 10, current_price: 11, roi_pct: {}, ...spy },
+    { ticker: 'C', sector: 'S', recommended_at: '2026-01-02T00:00:00Z', trigger_price: 10, current_price: 11, roi_pct: NaN, ...spy },
+    { ticker: 'D', sector: 'S', recommended_at: '2026-01-02T00:00:00Z', trigger_price: 10, current_price: 11, roi_pct: 8, ...spy },
+  ];
+
+  const html = renderHistoryRowsHTML(rows);
+  assert.equal(typeof html, 'string');
+  assert.equal(html.split('roi-badge--null').length - 1, 3, 'string, object and NaN ROI render the null badge');
+  assert.ok(html.includes('<td class="col-date">—</td>'), 'unparseable date renders a dash');
+  assert.ok(!html.includes('NaN'), html);
+
+  const kpis = computeKpis(rows);
+  assert.equal(kpis.winRate, '100.0%', 'only the finite ROI row counts');
+  assert.equal(kpis.avg.text, '+8.0%');
+  assert.equal(typeof renderBenchmarkSectionHTML(rows), 'string');
+  assert.equal(computeSpyDelta(rows).text, '−2.0%', 'rows with non-finite ROI stay out of the average');
+
+  const risk = renderRiskDonutWrapHTML({ conservative: '2<b>', aggressive: {} });
+  assert.equal(typeof risk, 'string');
+  assert.ok(!risk.includes('<b>') && !risk.includes('NaN') && !risk.includes('<circle'), risk);
+  const riskMixed = renderRiskDonutWrapHTML({ conservative: '2<b>', moderate: 3 });
+  assert.ok(!riskMixed.includes('NaN') && riskMixed.split('<circle').length - 1 === 1, riskMixed);
+
+  const pieces = renderDecisionsDonutPieces({
+    S: { counts: { 'LONG-BUY': '3', AVOID: {}, MONITOR: 2 }, total: '5' },
+    T: null,
+  }, 'S');
+  assert.equal(pieces.svgInner.split('<circle').length - 1, 1, 'only the finite MONITOR count draws a slice');
+  assert.ok(!pieces.legendHTML.includes('LONG-BUY') && !pieces.legendHTML.includes('AVOID'), pieces.legendHTML);
+  assert.ok(!pieces.legendHTML.includes('NaN') && !pieces.svgInner.includes('NaN'));
+  const overall = renderDecisionsDonutPieces({ S: { counts: { 'LONG-BUY': '3', MONITOR: 2 } }, T: null });
+  assert.equal(overall.svgInner.split('<circle').length - 1, 1);
+});
+
+test('report hostile types do not throw', () => {
+  const dash = label => new RegExp(`${label}</div>\\s*<div class="m-value ?">—</div>`);
+  const three = renderReport({
+    deployed_pct: '5', reserved_pct: {}, total_allocated_pct: 'x', cash_reserve_pct: null,
+    positions: [{ ticker: 'A', action: 'MONITOR', review_frequency: 7 }],
+  });
+  assert.equal(typeof three, 'string');
+  for (const label of ['Deployed', 'Reserved', 'Cash Buffer']) {
+    assert.ok(dash(label).test(three), `${label} shows a dash`);
+  }
+  const two = renderReport({ total_allocated_pct: 'x', cash_reserve_pct: {} });
+  for (const label of ['Allocated', 'Cash Reserve']) {
+    assert.ok(dash(label).test(two), `${label} shows a dash`);
+  }
+  const normal = renderReport({ deployed_pct: 12.34, reserved_pct: 0, cash_reserve_pct: 5 });
+  assert.ok(normal.includes('>12.3%<') && normal.includes('>0.0%<') && normal.includes('>5.0%<'), normal);
+  assert.equal(typeof renderReport({ positions: 'abc' }), 'string', 'non-array positions');
+  assert.equal(typeof renderReport({ positions: [null, { ticker: 'A', monitoring_triggers: 'x', key_risks: 7 }] }), 'string');
+  assert.equal(typeof renderMetrics({ phases: 'x', by_model: { m: null }, tool_calls: [null] }), 'string');
+});
+
+test('formatters fmtRoi and fmtDate refuse non-numbers', () => {
+  for (const bad of ['5', NaN, {}, Infinity, null, undefined]) {
+    assert.deepEqual(fmtRoi(bad), { text: '—', cls: '' }, `fmtRoi(${String(bad)})`);
+  }
+  assert.deepEqual(fmtRoi(5), { text: '+5.0%', cls: 'stats-kpi-value--pos' });
+  assert.deepEqual(fmtRoi(-2), { text: '−2.0%', cls: 'stats-kpi-value--neg' });
+  assert.equal(fmtDate('not-a-date'), '—');
+  assert.equal(fmtDate(null), '—');
+  assert.equal(fmtDate('2026-03-05T10:00:00Z'), '05-Mar-26');
+  assert.equal(fmtPrice('x'), '—');
+  assert.equal(fmtPrice(1234.5), '$1,234.50');
 });

@@ -58,8 +58,10 @@ async function init() {
   // Update header
   document.getElementById('viewer-sector').textContent = sector;
   document.getElementById('viewer-run-id').textContent = runId.slice(0, 8) + '…';
-  document.getElementById('viewer-date').textContent   = runAt
-    ? new Date(runAt).toISOString().slice(0, 16).replace('T', ' ') + ' UTC'
+  // An unparseable run_at must not throw (toISOString raises RangeError) and blank the page.
+  const runAtDate = runAt ? new Date(runAt) : null;
+  document.getElementById('viewer-date').textContent   = runAtDate && !Number.isNaN(runAtDate.getTime())
+    ? runAtDate.toISOString().slice(0, 16).replace('T', ' ') + ' UTC'
     : '—';
 
   // Render body
