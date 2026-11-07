@@ -1,0 +1,7 @@
+# Cloudflare Pages response headers.
+# JavaScript revalidates on every load (ETag / 304), so a deploy reaches
+# returning visitors immediately instead of after the default cache lifetime
+# (a stale pipeline.js once ran for up to 4 h and sent no client_run_id).
+# The splat matches across slashes, so this covers /app.js and /ui/*.js.
+/*.js
+  Cache-Control: public, max-age=0, must-revalidate
