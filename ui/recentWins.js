@@ -10,7 +10,7 @@ import { escapeHtml } from './formatters.js';
 const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL
   ?? 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
 
-const TICKER_PX_PER_SECOND = 60;
+const TICKER_PX_PER_SECOND = 48;
 
 const MONTH_ABBREVIATIONS = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
