@@ -5,7 +5,7 @@
    identical markup from identical data.
    ============================================================ */
 
-import { fmtDate, utcDateStr, fmtPrice, fmtRoi, escapeHtml } from './formatters.js';
+import { fmtDate, utcDateStr, fmtPrice, fmtRoi, escapeHtml, safeUrl } from './formatters.js';
 import { getSectorEtf } from './data.js';
 
 export const ACTION_COLOURS = {
@@ -27,10 +27,16 @@ export const RISK_LABELS = {
   moderate:     'Moderate',
 };
 
+// Backend numbers (counts, prices, ROI) are used only when they are finite
+// numbers; anything else is unavailable (null), never 0.0 and never a throw.
+function finiteOrNull(v) {
+  return Number.isFinite(v) ? v : null;
+}
+
 export function buildSlices(counts) {
   return ACTION_ORDER
-    .filter(a => (counts[a] ?? 0) > 0)
-    .map(a => ({ label: a, value: counts[a], colour: ACTION_COLOURS[a] }));
+    .map(a => ({ label: a, value: finiteOrNull(counts?.[a]) ?? 0, colour: ACTION_COLOURS[a] }))
+    .filter(sl => sl.value > 0);
 }
 
 /* ── SVG donut (string) ─────────────────────────────────────── */
@@ -58,7 +64,7 @@ export function buildLegendHTML(slices, total) {
     const pct = total > 0 ? ((sl.value / total) * 100).toFixed(1) : '0.0';
     return `<li class="stats-legend-item">
       <span class="stats-legend-dot" style="background:${sl.colour}"></span>
-      <span class="stats-legend-label">${sl.label}</span>
+      <span class="stats-legend-label">${escapeHtml(sl.label)}</span>
       <span class="stats-legend-pct">${pct}%</span>
     </li>`;
   }).join('');
@@ -67,12 +73,15 @@ export function buildLegendHTML(slices, total) {
 /* ── Activity tab ────────────────────────────────────────────── */
 
 export function renderSectorBarListHTML(bySector) {
-  const sectors  = Object.entries(bySector ?? {}).sort((a, b) => b[1] - a[1]);
-  const maxCount = sectors.length > 0 ? sectors[0][1] : 1;
+  // Counts come from stored data: only finite numbers are rendered (else 0).
+  const sectors  = Object.entries(bySector ?? {})
+    .map(([name, count]) => [name, Number.isFinite(count) ? count : 0])
+    .sort((a, b) => b[1] - a[1]);
+  const maxCount = sectors.length > 0 && sectors[0][1] > 0 ? sectors[0][1] : 1;
   const rows = sectors.map(([name, count]) => {
     const pct = Math.round((count / maxCount) * 100);
     return `<li class="stat-bar-row">
-      <span class="stat-bar-label" title="${name}">${name}</span>
+      <span class="stat-bar-label" title="${escapeHtml(name)}">${escapeHtml(name)}</span>
       <div class="stat-bar-track">
         <div class="stat-bar-fill" style="width:${pct}%"></div>
       </div>
@@ -83,12 +92,15 @@ export function renderSectorBarListHTML(bySector) {
 }
 
 export function renderRiskDonutWrapHTML(byRiskProfile) {
-  const risks     = Object.entries(byRiskProfile ?? {}).sort((a, b) => b[1] - a[1]);
+  const risks     = Object.entries(byRiskProfile ?? {})
+    .filter(([, v]) => Number.isFinite(v))
+    .sort((a, b) => b[1] - a[1]);
   const riskTotal = risks.reduce((s, [, v]) => s + v, 0);
   const slices    = risks.map(([key, value]) => ({
-    label:  RISK_LABELS[key] ?? key,
+    // Object.hasOwn: a backend key like 'constructor' must not reach Object.prototype.
+    label:  Object.hasOwn(RISK_LABELS, key) ? RISK_LABELS[key] : key,
     value,
-    colour: RISK_COLOURS[key] ?? '#8c8c8c',
+    colour: Object.hasOwn(RISK_COLOURS, key) ? RISK_COLOURS[key] : '#8c8c8c',
   }));
   const svgSize = 90;
   const donutInner = renderDonutSVGInner(slices, svgSize, 33, 16);
@@ -109,17 +121,17 @@ export function renderRiskDonutWrapHTML(byRiskProfile) {
 
 export function computeDecisionsForSector(actionBreakdown, sectorKey) {
   if (sectorKey === '__overall__') {
-    const counts = {};
+    const counts = Object.create(null);
     for (const sd of Object.values(actionBreakdown ?? {})) {
-      for (const [a, c] of Object.entries(sd.counts ?? {})) {
-        counts[a] = (counts[a] ?? 0) + c;
+      for (const [a, c] of Object.entries(sd?.counts ?? {})) {
+        counts[a] = (counts[a] ?? 0) + (finiteOrNull(c) ?? 0);
       }
     }
     const total = Object.values(counts).reduce((s, v) => s + v, 0);
     return { counts, total, label: 'Overall' };
   }
   const sd = (actionBreakdown ?? {})[sectorKey] ?? {};
-  return { counts: sd.counts ?? {}, total: sd.total ?? 0, label: sectorKey };
+  return { counts: sd.counts ?? {}, total: finiteOrNull(sd.total) ?? 0, label: sectorKey };
 }
 
 export function renderDecisionsDonutPieces(actionBreakdown, sectorKey = '__overall__') {
@@ -128,7 +140,7 @@ export function renderDecisionsDonutPieces(actionBreakdown, sectorKey = '__overa
   return {
     label,
     svgInner:   renderDonutSVGInner(slices, 120, 44, 22),
-    centerHTML: `<span style="font-size:9px;color:var(--text-dim)">${label}</span>`,
+    centerHTML: `<span style="font-size:9px;color:var(--text-dim)">${escapeHtml(label)}</span>`,
     legendHTML: buildLegendHTML(slices, total),
   };
 }
@@ -160,8 +172,8 @@ export function applyDataRules(history) {
 export function sortHistory(history, col, dir) {
   return [...history].sort((a, b) => {
     if (col === 'roi') {
-      const nullA = a.roi_pct == null;
-      const nullB = b.roi_pct == null;
+      const nullA = !Number.isFinite(a.roi_pct);
+      const nullB = !Number.isFinite(b.roi_pct);
       if (nullA && nullB) return 0;
       if (nullA) return 1;
       if (nullB) return -1;
@@ -174,7 +186,7 @@ export function sortHistory(history, col, dir) {
 }
 
 export function computeKpis(history) {
-  const valid    = history.filter(r => r.roi_pct != null);
+  const valid    = history.filter(r => Number.isFinite(r.roi_pct));
   const positive = valid.filter(r => r.roi_pct > 0);
 
   const winRate = valid.length > 0
@@ -207,7 +219,7 @@ export function computeKpis(history) {
 /* ── Performance tab — benchmark comparison (vs SPY / vs sector ETF) ─ */
 
 export function computeRoiPct(triggerPrice, currentPrice) {
-  if (triggerPrice == null || currentPrice == null || triggerPrice === 0) return null;
+  if (!Number.isFinite(triggerPrice) || !Number.isFinite(currentPrice) || triggerPrice === 0) return null;
   return (currentPrice - triggerPrice) / triggerPrice * 100;
 }
 
@@ -216,7 +228,7 @@ export function computeRoiPct(triggerPrice, currentPrice) {
 // (a rolling per-row window, not one shared calendar range).
 function computeBenchmarkGroup(history, triggerField, currentField) {
   const rows = (history ?? []).filter(r =>
-    r.roi_pct != null && computeRoiPct(r[triggerField], r[currentField]) != null
+    Number.isFinite(r.roi_pct) && computeRoiPct(r[triggerField], r[currentField]) != null
   );
   if (rows.length === 0) return null;
   const avgPick      = rows.reduce((s, r) => s + r.roi_pct, 0) / rows.length;
@@ -292,7 +304,7 @@ export function renderBenchmarkSectionHTML(history) {
 
 export function renderHistoryRowsHTML(history) {
   return history.map((row, i) => {
-    const roi    = row.roi_pct;
+    const roi    = finiteOrNull(row.roi_pct);
     const isPos  = roi != null && roi > 0;
     const isNull = roi == null;
 
@@ -308,7 +320,7 @@ export function renderHistoryRowsHTML(history) {
     }
 
     const reportCell = row.report_url
-      ? `<a href="${escapeHtml(row.report_url)}" target="_blank" rel="noopener noreferrer" class="report-link">View</a>`
+      ? `<a href="${escapeHtml(safeUrl(row.report_url))}" target="_blank" rel="noopener noreferrer" class="report-link">View</a>`
       : '—';
 
     return `<tr>

@@ -7,8 +7,13 @@
      agent_start   — {agent_index, agent_name}
      agent_step    — {agent_index, step_type, thought, tool?, tool_input?}
      agent_done    — {agent_index, summary}
-     pipeline_done — {report}
-     error         — {message}
+     pipeline_done — {report, run_id}
+     error         — {message}, plus {code} when the server refuses the
+                     run (rate_limited, busy, budget_exhausted,
+                     duplicate_run). A refusal is shown and never retried.
+
+   Each click on Run mints a fresh client_run_id (sent on the URL,
+   single use). Incoming data is parsed by ui/sseEvents.js.
    ============================================================ */
 
 import { getSelectedSector, getIsRunning, setIsRunning, getRiskProfile } from './state.js';
@@ -18,6 +23,7 @@ import * as report from './report.js';
 import { disableControls, enableControls } from './sectorSelector.js';
 import { renderReport } from './reportRenderer.js';
 import { refresh as refreshAnalytics } from './analytics.js';
+import { parseSseEvent, errorStatusText, formatActionStep, newClientRunId, buildAnalyzeUrl } from './sseEvents.js';
 
 // ── Backend URL ─────────────────────────────────────────────
 // In local dev (npm run dev) Vite proxies /api → Modal, so BACKEND_URL is ''.
@@ -252,20 +258,12 @@ function startBootProgress() {
   initRaf = requestAnimationFrame(frame);
 }
 
-/**
- * Formats an AgentAction step into a display string (tool calls only).
- * Finish and unknown steps are handled inline in the event handler.
- */
-function formatActionStep(event) {
-  const tool    = event.tool    ? `Calling tool: ${event.tool}` : '';
-  const thought = event.thought || '';
-  return [thought, tool].filter(Boolean).join('\n') || 'Running…';
-}
-
 export async function runAnalysis() {
   const sector = getSelectedSector();
   if (!sector || getIsRunning()) return;
   setIsRunning(true);
+  // One id per click, never reused: the server refuses a repeated id (SEC-07, D-08).
+  const clientRunId = newClientRunId();
 
   panel.reset();
   panel.show(sector);
@@ -292,7 +290,7 @@ export async function runAnalysis() {
   }, INIT_STATUS_MS);
 
   await new Promise((resolve) => {
-    const url    = `${BACKEND_URL}/api/analyze?sector=${encodeURIComponent(sector)}&risk_profile=${encodeURIComponent(getRiskProfile())}`;
+    const url    = buildAnalyzeUrl(BACKEND_URL, sector, getRiskProfile(), clientRunId);
     const source = new EventSource(url);
 
     /** True once `pipeline_done` or JSON `error` is handled — avoids treating normal SSE close as failure. */
@@ -312,8 +310,8 @@ export async function runAnalysis() {
     }
 
     source.onmessage = (e) => {
-      let event;
-      try { event = JSON.parse(e.data); } catch { return; }
+      const event = parseSseEvent(e.data);
+      if (!event) return;
 
       switch (event.type) {
 
@@ -421,7 +419,7 @@ export async function runAnalysis() {
           refreshAnalytics();
           const html = renderReport(event.report);
           const reportUrl = event.run_id
-            ? `${window.location.origin}/report.html?id=${event.run_id}`
+            ? `${window.location.origin}/report.html?id=${encodeURIComponent(event.run_id)}`
             : null;
           setTimeout(() => {
             report.show(sector, startTime, html, event.report, event.metrics ?? null, reportUrl);
@@ -436,8 +434,9 @@ export async function runAnalysis() {
           clearInitProgress();
           clearInitStatusTimer();
           clearIdleTick();
-          trackAnalysisError(sector, event.message);
-          panel.setProgress(0, `Error: ${event.message}`);
+          // Refusals (event.code) show the server message and end the run; no retry.
+          trackAnalysisError(sector, event.code ?? event.message);
+          panel.setProgress(0, errorStatusText(event));
           finish();
           break;
         }

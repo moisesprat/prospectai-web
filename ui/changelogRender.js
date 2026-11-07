@@ -5,15 +5,9 @@
    — mirrors ui/statsRender.js.
    ============================================================ */
 
-const MAX_RELEASES = 30;
+import { escapeHtml } from './formatters.js';
 
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
+const MAX_RELEASES = 30;
 
 /**
  * Extracts per-version release notes from the "## Release Notes" section
@@ -61,7 +55,7 @@ export function renderReleaseNotesHTML(items) {
   return capped
     .map(({ version, date, bullets }) => `
       <article class="changelog-entry">
-        <time class="changelog-date" datetime="${date}">${date}</time>
+        <time class="changelog-date" datetime="${escapeHtml(date)}">${escapeHtml(date)}</time>
         <div class="changelog-entry-body">
           <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
           <h2 class="changelog-title">v${escapeHtml(version)}</h2>

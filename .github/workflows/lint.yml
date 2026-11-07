@@ -3,8 +3,13 @@
 # - The single job id `lint` is the branch-protection required-check context
 #   (plan 01-08 configures it). Do not rename it or add a path filter, since a
 #   skipped workflow leaves a required check pending.
-# - There is no web test runner until Phase 3 (TEST-02), so the metrics render
-#   check is a plain Node assert script.
+# - The web test runner now exists (node:test, run by the "Unit tests" step). It checks the
+#   committed SSE fixture copy against the contract tables pinned in
+#   ui/sseEvents.js. The byte comparison with the backend's fixture runs in
+#   backend CI, which clones this public repo read-only, and in the ProspectAI
+#   deploy.sh preflight, because the backend repo is private and this job
+#   holds no token.
+# - The metrics render check stays a plain Node assert script.
 # - generate-sitemap.yml is unrelated and untouched. It pushes to main every
 #   15 minutes, which is why this workflow has no push trigger.
 name: Lint
@@ -38,3 +43,6 @@ jobs:
 
       - name: Metrics render check
         run: node scripts/check-metrics-render.mjs
+
+      - name: Unit tests
+        run: npm test
