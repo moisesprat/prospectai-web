@@ -42,14 +42,19 @@ export function escapeHtml(str) {
 // Allow-list for hrefs built from backend or stored data (SEC-06): https URLs,
 // same-origin absolute paths ('/x') and bare same-origin page paths
 // ('report.html?id=1'). Everything else (javascript:, data:, http:,
-// protocol-relative '//host') returns '#'. The result is NOT HTML-escaped:
+// protocol-relative '//host') returns '#'. Backslashes, whitespace and control
+// characters anywhere in the value also return '#': browsers strip tabs and
+// newlines and treat a backslash as '/', so '/\evil.example' or '/<TAB>/evil.example'
+// would otherwise become protocol-relative (WR-01). The result is NOT HTML-escaped:
 // callers still pass it through escapeHtml when placing it inside an attribute.
 const BARE_PAGE_PATH = /^[A-Za-z0-9._-]+\.html(?:[?#][^\s]*)?$/;
+// eslint-disable-next-line no-control-regex
+const UNSAFE_URL_CHARS = /[\\\u0000-\u0020\u007f-\u009f]/;
 
 export function safeUrl(u) {
   if (typeof u !== 'string') return '#';
-  const value = u.trim();
-  if (!value) return '#';
+  const value = u;
+  if (!value || UNSAFE_URL_CHARS.test(value)) return '#';
   if (/^https:\/\//i.test(value)) {
     try {
       return new URL(value).protocol === 'https:' ? value : '#';
