@@ -109,6 +109,30 @@ test('newClientRunId is a lowercase UUID4 and never repeats', () => {
   assert.notEqual(a, b);
 });
 
+const UUID4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+
+/** Runs fn with globalThis.crypto replaced, then restores the original descriptor. */
+function withCrypto(replacement, fn) {
+  const original = Object.getOwnPropertyDescriptor(globalThis, 'crypto');
+  Object.defineProperty(globalThis, 'crypto', { value: replacement, configurable: true, writable: true });
+  try { fn(); } finally { Object.defineProperty(globalThis, 'crypto', original); }
+}
+
+test('newClientRunId falls back to a UUID4 when crypto.randomUUID is unavailable (WR-04)', () => {
+  const getRandomValues = (a) => { for (let i = 0; i < a.length; i++) a[i] = Math.floor(Math.random() * 256); return a; };
+  for (const replacement of [{ getRandomValues }, {}, undefined]) {
+    withCrypto(replacement, () => {
+      const ids = new Set();
+      for (let i = 0; i < 50; i++) {
+        const id = newClientRunId();
+        assert.match(id, UUID4);
+        ids.add(id);
+      }
+      assert.equal(ids.size, 50);
+    });
+  }
+});
+
 // ─── hostile events stay inert ───
 
 test('hostile event text is inert through the escaping renderer', () => {
@@ -135,4 +159,12 @@ test('pipeline.js mints the run id once, inside runAnalysis', () => {
   assert.ok(fnStart >= 0);
   assert.ok(pipelineSrc.indexOf('newClientRunId()') > fnStart);
   assert.equal((pipelineSrc.match(/parseSseEvent\(e\.data\)/g) ?? []).length, 1);
+});
+
+test('pipeline.js mints the run id before locking the Run button (WR-04)', () => {
+  const fnStart = pipelineSrc.indexOf('export async function runAnalysis');
+  const mint = pipelineSrc.indexOf('newClientRunId()', fnStart);
+  const lock = pipelineSrc.indexOf('setIsRunning(true)', fnStart);
+  assert.ok(mint > fnStart && lock > fnStart);
+  assert.ok(mint < lock, 'newClientRunId() must run before setIsRunning(true) so a throw cannot leave the button locked');
 });
