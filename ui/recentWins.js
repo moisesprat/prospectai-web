@@ -10,6 +10,8 @@ import { escapeHtml } from './formatters.js';
 const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL
   ?? 'https://moisesprat--prospectai-backend-fastapi-app.modal.run';
 
+const TICKER_PX_PER_SECOND = 60;
+
 const MONTH_ABBREVIATIONS = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
@@ -97,4 +99,10 @@ export async function render(parent, beforeEl) {
   `;
 
   parent.insertBefore(section, beforeEl);
+
+  // The loop scrolls half the track, so scale the duration with the track
+  // width to keep the speed constant no matter how many wins there are.
+  const track = section.querySelector('.rw-track');
+  const scrollDistance = track.scrollWidth / 2;
+  section.style.setProperty('--ticker-duration', `${scrollDistance / TICKER_PX_PER_SECOND}s`);
 }
