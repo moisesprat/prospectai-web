@@ -1,0 +1,37 @@
+{
+  "fixture_version": 1,
+  "required_keys": {
+    "agent_start": ["agent_index", "agent_name", "model"],
+    "agent_step": ["agent_index", "step_type"],
+    "agent_done": ["agent_index", "summary"],
+    "pipeline_done": ["report", "run_id"],
+    "error": ["message"]
+  },
+  "step_types": ["action", "finish", "unknown"],
+  "rejection_codes": ["rate_limited", "busy", "budget_exhausted", "duplicate_run"],
+  "rejection_stream": {"data_events": 1, "retry_field": false},
+  "streams": {
+    "success": [
+      {"type": "agent_start", "agent_index": 0, "agent_name": "Market Analyst", "model": "model-for-market_analyst"},
+      {"type": "agent_step", "agent_index": 0, "step_type": "action", "tool": "fetch_market_data", "tool_input": "sector=Technology", "thought": "Flow: fetching market data"},
+      {"type": "agent_step", "agent_index": 0, "step_type": "finish", "thought": "done", "preview": "final text"},
+      {"type": "agent_step", "agent_index": 0, "step_type": "unknown", "raw": "opaque-step"},
+      {"type": "agent_done", "agent_index": 0, "summary": "Market Analyst finished. Top stock candidates identified by sentiment and mention signals.", "preview": "", "tokens_est": 0},
+      {"type": "pipeline_done", "report": {"positions": []}, "metrics": {}, "run_id": "__run_id__", "report_url": null}
+    ],
+    "pipeline_error": [
+      {"type": "agent_start", "agent_index": 0, "agent_name": "Market Analyst", "model": "model-for-market_analyst"},
+      {"type": "error", "message": "boom", "metrics": {}}
+    ],
+    "rejected_rate_limited": [{"type": "error", "code": "rate_limited", "message": "__nonempty__"}],
+    "rejected_busy": [{"type": "error", "code": "busy", "message": "__nonempty__"}],
+    "rejected_budget_exhausted": [{"type": "error", "code": "budget_exhausted", "message": "__nonempty__"}],
+    "rejected_duplicate_run": [{"type": "error", "code": "duplicate_run", "message": "__nonempty__"}]
+  },
+  "hostile": [
+    {"type": "agent_step", "agent_index": 1, "step_type": "action", "tool": "<svg onload=alert(1)>", "tool_input": "\"'&", "thought": "<img src=x onerror=alert(2)>"},
+    {"type": "agent_step", "agent_index": 1, "step_type": "finish", "thought": "<img src=x onerror=alert(3)>", "preview": "<script>alert(4)</script>"},
+    {"type": "agent_done", "agent_index": 2, "summary": "<b>done</b>", "preview": "<img src=x onerror=alert(5)>", "tokens_est": 0},
+    {"type": "error", "message": "<img src=x onerror=alert(6)>"}
+  ]
+}

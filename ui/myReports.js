@@ -4,6 +4,8 @@
    a panel listing the user's saved report links.
    ============================================================ */
 
+import { escapeHtml, safeUrl } from './formatters.js';
+
 const STORAGE_KEY = 'prospectai_my_reports';
 
 let panelEl = null;
@@ -41,6 +43,15 @@ export function addEntry({ report_url, sector, run_at }) {
   saveEntries(entries);
 }
 
+/** Pure markup for one saved report; every stored string is escaped, the link goes through safeUrl (SEC-06). */
+export function renderEntryHTML(entry) {
+  return `
+      <a href="${escapeHtml(safeUrl(entry.report_url))}" target="_blank" rel="noopener noreferrer" class="my-reports-link">
+        <span class="my-reports-sector">${escapeHtml(entry.sector) || '—'}</span>
+        <span class="my-reports-date">${escapeHtml(fmtDate(entry.run_at))}</span>
+      </a>`;
+}
+
 /** Re-renders the panel list from localStorage. */
 export function refresh() {
   if (!listEl) return;
@@ -55,11 +66,7 @@ export function refresh() {
   for (const entry of entries) {
     const li = document.createElement('li');
     li.className = 'my-reports-item';
-    li.innerHTML = `
-      <a href="${entry.report_url}" target="_blank" rel="noopener noreferrer" class="my-reports-link">
-        <span class="my-reports-sector">${entry.sector || '—'}</span>
-        <span class="my-reports-date">${fmtDate(entry.run_at)}</span>
-      </a>`;
+    li.innerHTML = renderEntryHTML(entry);
     listEl.appendChild(li);
   }
 }

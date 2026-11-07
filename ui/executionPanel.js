@@ -4,7 +4,7 @@
    Exposes update methods called by pipeline.js during a run.
    ============================================================ */
 
-import { typeOutput } from './utils.js';
+import { typeOutput, textWithCursorHTML } from './utils.js';
 
 const AGENT_DEFS = [
   { id: 'AGENT-01', name: 'Market Analyst',      role: 'macro_trends - sentiment - reddit_signals' },
@@ -103,7 +103,7 @@ export function scrollIntoView() {
 export function reset() {
   cardEls.forEach((card, i) => {
     card.className = 'agent-card pending';
-    outputEls[i].innerHTML = 'Waiting to execute...';
+    outputEls[i].textContent = 'Waiting to execute...';
     modelEls[i].textContent = '';
   });
   setProgress(0, 'Initializing agents...');
@@ -159,7 +159,8 @@ export function updateMeta(startTime) {
 
 export function activateAgent(i, text) {
   cardEls[i].className = 'agent-card active';
-  outputEls[i].innerHTML = text + '<span class="typing-cursor"></span>';
+  const html = textWithCursorHTML(text);
+  outputEls[i].innerHTML = html;
   cardEls[i].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
@@ -172,7 +173,8 @@ export function completeAgent(i) {
  * Called repeatedly as agent_step SSE events arrive.
  */
 export function setAgentStep(i, text) {
-  outputEls[i].innerHTML = text + '<span class="typing-cursor"></span>';
+  const html = textWithCursorHTML(text);
+  outputEls[i].innerHTML = html;
 }
 
 /** Animates the final output text for agent i. */
