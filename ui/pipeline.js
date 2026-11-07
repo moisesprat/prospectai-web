@@ -261,9 +261,10 @@ function startBootProgress() {
 export async function runAnalysis() {
   const sector = getSelectedSector();
   if (!sector || getIsRunning()) return;
-  setIsRunning(true);
   // One id per click, never reused: the server refuses a repeated id (SEC-07, D-08).
+  // Minted before the Run button locks so a throw here cannot leave it stuck (WR-04).
   const clientRunId = newClientRunId();
+  setIsRunning(true);
 
   panel.reset();
   panel.show(sector);

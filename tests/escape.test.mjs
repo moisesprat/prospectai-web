@@ -56,6 +56,14 @@ test('safeUrl keeps https URLs and same-origin paths unchanged', () => {
   }
 });
 
+test('safeUrl rejects backslash, control-character and whitespace protocol-relative forms (WR-01)', () => {
+  for (const bad of ['/\\evil.example', '/\\/evil.example', '/\t/evil.example', '/\n/evil.example',
+    '/\r/evil.example', '/ /evil.example', '//evil.example', '/\u0000/evil.example',
+    'https://ok.example/\u0001', 'https://ok.example/a b', '/a\\b', 'report.html?id=1\n']) {
+    assert.equal(safeUrl(bad), '#', `expected # for ${JSON.stringify(bad)}`);
+  }
+});
+
 // ─── reportsRender ───
 
 test('renderReportCardHTML neutralises hostile report records', () => {
