@@ -7,7 +7,7 @@
 import { typeOutput, textWithCursorHTML } from './utils.js';
 
 const AGENT_DEFS = [
-  { id: 'AGENT-01', name: 'Market Analyst',      role: 'macro_trends - sentiment - reddit_signals' },
+  { id: 'AGENT-01', name: 'Market Analyst',      role: 'macro_trends - web_search - news_sentiment' },
   { id: 'AGENT-02', name: 'Technical Analyst',   role: 'price_action - indicators - momentum' },
   { id: 'AGENT-03', name: 'Fundamental Analyst', role: 'earnings - valuation - balance_sheet' },
   { id: 'AGENT-04', name: 'Draft Strategist',    role: 'portfolio_draft - initial_allocation - entry_zones' },
@@ -141,7 +141,7 @@ export function setTaskProgress(i) {
 }
 
 export function getStatusMessage(pct) {
-  if (pct < 18) return 'Market Analyst scanning sentiment and community signals...';
+  if (pct < 18) return 'Market Analyst searching the web and reading news sentiment...';
   if (pct < 35) return 'Technical Analyst computing price indicators...';
   if (pct < 52) return 'Fundamental Analyst evaluating earnings and valuations...';
   if (pct < 66) return 'Draft Strategist constructing initial portfolio...';
