@@ -27,8 +27,8 @@ export function getSectorEtf(sectorName) {
 export const AGENT_SCRIPTS = {
   Technology: [
     {
-      active: 'Fetching macro indicators for Technology sector. Scanning Reddit for sentiment signals. Analyzing YTD performance vs SPY...',
-      done:   'Macro: Bullish bias. Fed path neutral-to-dovish. Reddit sentiment 72% positive. XLK outperforming SPY +4.2% YTD. AI infrastructure spend accelerating.',
+      active: 'Fetching macro indicators for Technology sector. Searching the web and reading news sentiment. Analyzing YTD performance vs SPY...',
+      done:   'Macro: Bullish bias. Fed path neutral-to-dovish. News sentiment mildly positive. XLK outperforming SPY +4.2% YTD. AI infrastructure spend accelerating.',
     },
     {
       active: 'Running technical analysis on top 10 XLK holdings. Computing RSI, MACD, Bollinger Bands...',
@@ -105,8 +105,8 @@ export const REPORT_TEMPLATES = {
     </div>
     <h2>Market Analyst Findings</h2>
     <p>The macro environment remains supportive for Technology with a neutral-to-dovish Fed trajectory
-    reducing discount rate pressure on growth multiples. Reddit sentiment analysis across r/investing
-    and r/stocks registered 72% positive mentions for major Tech holdings over the trailing 30 days.</p>
+    reducing discount rate pressure on growth multiples. News coverage of the major Tech
+    holdings leaned positive over the past week.</p>
     <ul>
       <li>AI capital expenditure cycle showing no signs of deceleration</li>
       <li>Enterprise software renewal rates holding above historical averages</li>
@@ -193,8 +193,8 @@ export const REPORT_TEMPLATES = {
       <div class="metric-box"><div class="m-label">Data Sources</div><div class="m-value">3</div></div>
     </div>
     <h2>Market Analyst</h2>
-    <p>Macro and sentiment analysis complete. The agent processed macroeconomic indicators, Reddit
-    community sentiment signals, and sector ETF performance relative to the SPY benchmark.</p>
+    <p>Macro and sentiment analysis complete. The agent processed macroeconomic indicators, web search
+    coverage, per-ticker news sentiment, and sector ETF performance relative to the SPY benchmark.</p>
     <h2>Technical Analyst</h2>
     <p>Technical evaluation of the sector ETF and top holdings complete. RSI, MACD, and moving average
     analysis produced key support/resistance levels and momentum signals.</p>

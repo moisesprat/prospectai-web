@@ -50,13 +50,13 @@ const STATUS_INIT = 'Initializing agents…';
 const AGENT_IDLE_MESSAGES = [
   // 0 — Market Analyst
   (sector) => [
-    `Scanning Reddit posts for ${sector} sector activity…`,
-    `Crawling r/investing, r/stocks, r/wallstreetbets for mentions…`,
-    `Falling back to SerperDev web search for additional signals…`,
-    `Scoring sentiment polarity for each ticker found…`,
-    `Counting mention frequency per stock…`,
-    `Ranking candidates by mention count and sentiment score…`,
-    `Identifying top 5 ${sector} stocks by community signals…`,
+    `Searching the web for ${sector} sector stocks…`,
+    `Running three fixed searches for ${sector} coverage…`,
+    `Merging and de-duplicating the search results…`,
+    `Counting how often each ticker symbol appears…`,
+    `Keeping only picks whose symbol appears in the results…`,
+    `Reading recent news sentiment for each pick…`,
+    `Choosing up to 5 ${sector} stocks from the search coverage…`,
   ],
   // 1 — Technical Analyst
   (sector) => [
