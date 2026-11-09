@@ -2,38 +2,46 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://prospect-ai.moisesprat.dev/</loc>
-    <lastmod>2026-11-08</lastmod>
+    <lastmod>2026-11-09</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/stats.html</loc>
-    <lastmod>2026-11-08</lastmod>
+    <lastmod>2026-11-09</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/reports.html</loc>
-    <lastmod>2026-11-08</lastmod>
+    <lastmod>2026-11-09</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/architecture.html</loc>
-    <lastmod>2026-11-08</lastmod>
+    <lastmod>2026-11-09</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/architecture/patterns/</loc>
-    <lastmod>2026-11-08</lastmod>
+    <lastmod>2026-11-09</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/architecture/patterns/adversarial-critic</loc>
-    <lastmod>2026-11-08</lastmod>
+    <lastmod>2026-11-09</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/architecture/patterns/parallel-execution</loc>
-    <lastmod>2026-11-08</lastmod>
+    <lastmod>2026-11-09</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/architecture/patterns/output-validation</loc>
-    <lastmod>2026-11-08</lastmod>
+    <lastmod>2026-11-09</lastmod>
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/architecture/patterns/model-tiering</loc>
+    <lastmod>2026-11-09</lastmod>
+  </url>
+  <url>
+    <loc>https://prospect-ai.moisesprat.dev/report.html?id=5a76ea3d-5a41-432d-ab8b-13aa0e8092a8</loc>
+    <lastmod>2026-11-08</lastmod>
+  </url>
+  <url>
+    <loc>https://prospect-ai.moisesprat.dev/report.html?id=ec7a8519-eeb4-4c14-b0fd-ab1c231c755b</loc>
     <lastmod>2026-11-08</lastmod>
   </url>
   <url>
@@ -826,14 +834,6 @@
   </url>
   <url>
     <loc>https://prospect-ai.moisesprat.dev/report.html?id=927b70b7-b969-4148-83ba-a9c19f148e1d</loc>
-    <lastmod>2026-08-01</lastmod>
-  </url>
-  <url>
-    <loc>https://prospect-ai.moisesprat.dev/report.html?id=4137b5ef-7546-4d9d-8b07-e953831780e8</loc>
-    <lastmod>2026-08-01</lastmod>
-  </url>
-  <url>
-    <loc>https://prospect-ai.moisesprat.dev/report.html?id=2ffba882-f94a-4574-a378-9f237c179f17</loc>
     <lastmod>2026-08-01</lastmod>
   </url>
 </urlset>
