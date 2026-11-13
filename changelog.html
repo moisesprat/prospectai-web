@@ -44,6 +44,26 @@
 
       <!--SSR:pypi-releases-->
       <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-11-13">2026-11-13</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
+          <h2 class="changelog-title">v1.13.3</h2>
+          <ul class="changelog-bullets">
+            <li>The web searches for each sector now use plain sector terms and name a few of the sector&#39;s best-known stocks, so an analysis such as Financials finds bank and financial stocks to choose from instead of general market news.</li><li>When none of the stocks chosen from the web search can be confirmed as part of the sector you picked, the analysis now continues with five well-known stocks of that sector instead of stopping with an error, and the market step&#39;s text says the stocks came from this list.</li><li>Those five stocks show no mention count, relevance or news sentiment, because they were not found in the web search, and the run record notes that the list was used and why.</li>
+          </ul>
+        </div>
+      </article>
+      <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-11-13">2026-11-13</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
+          <h2 class="changelog-title">v1.13.2</h2>
+          <ul class="changelog-bullets">
+            <li>A stock found in the web search is now kept only when its listed sector or industry belongs to the sector you chose, so a web-search mention of a company such as Apple or Nvidia no longer puts it in a Financials analysis.</li><li>The new check never sets aside a sector&#39;s well-known stocks, and it keeps a stock whose listed sector cannot be read, so a slow or failed lookup never stops the analysis.</li><li>The run record now lists the stocks the check set aside for being outside the sector, with their listed sector and industry.</li>
+          </ul>
+        </div>
+      </article>
+      <article class="changelog-entry">
         <time class="changelog-date" datetime="2026-11-12">2026-11-12</time>
         <div class="changelog-entry-body">
           <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
@@ -70,26 +90,6 @@
           <h2 class="changelog-title">v1.12.3</h2>
           <ul class="changelog-bullets">
             <li>When several analyses run at the same moment, each now keeps its own price and company data, so one analysis starting can no longer discard data another is still using.</li><li>Within a single analysis nothing changes: each stock&#39;s data is still fetched once and reused across the steps.</li>
-          </ul>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-11-05">2026-11-05</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">v1.12.2</h2>
-          <ul class="changelog-bullets">
-            <li>The token and cost figures shown for a run no longer count the draft step a second time under the final step, so the per-step, per-model and total figures now match what each step really used.</li><li>A sector fund or a market-wide fund picked as a stock is now set aside before the picks are checked, so it can no longer leave a run without stocks or lower the other picks&#39; relevance.</li><li>Common capitalised words and abbreviations such as AI, CEO and EV in web search results no longer count as stock mentions unless they are written as a ticker, for example $AI or NYSE: AI.</li><li>An analysis for a sector the app does not support is now refused straight away instead of starting paid web searches, and the stored record of a run&#39;s web searches never keeps a web address.</li>
-          </ul>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-11-03">2026-11-03</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">v1.12.1</h2>
-          <ul class="changelog-bullets">
-            <li>Analyses no longer use prompt caching. Every step of a run sends a different prompt, so a cached prompt was never reused and only added cost; each run now costs a little less, and reports are unchanged.</li>
           </ul>
         </div>
       </article><!--/SSR-->
