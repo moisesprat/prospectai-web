@@ -44,6 +44,16 @@
 
       <!--SSR:pypi-releases-->
       <article class="changelog-entry">
+        <time class="changelog-date" datetime="2026-11-14">2026-11-14</time>
+        <div class="changelog-entry-body">
+          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
+          <h2 class="changelog-title">v1.13.4</h2>
+          <ul class="changelog-bullets">
+            <li>An analysis started after the market closes, before Yahoo Finance records that day&#39;s closing price, no longer stops with &quot;no valid current price&quot; for every stock.</li><li>In that window each stock&#39;s price and indicators come from the most recent trading day that has a closing price, usually the day before. No price is filled in or estimated.</li>
+          </ul>
+        </div>
+      </article>
+      <article class="changelog-entry">
         <time class="changelog-date" datetime="2026-11-13">2026-11-13</time>
         <div class="changelog-entry-body">
           <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
@@ -80,16 +90,6 @@
           <h2 class="changelog-title">v1.13.0</h2>
           <ul class="changelog-bullets">
             <li>Each stock the analysis picks now gets a news sentiment score from Marketaux, based on recent articles about the company, and the report shows it next to the stock.</li><li>A stock with too few recent articles, or a day when the news source is unavailable or out of free requests, shows no score instead of an invented one, and the analysis still finishes.</li><li>Stock picks come from web search alone, and the old forum source that had stopped returning data is gone, so runs no longer wait on it.</li>
-          </ul>
-        </div>
-      </article>
-      <article class="changelog-entry">
-        <time class="changelog-date" datetime="2026-11-07">2026-11-07</time>
-        <div class="changelog-entry-body">
-          <span class="changelog-tag changelog-tag--module">ProspectAI Module</span>
-          <h2 class="changelog-title">v1.12.3</h2>
-          <ul class="changelog-bullets">
-            <li>When several analyses run at the same moment, each now keeps its own price and company data, so one analysis starting can no longer discard data another is still using.</li><li>Within a single analysis nothing changes: each stock&#39;s data is still fetched once and reused across the steps.</li>
           </ul>
         </div>
       </article><!--/SSR-->
