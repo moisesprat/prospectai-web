@@ -17,10 +17,12 @@ import {
   errorStatusText, formatActionStep, newClientRunId, buildAnalyzeUrl,
 } from '../ui/sseEvents.js';
 import { textWithCursorHTML } from '../ui/utils.js';
+import { renderFailureMetrics } from '../ui/reportRenderer.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(readFileSync(join(here, 'fixtures', 'sse_events.json'), 'utf8'));
 const pipelineSrc = readFileSync(join(here, '..', 'ui', 'pipeline.js'), 'utf8');
+const panelSrc = readFileSync(join(here, '..', 'ui', 'executionPanel.js'), 'utf8');
 
 // ─── pinned tables equal the fixture ───
 
@@ -167,4 +169,49 @@ test('pipeline.js mints the run id before locking the Run button (WR-04)', () =>
   const lock = pipelineSrc.indexOf('setIsRunning(true)', fnStart);
   assert.ok(mint > fnStart && lock > fnStart);
   assert.ok(mint < lock, 'newClientRunId() must run before setIsRunning(true) so a throw cannot leave the button locked');
+});
+
+// ─── failed-run metrics block (D-13) ───
+
+test('the fixture pipeline_error metrics render a closed Partial run metrics block', () => {
+  const errorEvent = fixture.streams.pipeline_error.find((e) => e.type === 'error');
+  const html = renderFailureMetrics(errorEvent.metrics);
+  assert.ok(html.includes('<details class="tool-timings run-failure-metrics">'));
+  assert.ok(html.includes('<summary>Partial run metrics</summary>'));
+  assert.ok(html.includes('Stopped after 12.3s'));
+  assert.ok(!html.includes('<details open'));
+  assert.ok(!html.includes('<table'));
+});
+
+test('refusals and empty metrics render no failed-run block', () => {
+  assert.equal(renderFailureMetrics({}), '');
+  assert.equal(renderFailureMetrics(undefined), '');
+  for (const code of fixture.rejection_codes) {
+    const [event] = fixture.streams[`rejected_${code}`];
+    assert.equal(renderFailureMetrics(event.metrics), '', code);
+  }
+});
+
+test('pipeline.js shows the failed-run state only for pipeline failures (T-05-15)', () => {
+  const errStart = pipelineSrc.indexOf("case 'error'");
+  const onErr = pipelineSrc.indexOf('source.onerror');
+  assert.ok(errStart >= 0 && onErr > errStart);
+  const errorRegion = pipelineSrc.slice(errStart, onErr);
+  assert.ok(errorRegion.includes('event.code == null'));
+  assert.ok(errorRegion.includes('panel.setStatusError(true)'));
+  assert.ok(errorRegion.includes('panel.showFailureMetrics(renderFailureMetrics(event.metrics))'));
+  const connRegion = pipelineSrc.slice(onErr);
+  assert.ok(connRegion.includes('panel.setStatusError(true)'));
+  assert.ok(connRegion.includes('source.close()'));
+});
+
+test('executionPanel.js clears the failed-run state in reset and announces the status line', () => {
+  const resetStart = panelSrc.indexOf('export function reset()');
+  assert.ok(resetStart >= 0);
+  const resetBody = panelSrc.slice(resetStart, panelSrc.indexOf('\n}', resetStart));
+  assert.ok(resetBody.includes('setStatusError(false)'));
+  assert.ok(resetBody.includes('failureEl.hidden = true'));
+  assert.ok(panelSrc.includes('role="status"'));
+  assert.ok(panelSrc.includes('aria-live="polite"'));
+  assert.ok(panelSrc.includes('<div class="run-failure" hidden></div>'));
 });

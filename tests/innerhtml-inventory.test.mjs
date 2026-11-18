@@ -35,6 +35,7 @@ const T_REPORT         = 'report renderReport hostile summary fields';
 const T_STATS_TYPES    = 'stats hostile types do not throw';
 const T_REPORT_TYPES   = 'report hostile types do not throw';
 const T_METRICS        = 'report renderMetrics hostile names';
+const T_FAILURE_METRICS = 'report renderFailureMetrics hostile names';
 const T_SECTOR_BARS    = 'renderSectorBarListHTML escapes the sector in text and title, counts are numbers';
 const T_RISK_LEGEND    = 'buildLegendHTML and the risk donut escape slice labels';
 const T_RISK_PROTO     = 'renderRiskDonutWrapHTML ignores prototype keys';
@@ -64,6 +65,12 @@ const REVIEWED = {
       hostileTests: [] },
     { sink: 'card.innerHTML = `',
       sources: ['constant: AGENT_DEFS id, name, role from executionPanel.js'],
+      hostileTests: [] },
+    { sink: 'failureEl.innerHTML = html;',
+      sources: ['backend: error event metrics (phase names, statuses, tool names, numbers) via pipeline.js renderFailureMetrics (escapeHtml, phaseLabel, finite numbers only)'],
+      hostileTests: [T_FAILURE_METRICS] },
+    { sink: "failureEl.innerHTML = '';",
+      sources: ['static: clears the failed-run block'],
       hostileTests: [] },
     { sink: 'outputEls[i].innerHTML = html;',
       sources: ['llm: agent_start text via activateAgent -> textWithCursorHTML (escapeHtml + cursor span)'],

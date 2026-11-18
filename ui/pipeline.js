@@ -21,7 +21,7 @@ import { trackAnalysisComplete, trackAnalysisError } from './saEvents.js';
 import * as panel from './executionPanel.js';
 import * as report from './report.js';
 import { disableControls, enableControls } from './sectorSelector.js';
-import { renderReport } from './reportRenderer.js';
+import { renderReport, renderFailureMetrics } from './reportRenderer.js';
 import { refresh as refreshAnalytics } from './analytics.js';
 import { parseSseEvent, errorStatusText, formatActionStep, newClientRunId, buildAnalyzeUrl } from './sseEvents.js';
 
@@ -438,6 +438,11 @@ export async function runAnalysis() {
           // Refusals (event.code) show the server message and end the run; no retry.
           trackAnalysisError(sector, event.code ?? event.message);
           panel.setProgress(0, errorStatusText(event));
+          // A pipeline failure carries no code; show how far it got. Refusals keep today's look.
+          if (event.code == null) {
+            panel.setStatusError(true);
+            panel.showFailureMetrics(renderFailureMetrics(event.metrics));
+          }
           finish();
           break;
         }
@@ -459,6 +464,7 @@ export async function runAnalysis() {
       clearIdleMessages();
       trackAnalysisError(sector, 'connection_failed');
       panel.setProgress(0, 'Connection lost. Please try again.');
+      panel.setStatusError(true);
       finish();
     };
   });

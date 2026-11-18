@@ -66,7 +66,7 @@ function fmtCount(n) {
  * @param {object} metrics — the `execution_metrics` dict from the backend
  * @returns {string} HTML
  */
-function renderToolTimings(metrics) {
+export function renderToolTimings(metrics) {
   if (!Array.isArray(metrics.tool_calls)) return '';
 
   const phases  = objects(metrics.phases);
@@ -167,6 +167,59 @@ function renderToolTimings(metrics) {
           <tbody>${callRows}</tbody>
         </table>
       </div>
+    </details>`;
+}
+
+/**
+ * Renders the closed "Partial run metrics" block shown under a failed run's
+ * status line (D-13). The backend's error event carries `metrics`; this reads
+ * only what is present: backend.wall_total_sec, phases, tool_calls.
+ * Returns '' unless metrics is a plain object with a finite wall time or at
+ * least one phase, so refusals and `{}` show nothing. Every backend value goes
+ * through escapeHtml or phaseLabel, and a non-finite number renders '—'.
+ * @param {object} metrics — the `metrics` field of an error SSE event
+ * @returns {string} HTML (a closed <details>), or ''
+ */
+export function renderFailureMetrics(metrics) {
+  if (!metrics || typeof metrics !== 'object' || Array.isArray(metrics)) return '';
+
+  const backend = metrics.backend && typeof metrics.backend === 'object' ? metrics.backend : {};
+  const wall    = Number.isFinite(backend.wall_total_sec) ? backend.wall_total_sec : null;
+  const phases  = objects(metrics.phases);
+  if (wall === null && phases.length === 0) return '';
+
+  const stopped = wall !== null
+    ? `<p class="tool-timings-summary">Stopped after ${fmtElapsed(wall)}</p>`
+    : '';
+
+  const phaseRows = phases.map(p => `
+        <tr>
+          <td class="mt-name">${phaseLabel(p.name)}</td>
+          <td class="mt-num">${escapeHtml(p.status ?? '—')}</td>
+          <td class="mt-num">${fmtElapsed(Number.isFinite(p.elapsed_sec) ? p.elapsed_sec : null)}</td>
+          <td class="mt-num">${fmtTok(Number.isFinite(p.total_tokens) ? p.total_tokens : null)}</td>
+        </tr>`).join('');
+
+  const table = phases.length > 0 ? `
+      <div class="metrics-table-wrap">
+        <table class="metrics-table">
+          <thead>
+            <tr>
+              <th class="mt-name">Phase</th>
+              <th class="mt-num">Status</th>
+              <th class="mt-num">Elapsed</th>
+              <th class="mt-num">Tokens</th>
+            </tr>
+          </thead>
+          <tbody>${phaseRows}</tbody>
+        </table>
+      </div>` : '';
+
+  return `
+    <details class="tool-timings run-failure-metrics">
+      <summary>Partial run metrics</summary>
+      ${stopped}${table}
+      ${renderToolTimings(metrics)}
     </details>`;
 }
 
