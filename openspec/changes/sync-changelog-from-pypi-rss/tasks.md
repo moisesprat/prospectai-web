@@ -32,3 +32,7 @@ The RSS feed (task group 3) shipped entries with no real content ("Release v1.9.
 - [x] 6.3 Remove all hand-authored `<article class="changelog-entry">` entries from `changelog.html` (both "ProspectAI Module" and "Frontend" tagged) per explicit user decision — the page is now composed entirely of the PyPI-sourced SSR block.
 - [x] 6.4 Add `.changelog-bullets` list styling to `styles/changelog.css`.
 - [x] 6.5 Re-verify: `npm run generate` renders real bullet-point release notes matching the actual PyPI page content; idempotency (checksum unchanged across repeated runs); fail-soft behavior (broken URL leaves `changelog.html` byte-for-byte unchanged); visual check in browser.
+
+## 7. Phase 5 close-out
+
+- [ ] 7.1 Verify live in production (phase 5): the newest entry equals the latest PyPI version after an automatic regeneration

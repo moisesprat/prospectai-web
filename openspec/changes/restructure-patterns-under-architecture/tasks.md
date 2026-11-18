@@ -52,3 +52,8 @@
 - [x] 7.4 Run `grep -rn "/patterns/" --include="*.html" --include="*.js" --include="*.mjs" .` (excluding `node_modules`, `dist`, and `_redirects`) and confirm zero remaining stale references
 - [x] 7.5 Verify the moved/edited source files directly (not via `npm run preview`, which only serves `dist/` — an incomplete build list that already excludes pages like `changelog.html` and would give false negatives): confirmed `architecture/patterns/*.html` render correct titles/H1s/nav, `architecture.html`'s related-patterns links point at the new paths, and no page has a separate "Patterns" nav entry
 - [x] 7.6 Verify `_redirects` is at the repo root (`/Users/Moises_Prat/Development/prospectai-web/_redirects`) with all five rules, since that's the path Cloudflare Pages actually reads for this project's no-build deployment
+
+## 8. Phase 5 close-out
+
+- [x] 8.1 Correct the delta before archive: RENAMED the nav requirement from its base name (phase 5)
+- [ ] 8.2 Verify live in production (phase 5): five 301s and one Architecture nav entry

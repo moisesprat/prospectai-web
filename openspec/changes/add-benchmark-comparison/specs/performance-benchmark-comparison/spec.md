@@ -1,48 +1,55 @@
 ## ADDED Requirements
 
-### Requirement: Per-position benchmark alpha
-The Performance tab track-record table SHALL display, for each history row that carries benchmark price fields, the position's alpha versus SPY and versus its sector ETF, computed as `roi_pct` minus the corresponding benchmark ROI over the same trigger-to-current window.
+### Requirement: Performance tab benchmark delta
+The Performance tab "Avg Return" KPI card SHALL show one delta line under its value (element `#kpi-avg-return-delta`) comparing the average LONG-BUY buy ROI against the benchmark over the same signals. The delta value is the average buy ROI minus the average benchmark return, and its label names the benchmark: `vs SPY` when all sectors are selected, `vs {ETF}` when a single sector is selected.
 
-The benchmark ROI for a row MUST be measured over that row's own purchase window: `spy_trigger_price` and `sector_etf_trigger_price` are the index/ETF price on the same date the position was recommended/purchased (`recommended_at`, the same date used for the stock's own `trigger_price`), and `spy_current_price` / `sector_etf_current_price` are the index/ETF price as of the same "as-of" date used for the stock's own `current_price`. This is a rolling, per-row window — it is NOT a fixed calendar period shared across rows — so two rows with different purchase dates are each compared against the index's move over their own respective windows, not a common date range.
+#### Scenario: All sectors selected
+- **WHEN** the sector filter is set to all sectors and at least one row qualifies
+- **THEN** the delta line shows the signed delta followed by the label `vs SPY`
 
-#### Scenario: Row has full benchmark data
-- **WHEN** a history row includes `spy_trigger_price`, `spy_current_price`, `sector_etf_trigger_price`, and `sector_etf_current_price`
-- **THEN** the table shows an alpha-vs-SPY badge and an alpha-vs-sector-ETF badge for that row, computed as `roi_pct - spy_roi_pct` and `roi_pct - sector_roi_pct` respectively, where `spy_roi_pct = (spy_current_price - spy_trigger_price) / spy_trigger_price * 100` and `sector_roi_pct` is computed the same way from the sector ETF fields
+#### Scenario: One sector selected
+- **WHEN** the sector filter is set to a sector whose ETF is in the `SECTORS` mapping and at least one row of that sector qualifies
+- **THEN** the delta line shows the signed delta followed by the label `vs {ETF}`, where `{ETF}` is the mapped ticker for that sector
 
-#### Scenario: Benchmark window matches the position's own window
-- **WHEN** a history row's `trigger_price`/`current_price` reflect the stock's price on `recommended_at` and as of today respectively
-- **THEN** `spy_trigger_price`/`sector_etf_trigger_price` MUST reflect the index/ETF price on that same `recommended_at` date, and `spy_current_price`/`sector_etf_current_price` MUST reflect the index/ETF price as of that same today, so the stock's ROI and the benchmark ROI cover an identical date range for that row
+#### Scenario: No qualifying rows
+- **WHEN** no visible row qualifies for the benchmark comparison
+- **THEN** the delta line carries the `hidden` attribute and never shows `—` or `0.0%`
 
-#### Scenario: Row is missing benchmark data
-- **WHEN** a history row is missing one or more of the four benchmark price fields
-- **THEN** the table shows `—` in both benchmark columns for that row instead of a computed value, and does not throw or omit the row
+### Requirement: Benchmark tab comparison groups
+The Stats page SHALL have a Benchmark tab that shows an "Overall — vs SPY" group first, followed by one group per sector, sorted by sector name, titled `{Sector} — vs {ETF}`. Each group MUST contain three cards: `Avg Buy ROI` with the sub `{N} signals` (or `1 signal`), `Avg SPY Return` (or `Avg {ETF} Return` in a sector group) with the sub `same trigger-to-current window`, and `Delta` with the sub `buy ROI minus benchmark`.
 
-#### Scenario: Positive vs negative alpha styling
-- **WHEN** a row's computed alpha value is greater than zero
-- **THEN** the badge renders with the existing positive (green) styling used for ROI; a negative alpha renders with the existing negative (red) styling; a null alpha renders with the existing null/neutral styling
+A row qualifies only when its `roi_pct` is finite, both benchmark prices for that comparison are finite, and the benchmark trigger price is nonzero. Averages are computed over qualifying rows only. The benchmark window is per row: the benchmark return for a row is measured from that row's own trigger date to its own current as-of date, never over a calendar period shared across rows.
 
-### Requirement: Aggregate benchmark summary
-The Performance tab SHALL show a benchmark summary panel comparing the average ROI of the currently filtered/visible signals against the average SPY ROI and average sector-ETF ROI over the same set, plus the percentage of those signals that outperformed SPY.
+#### Scenario: Benchmark window is per row
+- **WHEN** two rows have different purchase dates
+- **THEN** each row's benchmark return is computed from its own benchmark trigger price and benchmark current price, and the group averages those per-row returns
 
-#### Scenario: Summary reflects current sector filter
-- **WHEN** the user selects a specific sector in the Performance tab's sector filter
-- **THEN** the benchmark summary recomputes using only the rows matching that sector (after existing data-quality rules are applied), consistent with how the KPI cards already scope to the filtered set
+#### Scenario: Partial data averages only qualifying rows
+- **WHEN** some rows in a group lack a finite `roi_pct` or a benchmark price
+- **THEN** the group is rendered from the qualifying rows only, and the sample size on the `Avg Buy ROI` card counts only those rows
 
-#### Scenario: No rows carry benchmark data
-- **WHEN** none of the currently visible rows include benchmark price fields
-- **THEN** the benchmark summary panel and the two benchmark table columns are hidden rather than showing placeholder/empty values
+#### Scenario: One signal
+- **WHEN** exactly one row qualifies for a group
+- **THEN** the `Avg Buy ROI` card sub reads `1 signal`
 
-#### Scenario: Partial benchmark data
-- **WHEN** some but not all visible rows include benchmark price fields
-- **THEN** the summary panel is shown, and its averages are computed only from the subset of rows that have the needed fields, mirroring how `computeKpis` already excludes rows with a null `roi_pct`
+### Requirement: Benchmark data degrades to hidden
+When no row qualifies for a benchmark comparison, the system SHALL render no benchmark group, card or delta line, SHALL show the Benchmark panel empty state (`#benchmark-empty`) instead of a blank panel, and MUST keep the Benchmark tab button visible so `#benchmark` deep links and the tab bar stay stable. This applies at build time (pre-render) and at client time.
+
+#### Scenario: Build time
+- **WHEN** the static pre-render runs against history that has no benchmark fields
+- **THEN** the generated `stats.html` has the `hidden` attribute on `#kpi-avg-return-delta`, contains no `.benchmark-group`, and shows `#benchmark-empty` without `hidden`, so no previously committed delta survives regeneration
+
+#### Scenario: Client time
+- **WHEN** the pre-rendered Benchmark panel has no group children and the history fetch fails or returns no qualifying rows
+- **THEN** `#benchmark-empty` is visible, the panel is not blank, and the Benchmark tab button remains visible
 
 ### Requirement: Sector ETF resolution
-The system SHALL resolve which sector ETF a position is benchmarked against using the existing sector-to-ETF mapping, without requiring the backend to send an explicit ETF ticker field.
+The system SHALL resolve which sector ETF a position is benchmarked against from the SPA `SECTORS` mapping, without requiring the backend to send an explicit ETF ticker field.
 
 #### Scenario: Known sector
-- **WHEN** a history row's `sector` matches one of the sectors in the existing `SECTORS` mapping (e.g. "Semiconductors" → SOXX, "Real Estate" → XLRE)
-- **THEN** the sector-ETF benchmark label/column for that row displays the mapped ETF ticker
+- **WHEN** a history row's `sector` matches an entry in the `SECTORS` mapping
+- **THEN** that sector's group title and card label use the mapped ETF ticker
 
-#### Scenario: Unknown or missing sector
+#### Scenario: Unmapped sector
 - **WHEN** a history row's `sector` does not match any entry in the `SECTORS` mapping
-- **THEN** the sector-ETF benchmark column shows `—` for that row, and the row is excluded from the sector-ETF portion of the aggregate summary
+- **THEN** no group is rendered for that sector, and if no group renders at all the panel shows the empty state
