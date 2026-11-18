@@ -291,10 +291,11 @@ export function renderBenchmarkSectionHTML(history) {
   const sectors = [...new Set(rows.map(r => r.sector).filter(Boolean))].sort();
   for (const sector of sectors) {
     const etf = getSectorEtf(sector);
+    if (etf == null) continue; // unmapped sector: no group (UI-SPEC S2)
     const sectorRows = rows.filter(r => r.sector === sector);
     html += renderBenchmarkGroupHTML(
-      `${sector} — vs ${etf ?? 'Sector ETF'}`,
-      `Avg ${etf ?? 'Sector'} Return`,
+      `${sector} — vs ${etf}`,
+      `Avg ${etf} Return`,
       computeSectorBenchmarkGroup(sectorRows)
     );
   }

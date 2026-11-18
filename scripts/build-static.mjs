@@ -4,6 +4,10 @@
    of stats.html / reports.html from live backend data, writing
    the results in place at the repo root.
 
+   The stats.html transform itself lives in the pure module
+   scripts/statsPrerender.mjs (prerenderStats), so tests can
+   exercise it without any network or file writes.
+
    Run via `npm run generate`. Triggered by
    .github/workflows/generate-sitemap.yml on push and on a
    schedule, so content stays fresh even without a code change.
@@ -17,17 +21,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
-import {
-  renderSectorBarListHTML,
-  renderRiskDonutWrapHTML,
-  renderDecisionsDonutPieces,
-  applyDataRules,
-  sortHistory,
-  computeKpis,
-  renderHistoryRowsHTML,
-  computeSpyDelta,
-  renderBenchmarkSectionHTML,
-} from '../ui/statsRender.js';
+import { replaceBetween, prerenderStats } from './statsPrerender.mjs';
 import { renderReportsGridHTML } from '../ui/reportsRender.js';
 import { parsePypiReleaseNotes, renderReleaseNotesHTML } from '../ui/changelogRender.js';
 
@@ -57,14 +51,6 @@ async function fetchPypiProjectJSON() {
   } catch {
     return null;
   }
-}
-
-function replaceBetween(html, marker, content) {
-  const re = new RegExp(`<!--SSR:${marker}-->[\\s\\S]*?<!--/SSR-->`);
-  if (!re.test(html)) {
-    throw new Error(`SSR marker "${marker}" not found`);
-  }
-  return html.replace(re, `<!--SSR:${marker}-->${content}<!--/SSR-->`);
 }
 
 /* ── sitemap.xml ─────────────────────────────────────────────── */
@@ -102,110 +88,8 @@ async function generateSitemap(reports) {
 
 async function generateStats(analytics, historyData) {
   const path = join(ROOT, 'stats.html');
-  let html = await readFile(path, 'utf8');
-
-  if (analytics) {
-    html = replaceBetween(html, 'total-analyses', (analytics.total ?? 0).toLocaleString());
-    html = html.replace(
-      '<div class="stats-card-value" id="total-analyses">',
-      '<div class="stats-card-value" id="total-analyses" data-ssr="1">'
-    );
-
-    html = replaceBetween(html, 'sector-chart', renderSectorBarListHTML(analytics.by_sector));
-    html = html.replace('<div id="sector-chart">', '<div id="sector-chart" data-ssr="1">');
-
-    html = replaceBetween(html, 'risk-donut-wrap', renderRiskDonutWrapHTML(analytics.by_risk_profile));
-    html = html.replace(
-      '<div class="stats-risk-donut-wrap" id="risk-donut-wrap">',
-      '<div class="stats-risk-donut-wrap" id="risk-donut-wrap" data-ssr="1">'
-    );
-
-    const actionBreakdown = analytics.action_breakdown ?? {};
-    const { svgInner, centerHTML, legendHTML } = renderDecisionsDonutPieces(actionBreakdown, '__overall__');
-    html = replaceBetween(html, 'donut-decisions', svgInner);
-    html = replaceBetween(html, 'donut-decisions-center', centerHTML);
-    html = replaceBetween(html, 'legend-decisions', legendHTML);
-    html = html.replace(
-      '<ul class="stats-legend" id="legend-decisions">',
-      '<ul class="stats-legend" id="legend-decisions" data-ssr="1">'
-    );
-  }
-
-  if (historyData) {
-    const cleaned = applyDataRules(historyData.history ?? []);
-    const sorted  = sortHistory(cleaned, 'roi', 'desc');
-    const kpis    = computeKpis(cleaned);
-
-    html = replaceBetween(html, 'kpi-win-rate-val', kpis.winRate);
-    html = html.replace(
-      '<div class="stats-kpi-value" id="kpi-win-rate-val">',
-      '<div class="stats-kpi-value" id="kpi-win-rate-val" data-ssr="1">'
-    );
-
-    html = replaceBetween(html, 'kpi-avg-return-val', kpis.avg.text);
-    html = html.replace(
-      '<div class="stats-kpi-value" id="kpi-avg-return-val">',
-      `<div class="stats-kpi-value ${kpis.avg.cls}" id="kpi-avg-return-val" data-ssr="1">`
-    );
-
-    html = replaceBetween(html, 'kpi-best-pick-val', kpis.best.ticker);
-    html = html.replace(
-      '<div class="stats-kpi-value" id="kpi-best-pick-val">',
-      `<div class="stats-kpi-value ${kpis.best.cls}" id="kpi-best-pick-val" data-ssr="1">`
-    );
-    html = replaceBetween(html, 'kpi-best-pick-sub', kpis.best.text || 'highest ROI pick');
-
-    html = replaceBetween(html, 'kpi-worst-pick-val', kpis.worst.ticker);
-    html = html.replace(
-      '<div class="stats-kpi-value" id="kpi-worst-pick-val">',
-      `<div class="stats-kpi-value ${kpis.worst.cls}" id="kpi-worst-pick-val" data-ssr="1">`
-    );
-    html = replaceBetween(html, 'kpi-worst-pick-sub', kpis.worst.text || 'lowest ROI pick');
-
-    html = replaceBetween(html, 'history-tbody', renderHistoryRowsHTML(sorted));
-    html = html.replace('<tbody id="history-tbody">', '<tbody id="history-tbody" data-ssr="1">');
-
-    const spyDelta = computeSpyDelta(cleaned);
-    if (spyDelta != null) {
-      html = replaceBetween(html, 'kpi-avg-return-delta-val', spyDelta.text);
-      html = html.replace(
-        /<span class="stats-kpi-delta-val[^"]*" id="kpi-avg-return-delta-val"[^>]*>/,
-        `<span class="stats-kpi-delta-val ${spyDelta.cls}" id="kpi-avg-return-delta-val" data-ssr="1">`
-      );
-      html = replaceBetween(html, 'kpi-avg-return-delta-label', 'vs SPY');
-      html = html.replace(
-        /<div class="stats-kpi-delta" id="kpi-avg-return-delta"([^>]*)>/,
-        '<div class="stats-kpi-delta" id="kpi-avg-return-delta" data-ssr="1">'
-      );
-    }
-
-    html = replaceBetween(html, 'benchmark-groups', renderBenchmarkSectionHTML(cleaned));
-
-    html = replaceBetween(
-      html,
-      'perf-row-count',
-      sorted.length > 0
-        ? ` · ${sorted.length} signals · entries within 5 days and duplicates excluded`
-        : ' · 0 signals · entries within 5 days and duplicates excluded'
-    );
-
-    if (sorted.length > 0) {
-      html = html.replace(
-        '<div class="stats-loading" id="history-loading">',
-        '<div class="stats-loading" id="history-loading" hidden>'
-      );
-      html = html.replace(
-        '<table class="stats-table" id="history-table" hidden>',
-        '<table class="stats-table" id="history-table">'
-      );
-      html = html.replace(
-        '<p class="stats-disclaimer" id="perf-disclaimer" hidden>',
-        '<p class="stats-disclaimer" id="perf-disclaimer">'
-      );
-    }
-  }
-
-  await writeFile(path, html, 'utf8');
+  const html = await readFile(path, 'utf8');
+  await writeFile(path, prerenderStats(html, analytics, historyData), 'utf8');
 }
 
 /* ── reports.html ────────────────────────────────────────────── */
