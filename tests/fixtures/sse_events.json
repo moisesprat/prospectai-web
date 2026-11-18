@@ -21,7 +21,7 @@
     ],
     "pipeline_error": [
       {"type": "agent_start", "agent_index": 0, "agent_name": "Market Analyst", "model": "model-for-market_analyst"},
-      {"type": "error", "message": "boom", "metrics": {}}
+      {"type": "error", "message": "The analysis stopped before it finished. Please try again.", "metrics": {"partial": true, "backend": {"setup_sec": 0.4, "persist_sec": null, "wall_total_sec": 12.3, "unattributed_sec": 11.9}}}
     ],
     "rejected_rate_limited": [{"type": "error", "code": "rate_limited", "message": "__nonempty__"}],
     "rejected_busy": [{"type": "error", "code": "busy", "message": "__nonempty__"}],

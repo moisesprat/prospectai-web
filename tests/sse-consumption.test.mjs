@@ -73,7 +73,7 @@ test('refusals are recognised and shown with the server message unchanged', () =
 test('pipeline errors get the Error: prefix; unknown codes are not refusals', () => {
   const errorEvent = fixture.streams.pipeline_error.find((e) => e.type === 'error');
   assert.equal(isRejection(errorEvent), false);
-  assert.equal(errorStatusText(errorEvent), 'Error: boom');
+  assert.equal(errorStatusText(errorEvent), 'Error: The analysis stopped before it finished. Please try again.');
   const odd = { type: 'error', code: 'something_else', message: 'm' };
   assert.equal(isRejection(odd), false);
   assert.equal(errorStatusText(odd), 'Error: m');
