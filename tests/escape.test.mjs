@@ -259,8 +259,12 @@ test('stats renderBenchmarkSectionHTML hostile sector', () => {
     row('"><script>alert(2)</script>'),
   ]);
   assertInert(html);
-  assert.ok(html.includes('&lt;img src=x onerror=alert(1)&gt;'), 'sector title is literal text');
-  assert.ok(html.includes('benchmark-group-title'), 'groups still render');
+  // Unmapped sectors render no group at all (UI-SPEC S2); only Overall renders.
+  assert.ok(html.includes('Overall — vs SPY'), 'overall group still renders');
+  assert.equal((html.match(/class="benchmark-group"/g) || []).length, 1, 'no group for unmapped sectors');
+  assert.ok(!html.includes('&lt;img src=x onerror=alert(1)&gt;'), 'escaped hostile sector is absent');
+  assert.ok(!html.includes('onerror'), 'raw hostile sector is absent');
+  assert.ok(!html.includes('alert(2)'), 'second hostile sector is absent');
 });
 
 test('stats renderHistoryRowsHTML hostile row', () => {
