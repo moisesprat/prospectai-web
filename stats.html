@@ -4188,7 +4188,7 @@
     </tr><!--/SSR--></tbody>
           </table>
           <div class="stats-empty" id="history-empty" hidden>No signals yet for this sector.</div>
-          <div class="stats-error" id="history-error" hidden>Could not load signal performance data.</div>
+          <div class="stats-error" id="history-error" hidden>Could not load signal performance data. Please refresh the page to try again.</div>
         </div>
       </section>
     </div>
@@ -4403,7 +4403,11 @@
         </div>
       </div>
     </div><!--/SSR--></div>
-        <div class="stats-empty" id="benchmark-empty" hidden>No benchmark data available yet.</div>
+        <div class="stats-empty" id="benchmark-empty" hidden>
+          <p class="stats-empty-title">No benchmark comparison yet.</p>
+          <p class="stats-empty-body">Benchmark comparisons appear once LONG-BUY signals have been tracked against SPY and their sector ETF. Check back after the next scheduled refresh.</p>
+        </div>
+        <div class="stats-error" id="benchmark-error" hidden>Could not load signal performance data. Please refresh the page to try again.</div>
       </section>
     </div>
 

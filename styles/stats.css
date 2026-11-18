@@ -110,6 +110,10 @@
   border-bottom-color: var(--amber);
   background: rgba(240,165,0,.04);
 }
+.stats-tab:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
 
 /* ── Tab panels ──────────────────────────────────────────────── */
 /* Use .is-active class instead of hidden attribute — avoids cross-browser
@@ -124,6 +128,8 @@
   color: var(--text-dim);
   padding: 32px 0;
 }
+.stats-empty-title { margin: 0 0 4px; color: var(--text); }
+.stats-empty-body  { margin: 0; }
 
 /* ── Skeleton loaders ────────────────────────────────────────── */
 @keyframes skeleton-pulse {
@@ -359,6 +365,7 @@
 @media (max-width: 700px) {
   .benchmark-kpi-grid { grid-template-columns: 1fr; }
 }
+.benchmark-group .stats-kpi-sub { color: var(--text-dim); }
 
 .stats-kpi-card {
   padding: 18px 20px;
@@ -399,7 +406,7 @@
   font-weight: 600;
 }
 .stats-kpi-delta-val.stats-kpi-value--pos { color: var(--roi-positive); }
-.stats-kpi-delta-val.stats-kpi-value--neg { color: var(--roi-negative); }
+.stats-kpi-delta-val.stats-kpi-value--neg { color: var(--red); }
 
 /* ── Sections ────────────────────────────────────────────────── */
 .stats-section {
