@@ -944,6 +944,7 @@ h1 em {
   margin-top: 8px;
   min-height: 16px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
@@ -952,6 +953,16 @@ h1 em {
   content: '>';
   font-size: 10px;
   animation: blink 1s infinite;
+}
+
+/* Failed run: red status line with a static "!" prompt (phase 5, D-12) */
+.status-line--error {
+  color: var(--red);
+}
+
+.status-line--error::before {
+  content: '!';
+  animation: none;
 }
 
 /* Agent cards */
@@ -1518,6 +1529,24 @@ h1 em {
   color: var(--text-dim);
   font-family: var(--mono);
   font-size: 11px;
+}
+
+/* Failed-run partial metrics block under the status line (phase 5, D-13) */
+.run-failure {
+  margin-top: 16px;
+}
+
+.run-failure-metrics > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.run-failure-metrics > summary:focus-visible,
+.site-nav-link:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
 }
 
 /* ============================================================
