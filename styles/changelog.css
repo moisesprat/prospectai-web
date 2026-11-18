@@ -36,7 +36,7 @@
 .changelog-date {
   font-family: var(--mono);
   font-size: 12px;
-  color: var(--muted);
+  color: var(--text-dim);
   white-space: nowrap;
 }
 
@@ -57,12 +57,6 @@
   background: rgba(240, 165, 0, .08);
 }
 
-.changelog-tag--frontend {
-  color: var(--text-dim);
-  border: 1px solid var(--border2);
-  background: transparent;
-}
-
 .changelog-version {
   font-family: var(--mono);
   font-size: 11px;
@@ -75,6 +69,7 @@
   font-size: 20px;
   font-weight: 400;
   color: #E8F0F8;
+  line-height: 1.2;
   margin: 0 0 8px;
 }
 
