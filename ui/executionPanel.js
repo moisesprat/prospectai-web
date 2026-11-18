@@ -17,7 +17,7 @@ const AGENT_DEFS = [
 
 // DOM references — populated by render()
 let panel;
-let execSectorEl, execMetaEl, progressFillEl, progressPctEl, statusLineEl;
+let execSectorEl, execMetaEl, progressFillEl, progressPctEl, statusLineEl, failureEl;
 const cardEls   = new Array(6);
 const outputEls = new Array(6);
 const modelEls  = new Array(6);
@@ -51,10 +51,12 @@ export function render(container) {
     <div class="progress-bar-bg">
       <div class="progress-bar-fill"></div>
     </div>
-    <div class="status-line">Initializing agents...</div>`;
+    <div class="status-line" role="status" aria-live="polite">Initializing agents...</div>
+    <div class="run-failure" hidden></div>`;
   progressPctEl  = progressWrap.querySelector('.progress-pct');
   progressFillEl = progressWrap.querySelector('.progress-bar-fill');
   statusLineEl   = progressWrap.querySelector('.status-line');
+  failureEl      = progressWrap.querySelector('.run-failure');
 
   // Section label
   const sectionLabel = document.createElement('div');
@@ -106,6 +108,9 @@ export function reset() {
     outputEls[i].textContent = 'Waiting to execute...';
     modelEls[i].textContent = '';
   });
+  setStatusError(false);
+  failureEl.innerHTML = '';
+  failureEl.hidden = true;
   setProgress(0, 'Initializing agents...');
 }
 
@@ -132,6 +137,17 @@ export function getProgressFill() {
 
 export function setStatusLine(text) {
   statusLineEl.textContent = text;
+}
+
+/** Marks the status line as a failure (red, "!" prompt); reset() clears it. */
+export function setStatusError(on) {
+  statusLineEl.classList.toggle('status-line--error', Boolean(on));
+}
+
+/** Shows the failed-run metrics block; an empty string keeps it hidden. */
+export function showFailureMetrics(html) {
+  failureEl.innerHTML = html;
+  failureEl.hidden = !html;
 }
 
 export function setTaskProgress(i) {

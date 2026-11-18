@@ -300,6 +300,23 @@ function renderBenchmarkSection(history) {
   container.dataset.ssr = '1';
 }
 
+/* ── History fetch failure ───────────────────────────────────── */
+
+// The pre-render is judged by what it contains: an empty pre-rendered
+// Benchmark panel (no .benchmark-group child) must still show the empty
+// state, even though its container carries data-ssr="1" (SPEC-03).
+function showHistoryFailure() {
+  document.getElementById('history-loading').hidden = true;
+  if (document.getElementById('history-tbody').dataset.ssr !== '1') {
+    document.getElementById('history-error').hidden = false;
+    renderPerformanceKpis([]);
+  }
+  if (!document.querySelector('#benchmark-groups .benchmark-group')) {
+    renderBenchmarkSection([]);
+    document.getElementById('benchmark-error').hidden = false;
+  }
+}
+
 /* ── Init ────────────────────────────────────────────────────── */
 
 async function init() {
@@ -331,7 +348,6 @@ async function init() {
   }
 
   // Performance
-  const loadingEl = document.getElementById('history-loading');
   if (historyRes.status === 'fulfilled' && historyRes.value.ok) {
     try {
       const data = await historyRes.value.json();
@@ -342,24 +358,10 @@ async function init() {
       renderPerformanceKpis(cleaned);
       renderBenchmarkSection(cleaned);
     } catch {
-      loadingEl.hidden = true;
-      if (document.getElementById('history-tbody').dataset.ssr !== '1') {
-        document.getElementById('history-error').hidden = false;
-        renderPerformanceKpis([]);
-      }
-      if (document.getElementById('benchmark-groups').dataset.ssr !== '1') {
-        renderBenchmarkSection([]);
-      }
+      showHistoryFailure();
     }
   } else {
-    loadingEl.hidden = true;
-    if (document.getElementById('history-tbody').dataset.ssr !== '1') {
-      document.getElementById('history-error').hidden = false;
-      renderPerformanceKpis([]);
-    }
-    if (document.getElementById('benchmark-groups').dataset.ssr !== '1') {
-      renderBenchmarkSection([]);
-    }
+    showHistoryFailure();
   }
 }
 

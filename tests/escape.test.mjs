@@ -15,7 +15,7 @@ import {
   computeKpis, computeSpyDelta,
 } from '../ui/statsRender.js';
 import { renderReleaseNotesHTML } from '../ui/changelogRender.js';
-import { renderReport, renderMetrics } from '../ui/reportRenderer.js';
+import { renderReport, renderMetrics, renderFailureMetrics } from '../ui/reportRenderer.js';
 import { renderCards } from '../ui/recentWins.js';
 import { renderEntryHTML } from '../ui/myReports.js';
 import { typeOutput, textWithCursorHTML, CURSOR_HTML } from '../ui/utils.js';
@@ -259,8 +259,12 @@ test('stats renderBenchmarkSectionHTML hostile sector', () => {
     row('"><script>alert(2)</script>'),
   ]);
   assertInert(html);
-  assert.ok(html.includes('&lt;img src=x onerror=alert(1)&gt;'), 'sector title is literal text');
-  assert.ok(html.includes('benchmark-group-title'), 'groups still render');
+  // Unmapped sectors render no group at all (UI-SPEC S2); only Overall renders.
+  assert.ok(html.includes('Overall — vs SPY'), 'overall group still renders');
+  assert.equal((html.match(/class="benchmark-group"/g) || []).length, 1, 'no group for unmapped sectors');
+  assert.ok(!html.includes('&lt;img src=x onerror=alert(1)&gt;'), 'escaped hostile sector is absent');
+  assert.ok(!html.includes('onerror'), 'raw hostile sector is absent');
+  assert.ok(!html.includes('alert(2)'), 'second hostile sector is absent');
 });
 
 test('stats renderHistoryRowsHTML hostile row', () => {
@@ -317,6 +321,17 @@ test('report renderMetrics hostile names', () => {
   });
   assertInert(html);
   assert.ok(html.includes('&lt;img src=x onerror=alert(1)&gt;'), 'phase and model names are literal text');
+});
+
+test('report renderFailureMetrics hostile names', () => {
+  const html = renderFailureMetrics({
+    backend: { wall_total_sec: 5 },
+    phases: [{ name: XSS, status: '"><script>alert(1)</script>', elapsed_sec: 'x<svg>', total_tokens: '<img>' }],
+    tool_calls: [{ phase: XSS, tool: XSS, elapsed_sec: 1, ok: false, error: XSS }],
+  });
+  assertInert(html);
+  assert.ok(html.includes('&lt;img src=x onerror=alert(1)&gt;'), 'phase and tool names are literal text');
+  assert.ok(html.includes('<td class="mt-num">—</td>'), 'non-numeric elapsed and tokens render a dash');
 });
 
 // ─── Hostile value types (SEC-06 / T-03-47): a non-number is unavailable, never a throw ───

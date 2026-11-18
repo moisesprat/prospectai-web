@@ -1,3 +1,8 @@
+## RENAMED Requirements
+
+- FROM: `### Requirement: Main navigation includes a Patterns entry`
+- TO: `### Requirement: Main navigation surfaces Patterns under Architecture`
+
 ## MODIFIED Requirements
 
 ### Requirement: Patterns hub page
