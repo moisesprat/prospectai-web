@@ -19,27 +19,6 @@ The changelog page SHALL list entries ordered from most recent to oldest, each w
 - **WHEN** the changelog page renders
 - **THEN** each entry displays a date (via a `<time datetime="YYYY-MM-DD">` element or equivalent) and entries appear in the DOM in descending date order, most recent first
 
-### Requirement: Entries distinguish ProspectAI module changes from frontend changes
-Each changelog entry SHALL indicate whether it describes a change to the ProspectAI module (the multi-agent reasoning system — Market Analyst, Technical Analyst, Fundamental Analyst, Draft Strategist, Critic, Final Strategist) or a change to the web frontend, or both.
-
-#### Scenario: Entry shows a category tag
-- **WHEN** an entry is rendered
-- **THEN** it includes a visible tag/label identifying its category (e.g. "ProspectAI Module", "Frontend", or both) and, where applicable, references the ProspectAI module explicitly in its title or body text
-
-### Requirement: Backfilled historical entries
-The changelog SHALL include at least the following historically significant releases, each dated using the git-authored date of its anchor commit (or the latest commit date when a feature spans multiple commits):
-- 6-agent pipeline update (anchor: `0702b95`, 2026-04-10)
-- Report persistence — viewer, history page, My Reports (anchor: `00c1576`, 2026-06-07)
-- ProspectAI Stats page with analytics and track record (anchor: `27417d5`, 2026-05-30)
-- Persistent nav bar and Architecture page with live pipeline animation (anchor: `eaf004f`/`fdcf78e`, 2026-06-07)
-- Conservative / Aggressive risk profile selector, v1.7.0 (anchor: `554f0b9`, 2026-05-09)
-- SEO and structured data improvements across pages (anchors: `d817144` 2026-04-06, `61eed5e` 2026-04-14, `21940ed`/`9c0ffa8` 2026-07-12)
-- Architecture patterns for multi-agent systems section (anchor: `5d97229`, 2026-07-12)
-
-#### Scenario: Historical entries are present at launch
-- **WHEN** the changelog page ships
-- **THEN** it is not empty — it contains dated entries for each historically significant release listed above, in reverse-chronological order alongside any newer entries
-
 ### Requirement: Footer link on every page
 Every page in the site (`index.html`, `architecture.html`, `reports.html`, `stats.html`, `report.html`) SHALL include a link to `/changelog` in its footer.
 
@@ -57,3 +36,40 @@ The changelog page SHALL be discoverable by search engines consistent with other
 #### Scenario: Changelog page has basic SEO metadata
 - **WHEN** `changelog.html` is loaded
 - **THEN** it includes a `<title>` and meta description distinct from other pages, describing it as the ProspectAI release history/changelog
+
+### Requirement: ProspectAI Module release entries are sourced from real PyPI release notes
+The changelog page SHALL render one entry per version found in the `## Release Notes` section of the PyPI package README (via `https://pypi.org/pypi/prospectai/json` → `info.description`), generated at build time and committed as static markup, showing the version's actual release-note bullet points rather than just a bare version number.
+
+#### Scenario: A release entry is rendered for each version with release notes
+- **WHEN** the build-time changelog generator runs against a reachable PyPI project JSON endpoint whose README contains a `## Release Notes` section
+- **THEN** `changelog.html` contains one changelog entry per `### v<version>` block in that section, each showing the version number, a dated `<time>` element derived from the matching entry in the PyPI `releases` map, and a bullet list of the version's real release-note lines
+
+#### Scenario: Versions without release notes are not rendered
+- **WHEN** a version exists in the PyPI `releases` map but has no corresponding `### v<version>` block in the README's `## Release Notes` section
+- **THEN** no changelog entry is generated for that version — no fabricated or placeholder content is shown
+
+#### Scenario: Release entries are tagged as ProspectAI Module
+- **WHEN** a PyPI-sourced release entry is rendered
+- **THEN** it carries `ProspectAI Module` tag styling
+
+#### Scenario: Release entries appear newest first
+- **WHEN** multiple PyPI-sourced release entries are rendered
+- **THEN** they appear in descending order by release date
+
+### Requirement: PyPI sync is fail-soft
+Generating the PyPI-sourced changelog entries SHALL NOT remove or corrupt existing changelog content if the PyPI endpoint is unreachable or its content is unparseable.
+
+#### Scenario: Endpoint unreachable during generation
+- **WHEN** the build-time generator runs and the PyPI project JSON request fails or times out
+- **THEN** `changelog.html`'s PyPI-sourced region is left unchanged from its last successfully generated state, and no error is thrown that aborts the rest of the static-content build
+
+#### Scenario: Release Notes section missing or empty
+- **WHEN** the PyPI endpoint responds successfully but its README has no `## Release Notes` section, or the section yields zero parseable version blocks
+- **THEN** `changelog.html`'s PyPI-sourced region is left unchanged rather than being emptied
+
+### Requirement: Changelog build step runs on the existing schedule
+The PyPI release-notes sync SHALL run as part of the existing static-content generation job, without a separate workflow or schedule.
+
+#### Scenario: Scheduled workflow regenerates changelog entries
+- **WHEN** `.github/workflows/generate-sitemap.yml` runs its `node scripts/build-static.mjs` step (on push to `main` or its 15-minute schedule)
+- **THEN** `changelog.html` is included among the files checked for changes and committed if the PyPI-sourced region changed

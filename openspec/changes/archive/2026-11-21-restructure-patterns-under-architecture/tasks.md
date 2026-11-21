@@ -56,4 +56,4 @@
 ## 8. Phase 5 close-out
 
 - [x] 8.1 Correct the delta before archive: RENAMED the nav requirement from its base name (phase 5)
-- [ ] 8.2 Verify live in production (phase 5): five 301s and one Architecture nav entry
+- [x] 8.2 Verify live in production (phase 5): five 301s and one Architecture nav entry — verified 2026-11-21: five /patterns/ URLs answer 301 to the matching /architecture/patterns/ path; five live pages each carry exactly one Architecture nav link and no Patterns link

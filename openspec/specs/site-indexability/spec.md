@@ -2,13 +2,15 @@
 
 ## Purpose
 TBD - created by archiving change fix-site-indexability. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: Deploy-time sitemap generation
 The build SHALL generate `sitemap.xml` as part of every production build (`npm run build`), listing every publicly indexable page with an accurate `<lastmod>` value, rather than relying on a hand-maintained file.
 
 #### Scenario: Sitemap reflects current pages after a build
 - **WHEN** `npm run build` runs
-- **THEN** the generated `sitemap.xml` in the build output contains `<url>` entries for `/`, `/stats.html`, `/reports.html`, `/architecture.html`, `/patterns/`, `/patterns/adversarial-critic`, `/patterns/parallel-execution`, `/patterns/output-validation`, and `/patterns/model-tiering`
+- **THEN** the generated `sitemap.xml` in the build output contains `<url>` entries for `/`, `/stats.html`, `/reports.html`, `/architecture.html`, `/architecture/patterns/`, `/architecture/patterns/adversarial-critic`, `/architecture/patterns/parallel-execution`, `/architecture/patterns/output-validation`, and `/architecture/patterns/model-tiering`
 
 #### Scenario: Sitemap includes recent reports
 - **WHEN** `npm run build` runs and the Modal backend's `/api/reports` endpoint returns report entries
@@ -61,4 +63,3 @@ Every page on the site SHALL include a `<link rel="canonical">` tag pointing to 
 #### Scenario: noindex pages still get a canonical tag
 - **WHEN** `/stats.html` is requested
 - **THEN** the page contains both `<meta name="robots" content="noindex">` and a self-referencing canonical tag
-

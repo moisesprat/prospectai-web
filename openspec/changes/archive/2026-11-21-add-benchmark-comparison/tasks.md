@@ -26,4 +26,4 @@
 - [x] 5.1 Degrade to hidden at build time (scripts/statsPrerender.mjs) and client time (ui/stats.js)
 - [x] 5.2 Unmapped sectors render no group
 - [x] 5.3 Spec and tasks reconciled to the shipped UI before archive
-- [ ] 5.4 Verify live in production (phase 5)
+- [x] 5.4 Verify live in production (phase 5) — verified 2026-11-21: live stats page Technology vs XLK group (106 signals, -12.3% / -18.8% / +6.5%) equals the shipped computation and an independent Python recompute within 0.1 pp; KPI colour class and delta line match
