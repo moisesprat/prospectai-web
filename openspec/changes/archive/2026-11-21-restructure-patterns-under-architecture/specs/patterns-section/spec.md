@@ -70,6 +70,14 @@ Each pattern page SHALL link to the other three pattern pages and to `architectu
 ### Requirement: Main navigation surfaces Patterns under Architecture
 Every page on the site SHALL include an "Architecture" link in the main site navigation pointing to `architecture.html`, and SHALL NOT include a separate top-level "Patterns" nav entry. Patterns are discoverable by following the Architecture link and its in-page related-patterns section.
 
+#### Scenario: Nav entry present on existing pages
+- **WHEN** any of `/`, `/stats.html`, `/reports.html`, `/report.html`, or `/architecture.html` is requested
+- **THEN** the site navigation contains exactly one link labeled "Architecture" (pointing to `architecture.html`) and no link labeled "Patterns"
+
+#### Scenario: Nav entry present on new pattern pages
+- **WHEN** `/architecture/patterns/` or any of the four pattern pages is requested
+- **THEN** the site navigation contains exactly one link labeled "Architecture" and no link labeled "Patterns"
+
 #### Scenario: Single Architecture nav entry, no separate Patterns entry
 - **WHEN** any page on the site is requested
 - **THEN** the site navigation contains exactly one link labeled "Architecture" (pointing to `architecture.html`) and contains no nav link labeled "Patterns"

@@ -1,4 +1,9 @@
-## ADDED Requirements
+# performance-benchmark-comparison Specification
+
+## Purpose
+TBD - created by archiving change add-benchmark-comparison. Update Purpose after archive.
+
+## Requirements
 
 ### Requirement: Performance tab benchmark delta
 The Performance tab "Avg Return" KPI card SHALL show one delta line under its value (element `#kpi-avg-return-delta`) comparing the average LONG-BUY buy ROI against the benchmark over the same signals. The delta value is the average buy ROI minus the average benchmark return, and its label names the benchmark: `vs SPY` when all sectors are selected, `vs {ETF}` when a single sector is selected.
@@ -16,9 +21,15 @@ The Performance tab "Avg Return" KPI card SHALL show one delta line under its va
 - **THEN** the delta line carries the `hidden` attribute and never shows `—` or `0.0%`
 
 ### Requirement: Benchmark tab comparison groups
-The Stats page SHALL have a Benchmark tab that shows an "Overall — vs SPY" group first, followed by one group per sector, sorted by sector name, titled `{Sector} — vs {ETF}`. Each group MUST contain three cards: `Avg Buy ROI` with the sub `{N} signals` (or `1 signal`), `Avg SPY Return` (or `Avg {ETF} Return` in a sector group) with the sub `same trigger-to-current window`, and `Delta` with the sub `buy ROI minus benchmark`.
+The Stats page SHALL have a Benchmark tab that shows an "Overall — vs SPY" group first, followed by one group per sector sorted by sector name and titled `{Sector} — vs {ETF}`. Each group MUST contain three cards: average buy ROI, average benchmark return and their delta, computed over qualifying rows only.
 
-A row qualifies only when its `roi_pct` is finite, both benchmark prices for that comparison are finite, and the benchmark trigger price is nonzero. Averages are computed over qualifying rows only. The benchmark window is per row: the benchmark return for a row is measured from that row's own trigger date to its own current as-of date, never over a calendar period shared across rows.
+#### Scenario: Card labels and subs
+- **WHEN** a benchmark group is rendered
+- **THEN** its cards read `Avg Buy ROI` with the sub `{N} signals` (or `1 signal`), `Avg SPY Return` (or `Avg {ETF} Return` in a sector group) with the sub `same trigger-to-current window`, and `Delta` with the sub `buy ROI minus benchmark`
+
+#### Scenario: Qualifying rows
+- **WHEN** a group's rows are evaluated for the comparison
+- **THEN** a row qualifies only when its `roi_pct` is finite, both benchmark prices for that comparison are finite, and the benchmark trigger price is nonzero
 
 #### Scenario: Benchmark window is per row
 - **WHEN** two rows have different purchase dates

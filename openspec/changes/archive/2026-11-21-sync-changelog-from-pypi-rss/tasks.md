@@ -35,4 +35,4 @@ The RSS feed (task group 3) shipped entries with no real content ("Release v1.9.
 
 ## 7. Phase 5 close-out
 
-- [ ] 7.1 Verify live in production (phase 5): the newest entry equals the latest PyPI version after an automatic regeneration
+- [x] 7.1 Verify live in production (phase 5): the newest entry equals the latest PyPI version after an automatic regeneration — verified 2026-11-21: live changelog first entry v1.14.0 equals PyPI info.version 1.14.0, committed by github-actions[bot] (278e9d3) about 42 min after the upload with no manual edit
